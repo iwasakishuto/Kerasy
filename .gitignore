@@ -1,0 +1,22 @@
+.ipynb_checkpoints
+.DS_Store
+
+# Icon
+Icon?
+! */*icon*
+
+# pelican thems
+backdrop
+
+# pelican files
+__pycache__
+pelicanconf.py
+publishconf.py
+tasks.py
+Makefile
+
+# Editing now
+working
+
+# Markdown and jupyter notebook
+content

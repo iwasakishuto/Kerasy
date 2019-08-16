@@ -19,5 +19,4 @@ Makefile
 working
 
 # Markdown and jupyter notebook
-keras/jupyter
-keras/markdown
+content

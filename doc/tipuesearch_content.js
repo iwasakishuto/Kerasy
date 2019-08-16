@@ -1,1 +1,1 @@
-var tipuesearch = {"pages":[{"title":"Title","text":"sample","tags":"keras","url":"https://iwasakishuto.github.io/Keras-Imitation/doc/sample.html","loc":"https://iwasakishuto.github.io/Keras-Imitation/doc/sample.html"}]};
+var tipuesearch = {"pages":[{"title":"Title","text":"sample","tags":"keras","url":"https://iwasakishuto.github.io/Kerasy/doc/sample.html","loc":"https://iwasakishuto.github.io/Kerasy/doc/sample.html"}]};

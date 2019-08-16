@@ -7503,7 +7503,7 @@ footer {
       .master-row .content-pane {
         padding-left: 0;
         padding-right: 0;
-        width: 75%;
+        width: 85%;
         float: left;
         min-height: 100%; } }
     .master-row .content-pane .row {
@@ -7547,10 +7547,10 @@ footer {
       .master-row .image-pane {
         padding-left: 0;
         padding-right: 0;
-        width: 25%;
+        width: 15%;
         float: left;
         min-height: auto;
-        position: fixed;
+        /* position: fixed; */
         padding-left: 0.3125rem;
         right: 0;
         height: 100%; }

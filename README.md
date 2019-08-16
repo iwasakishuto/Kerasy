@@ -1,4 +1,4 @@
-# Keras Imitation
+# Kerasy
 I want to **deepen my understanding of deep learning** by imitating the sophisticated neural networks API, **Keras**.
 
 ## Keras

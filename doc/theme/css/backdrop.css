@@ -7507,7 +7507,7 @@ footer {
         float: left;
         min-height: 100%; } }
     .master-row .content-pane .row {
-      margin-right: 0;
+      /* margin-right: 0; */
       min-width: 75%; }
   .master-row .image-pane {
     padding-left: 0;

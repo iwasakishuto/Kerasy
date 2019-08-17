@@ -21,6 +21,8 @@
         <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr.js"></script>
 
         <!-- Added by Shuto Iwasaki. -->
+        <!-- Custom CSS -->
+        <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
         <!-- Syntax highlight -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
@@ -37,6 +39,7 @@
         		}
         	});
         </script>
+        <script src="https://iwasakishuto.github.io/js/jquery.color.js"></script>
     </head>
 
 
@@ -54,7 +57,7 @@
                   </a>
                 </div>
                 <div class="small-9 medium-12 large-9 columns text-justify">
-                  Imitating keras to deepen my understanding of deep learning.
+                  Bioinformatics/Deep learning/Augmented Human/The University of Tokyo
                 </div>
                 <div class="small-12 columns">
                   <ul class="inline-center social-list">
@@ -71,7 +74,7 @@
               <ul class="inline-center">
                 <li><a href="https://iwasakishuto.github.io">Home</a></li>
                 <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li>
-                <li><a href="https://iwasakishuto.github.io/study/notes/index.html">Notes</a></li>
+                <li><a href="https://iwasakishuto.github.io/University/notes/index.html">Notes</a></li>
                 <li><a href="https://iwasakishuto.github.io/kerasy/doc/index.html">Kerasy</a></li>
               </ul>
             </div>
@@ -93,7 +96,7 @@
               <ul class="left">
               </ul>
               <ul class="right">
-                <li><a href="https://iwasakishuto.github.io/Kerasy/doc/category/keras.html">keras</a></li>
+                <li><a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></li>
               </ul>
             </section>
           </nav>
@@ -111,16 +114,17 @@
     <div class="small-12 columns">
         <h2>Articles by Shuto</h2>
           <section class="summary">
-    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/sample.html" rel="bookmark" title="Permalink to Unknown">Unknown</a></h3>
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/NeuralNetworks.html" rel="bookmark" title="Permalink to NeuralNetworks">NeuralNetworks</a></h3>
     <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-16(金)</span></li>
-            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/keras.html">keras</a></span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-18(日)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
             <li>
                 <span>
                     <i class="fa fa-tags"></i>&nbsp;
-                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/keras.html"><span class="label">keras</span></a>
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/prml.html"><span class="label">prml</span></a>
                 </span>
             </li>
         </ul>
@@ -128,8 +132,80 @@
 </div>
     <div class="row summary">
         <div class="small-12 medium-12 columns">
-            <p>This is a sample pages.</p>
-            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/sample.html">Continue reading&hellip;</a></p>
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Neural-Network">Neural Network<a class="anchor-link" href="#Neural-Network">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Table-of-contents">Table of contents<a class="anchor-link" href="#Table-of-contents">¶</a></h2><ol>
+<li><a data-scroll="" href="#anchor1">単純パーセプロトン (Perceptron)</a></li>
+<li><a data-scroll="" href="#anchor2">多層パーセプロトン (Multilayer Perceptron)</a></li>
+<li><a data-scroll="" href="#anchor3">誤差逆伝播法 (Back Propagation)</a></li>
+<li><a data-scroll="" href="#anchor4">実装 (Implementation)</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="anchor1">1. 単純パーセプロトン (Perceptron)</h2><p>ニューラルネットワークは <strong>多数の素子（パーセプトロン）の集まり</strong> で表現されます。そこで、まずは１つ１つの素子、パーセプロトンを見ていきます。</p>
+<p>単一の素子は以下の図のように表され、入力を受け取り、</p>
+<ul>
+<li><strong>その値（の和）がある閾値 $\theta$ を超えたら発火して出力</strong></li>
+<li><strong>$\theta$ 以下だったら出力しない</strong></li>
+</ul>
+<p>という性質を持ちます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img alt="Perceptron" src="theme/img/NeuralNetworks/Perceptron.png" /></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>この性質を数学的に記述すると、</p>
+<ul>
+<li>重みパラメータ：$w_0,w_1,\ldots,w_m$</li>
+<li>活性化関数：$h$</li>
+</ul>
+<p>から構成される以下のような関数として書けます。</p>
+$$f(x_1,x_2,\ldots,x_m) = h(w_1x_1+w_2x_2+\cdots+w_Nx_N+w_0)$$<p>この時 $w_0$ は<font color="red"><b>バイアスパラメータ(bias parameter)</b></font>と呼ばれ、<b>関数を平行移動させる</b>役割を果たします。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="活性化関数(activation-function)">活性化関数(activation function)<a class="anchor-link" href="#活性化関数(activation-function)">¶</a></h3><p>活性化関数は、<font color="red"><b>「ある閾値 $\theta$ を超えたら発火して出力し、$\theta$ 以下だったら出力しない」</b></font>という神経の性質を表現するための関数であり、最も単純なものとしては以下で表される<b>ヘヴィサイド関数(Heaviside function)</b>があります。</p>
+$$h(a) = \left\{\begin{array}{cc}0 & (\theta < 0) \\1 & (\theta > 0)\end{array}\right.$$<p>この性質は表したい能力を如実に表してはいますが、<b>不連続であり扱いづらい</b>ため、実際は</p>
+<ul>
+<li><b>ロジスティックシグモイド関数</b>：
+$$h(a) = \frac{1}{1+\exp(-a)}\qquad(4.59)$$</li>
+<li><b>ハイパボリックタンジェント関数</b>：
+$$\begin{aligned}h(a) &= \tanh (a)\\&=\frac{e^a-e^{-1}}{e^1+e^{-1}}
+&(5.59)\end{aligned}$$</li>
+<li><b>ソフトマックス関数</b>：
+$$h(\mathbf{a}) = \frac{\exp(a_i)}{\sum_j \exp(a_i)}\qquad (4.63)$$</li>
+</ul>
+<p>などが用いられることが多いです。</p>
+<p>※ Kerasyでは<a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/activations.py">ここ</a>で定義しています。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/NeuralNetworks.html">Continue reading&hellip;</a></p>
         </div>
     </div>
 </section>
@@ -220,6 +296,8 @@
       <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery.min.js"></script>
       <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/foundation.min.js"></script>
       <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/app.js"></script>
+      <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css" media="screen">
     </body>
 
 </html>

@@ -1,0 +1,2046 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <link rel="shortcut icon" href="https://iwasakishuto.github.io/Kerasy/doc/theme/img/apple-touch-icon-152x152.png" />
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Shuto" />
+        <title>NeuralNetworks</title>
+
+<meta name="description" content="&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;h1 id=&#34;Neural-Network&#34;&gt;Neural Network&lt;a class=&#34;anchor-link&#34; href=&#34;#Neural-Network&#34;&gt;¶&lt;/a&gt;&lt;/h1&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;h2 id=&#34;Table-of-contents&#34;&gt;Table of contents&lt;a class=&#34;anchor-link&#34; href=&#34;#Table-of-contents&#34;&gt;¶&lt;/a&gt;&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a data-scroll=&#34;&#34; href=&#34;#anchor1&#34;&gt;単純パーセプロトン (Perceptron)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-scroll=&#34;&#34; href=&#34;#anchor2&#34;&gt;多層パーセプロトン (Multilayer Perceptron)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-scroll=&#34;&#34; href=&#34;#anchor3&#34;&gt;誤差逆伝播法 (Back Propagation)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a data-scroll=&#34;&#34; href=&#34;#anchor4&#34;&gt;実装 (Implementation)&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;h2 id=&#34;anchor1&#34;&gt;1. 単純パーセプロトン (Perceptron)&lt;/h2&gt;&lt;p&gt;ニューラルネットワークは &lt;strong&gt;多数の素子（パーセプトロン）の集まり&lt;/strong&gt; で表現されます。そこで、まずは１つ１つの素子、パーセプロトンを見ていきます。&lt;/p&gt;
+&lt;p&gt;単一の素子は以下の図のように表され、入力を受け取り、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;その値（の和）がある閾値 $\theta$ を超えたら発火して出力&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;$\theta$ 以下だったら出力しない&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;という性質を持ちます。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;p&gt;&lt;img alt=&#34;Perceptron&#34; src=&#34;theme/img/NeuralNetworks/Perceptron.png&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;p&gt;この性質を数学的に記述すると、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;重みパラメータ：$w_0,w_1,\ldots,w_m$&lt;/li&gt;
+&lt;li&gt;活性化関数：$h$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;から構成される以下のような関数として書けます。&lt;/p&gt;
+$$f(x_1,x_2,\ldots,x_m) = h(w_1x_1+w_2x_2+\cdots+w_Nx_N+w_0)$$&lt;p&gt;この時 $w_0$ は&lt;font color=&#34;red&#34;&gt;&lt;b&gt;バイアスパラメータ(bias parameter)&lt;/b&gt;&lt;/font&gt;と呼ばれ、&lt;b&gt;関数を平行移動させる&lt;/b&gt;役割を果たします。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;h3 id=&#34;活性化関数(activation-function)&#34;&gt;活性化関数(activation function)&lt;a class=&#34;anchor-link&#34; href=&#34;#活性化関数(activation-function)&#34;&gt;¶&lt;/a&gt;&lt;/h3&gt;&lt;p&gt;活性化関数は、&lt;font color=&#34;red&#34;&gt;&lt;b&gt;「ある閾値 $\theta$ を超えたら発火して出力し、$\theta$ 以下だったら出力しない」&lt;/b&gt;&lt;/font&gt;という神経の性質を表現するための関数であり、最も単純なものとしては以下で表される&lt;b&gt;ヘヴィサイド関数(Heaviside function)&lt;/b&gt;があります。&lt;/p&gt;
+$$h(a) = \left\{\begin{array}{cc}0 &amp; (\theta &lt; 0) \\1 &amp; (\theta &gt; 0)\end{array}\right.$$&lt;p&gt;この性質は表したい能力を如実に表してはいますが、&lt;b&gt;不連続であり扱いづらい&lt;/b&gt;ため、実際は&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;b&gt;ロジスティックシグモイド関数&lt;/b&gt;：
+$$h(a) = \frac{1}{1+\exp(-a)}\qquad(4.59)$$&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;ハイパボリックタンジェント関数&lt;/b&gt;：
+$$\begin{aligned}h(a) &amp;= \tanh (a)\\&amp;=\frac{e^a-e^{-1}}{e^1+e^{-1}}
+&amp;(5.59)\end{aligned}$$&lt;/li&gt;
+&lt;li&gt;&lt;b&gt;ソフトマックス関数&lt;/b&gt;：
+$$h(\mathbf{a}) = \frac{\exp(a_i)}{\sum_j \exp(a_i)}\qquad (4.63)$$&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;などが用いられることが多いです。&lt;/p&gt;
+&lt;p&gt;※ Kerasyでは&lt;a href=&#34;https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/activations.py&#34;&gt;ここ&lt;/a&gt;で定義しています。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing code_cell rendered&#34;&gt;
+&lt;div class=&#34;input&#34;&gt;" />
+<meta name="keywords" content=" Kerasy prml  "/>
+
+        <!--[if !IE 7]>
+        <style type="text/css">
+            #main-content {display:table;height:100%}
+        </style>
+        <![endif]-->
+        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/backdrop.css" />
+        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/pygments.css" />
+        <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr.js"></script>
+
+        <!-- Added by Shuto Iwasaki. -->
+        <!-- Custom CSS -->
+        <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
+        <!-- Syntax highlight -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <!-- LaTex -->
+        <!-- Github env -->
+        <!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script type="text/x-mathjax-config">
+        	MathJax.Hub.Config({
+        		tex2jax: {
+        			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        			displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        		}
+        	});
+        </script>
+        <script src="https://iwasakishuto.github.io/js/jquery.color.js"></script>
+    </head>
+
+
+    <body>
+      <div class="master-row">
+
+        <div class="image-pane main-content" style="background: url('https://iwasakishuto.github.io/Kerasy/doc/theme/img/background.png'); background-size:cover; background-position: right;">
+          <div class="row">
+            <div class="small-12 medium-4 large-12 columns">
+              <h5 class='text-center'>About</h5>
+              <div class="about-me">
+                <div class="hide-for-medium-only small-3 columns no-buffer">
+                  <a class="th" href="https://iwasakishuto.github.io/Kerasy/doc/theme/img/profile.png">
+                    <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/profile.png">
+                  </a>
+                </div>
+                <div class="small-9 medium-12 large-9 columns text-justify">
+                  Bioinformatics/Deep learning/Augmented Human/The University of Tokyo
+                </div>
+                <div class="small-12 columns">
+                  <ul class="inline-center social-list">
+                    <li><a href="https://twitter.com/cabernet_rock"><i class="fa fa-twitter"></i>&nbsp; twitter</a></li>
+                    <li><a href="https://github.com/iwasakishuto"><i class="fa fa-github"></i>&nbsp; github</a></li>
+                    <li><a href="https://www.facebook.com/iwasakishuto"><i class="fa fa-facebook"></i>&nbsp; facebook</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="small-12 medium-4  large-12 columns link-list">
+              <h5 class='text-center'>Links</h5>
+              <ul class="inline-center">
+                <li><a href="https://iwasakishuto.github.io">Home</a></li>
+                <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li>
+                <li><a href="https://iwasakishuto.github.io/University/notes/index.html">Notes</a></li>
+                <li><a href="https://iwasakishuto.github.io/kerasy/doc/index.html">Kerasy</a></li>
+              </ul>
+            </div>
+
+<!--
+            <div class="small-12 medium-3 large-12 columns">
+            </div>
+-->
+          </div>
+        </div>
+
+        <div class="content-pane main-content">
+          <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+              <li class="name"><!-- Leave this empty --></li>
+              <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+            </ul>
+            <section class="top-bar-section">
+              <ul class="left">
+              </ul>
+              <ul class="right">
+                <li class="active"><a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></li>
+              </ul>
+            </section>
+          </nav>
+
+          <div class="row title-bar">
+            <div class="small-12 columns">
+              <h1><a href="https://iwasakishuto.github.io/Kerasy/doc">Kerasy</a></h1>
+              <h2> <small>Imitating to deepen my understanding of deep learning</small></h2>
+              <hr>
+            </div>
+          </div>
+
+          <div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <h2>NeuralNetworks</h2>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-18(日)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/prml.html"><span class="label">prml</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Neural-Network">Neural Network<a class="anchor-link" href="#Neural-Network">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Table-of-contents">Table of contents<a class="anchor-link" href="#Table-of-contents">¶</a></h2><ol>
+<li><a data-scroll="" href="#anchor1">単純パーセプロトン (Perceptron)</a></li>
+<li><a data-scroll="" href="#anchor2">多層パーセプロトン (Multilayer Perceptron)</a></li>
+<li><a data-scroll="" href="#anchor3">誤差逆伝播法 (Back Propagation)</a></li>
+<li><a data-scroll="" href="#anchor4">実装 (Implementation)</a></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="anchor1">1. 単純パーセプロトン (Perceptron)</h2><p>ニューラルネットワークは <strong>多数の素子（パーセプトロン）の集まり</strong> で表現されます。そこで、まずは１つ１つの素子、パーセプロトンを見ていきます。</p>
+<p>単一の素子は以下の図のように表され、入力を受け取り、</p>
+<ul>
+<li><strong>その値（の和）がある閾値 $\theta$ を超えたら発火して出力</strong></li>
+<li><strong>$\theta$ 以下だったら出力しない</strong></li>
+</ul>
+<p>という性質を持ちます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img alt="Perceptron" src="theme/img/NeuralNetworks/Perceptron.png" /></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>この性質を数学的に記述すると、</p>
+<ul>
+<li>重みパラメータ：$w_0,w_1,\ldots,w_m$</li>
+<li>活性化関数：$h$</li>
+</ul>
+<p>から構成される以下のような関数として書けます。</p>
+$$f(x_1,x_2,\ldots,x_m) = h(w_1x_1+w_2x_2+\cdots+w_Nx_N+w_0)$$<p>この時 $w_0$ は<font color="red"><b>バイアスパラメータ(bias parameter)</b></font>と呼ばれ、<b>関数を平行移動させる</b>役割を果たします。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="活性化関数(activation-function)">活性化関数(activation function)<a class="anchor-link" href="#活性化関数(activation-function)">¶</a></h3><p>活性化関数は、<font color="red"><b>「ある閾値 $\theta$ を超えたら発火して出力し、$\theta$ 以下だったら出力しない」</b></font>という神経の性質を表現するための関数であり、最も単純なものとしては以下で表される<b>ヘヴィサイド関数(Heaviside function)</b>があります。</p>
+$$h(a) = \left\{\begin{array}{cc}0 & (\theta < 0) \\1 & (\theta > 0)\end{array}\right.$$<p>この性質は表したい能力を如実に表してはいますが、<b>不連続であり扱いづらい</b>ため、実際は</p>
+<ul>
+<li><b>ロジスティックシグモイド関数</b>：
+$$h(a) = \frac{1}{1+\exp(-a)}\qquad(4.59)$$</li>
+<li><b>ハイパボリックタンジェント関数</b>：
+$$\begin{aligned}h(a) &= \tanh (a)\\&=\frac{e^a-e^{-1}}{e^1+e^{-1}}
+&(5.59)\end{aligned}$$</li>
+<li><b>ソフトマックス関数</b>：
+$$h(\mathbf{a}) = \frac{\exp(a_i)}{\sum_j \exp(a_i)}\qquad (4.63)$$</li>
+</ul>
+<p>などが用いられることが多いです。</p>
+<p>※ Kerasyでは<a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/activations.py">ここ</a>で定義しています。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Linear</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">input</span>
+    
+    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">delta</span>   
+    
+<span class="k">class</span> <span class="nc">Tanh</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    
+<span class="n">ActivationHandler</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'linear'</span> <span class="p">:</span> <span class="n">Linear</span><span class="p">,</span>
+    <span class="s1">'tanh'</span>   <span class="p">:</span> <span class="n">Tanh</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">ActivationFunc</span><span class="p">(</span><span class="n">activation_func_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">ActivationHandler</span><span class="p">[</span><span class="n">activation_func_name</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="anchor2">2. 多層パーセプロトン (Multilayer Perceptron)</h2><p>それでは、複数の単子（単純パーセプロトン）を繋げて２層のパーセプトロンを作ります。なお、<b>２層以上のパーセプトロンを<font color="red">ニューラルネットワーク</font></b>と言います。</p>
+<p>例えば１層目に $m$ 個の素子を用意し、入力が $D$ 次元の場合、関数で表すと</p>
+$$y = h_2\left(\sum_{i=0}^{m} w^{(2)}_ih_1\left(\sum_{j=0}^{D}w^{(1)}_{ij} x_j\right)\right)\qquad(5.9)$$<p>となります。</p>
+<p><img alt="Multilayer Perceptron" src="theme/img/NeuralNetworks/Multilayer-Perceptron.png" /></p>
+<table>
+<thead><tr>
+<th style="text-align:center">記号</th>
+<th style="text-align:left">意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">$w^{(1)}_{ij}$</td>
+<td style="text-align:left">$1$ 層目の $i$ 番目の素子への入力 $x_j$ の重み</td>
+</tr>
+<tr>
+<td style="text-align:center">$w^{(2)}_i$</td>
+<td style="text-align:left">$1$ 層目の $i$ 番目の素子から $2$ 層目の素子への入力の重み</td>
+</tr>
+<tr>
+<td style="text-align:center">$h_1,h_2$</td>
+<td style="text-align:left">それぞれの層の活性化関数</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="多層にする意味">多層にする意味<a class="anchor-link" href="#多層にする意味">¶</a></h3><ul>
+<li>単純パーセプロトン：
+$$ y=f\left(\sum_i w_i\textcolor{red}{\phi_i(\mathbf{x})}\right) \qquad(5.1)$$</li>
+<li>$2$ 層パーセプトロン：
+$$ y = h_2\left(\sum_{i=0}^{m} w^{(2)}_i\textcolor{red}{h_1\left(\sum_{j=0}^{D}w^{(1)}_{ij} x_j\right)}\right)\qquad(5.9)$$</li>
+</ul>
+<p>この式から分かるように、基底 $\phi_i(\mathbf{x})$ が $\displaystyle h_1\left(\sum_{j=0}^{D}w^{(1)}_{ij} x_j\right)$ に置き換わっていることがわかります。</p>
+<p>これによって、<font color="red"><b>単一だと「固定」されていた基底関数が、多層になることで「適応的に変動」する</b></font>ようになります。ゆえに、<b>十分大きな $m$ をとり、活性化関数が非線形な多層パーセプトロンは、<font color="red">任意の関数を任意の精度で近似することができる</font></b>という性質を持ちます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="anchor3">3. 誤差逆伝播法 (Back Propagation)</h2><p>ニューラルネットワークについて語る上で避けては通れなく、理解が難しいのが<font color="red"><b>誤差逆伝播法（back propagation）</b></font>です。</p>
+<p>しかし、誤差逆伝播法とは<b>「ニューラルネットワークを学習させる際に用いられる効率的な計算方法」</b>のことで、簡単に言ってしまえば<font color="red"><b>「合成関数の微分則」</b></font>です。また、ネットワークの訓練とは、<b>「（重みを変化させることで）訓練データの出力と正解の誤差 $E_n(\mathbf{w})$ を最小化すること」</b>を指します。</p>
+<p>以下、</p>
+<ul>
+<li>素子 $i$ の出力を $z_i$</li>
+<li>素子 $j$ への入力和を $a_j$</li>
+</ul>
+<p>として、説明します。</p>
+<p>学習のプロセスにおいては<b>「素子 $i$ から素子 $j$ への接続の重み $w_{ji}$ として、全ての $i,j$ の組合せ（＝全ノードの重み）に対して$ \frac{\partial E_n}{\partial w_{ji}} $を計算すること」</b>が目標となります。</p>
+<p><img alt="Back Propagation" src="theme/img/NeuralNetworks/BackPropagation1.png" /></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>すると、上の図のように<b>「$E_n$ は $a_j$ を介してのみ $w_{ji}$ に依存する」（＝ $w_{ji}$ が変化すると $a_j$ が変化し、それが $E_n$ に影響を及ぼす）</b>ことに注意すれば</p>
+$$ \frac{\partial E_n}{\partial w_{ji}} = \frac{\partial E_n}{\partial a_j}\frac{\partial a_j}{\partial w_{ji}}\qquad(5.50)$$<p>となります。また、ここで $\delta_j = \partial E_n/\partial a_j$ と書くことにし、これを<font color="red"><b>誤差</b></font>と呼びます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img alt="Back Propagation2" src="theme/img/NeuralNetworks/BackPropagation2.png" /></p>
+<p>続いて、$\delta_i$ について考えると、$E_n$ は素子 $i$ の出力を受け取る素子 $j$ の入力 $a_j$ を介して $a_i$ に依存するので、合成微分則より</p>
+$$ \delta_i = \frac{\partial E_n}{\partial a_i} = \sum_j \frac{\partial E_n}{\partial a_j}\frac{\partial a_j}{\partial a_i} = \sum_j\delta_j\frac{\partial a_j}{\partial a_i}\qquad(5.55)$$<p>となります。（下図参照）</p>
+<p><img alt="Back Propagation3" src="theme/img/NeuralNetworks/BackPropagation3.png" /></p>
+<p>さらに、素子 $i$ の活性化関数を $h_i$ とすると、</p>
+$$a_j = \sum_i w_{ji} h_i(a_i)\qquad(5.48)$$<p>だった（素子 $i$ への入力和を活性化関数に通しそれぞれに重み $w_{ji}$ をかけた和を素子 $j$ に伝える）ので、</p>
+$$ \frac{\partial a_j}{\partial a_i} = w_{ji} h_i'(a_i)$$<p>となります。</p>
+<p><img alt="Back Propagation4" src="theme/img/NeuralNetworks/BackPropagation4.png" /></p>
+<p>ここまでをまとめると、誤差 $\delta_i$ の逆伝播公式</p>
+$$ \delta_i = h_i'(a_i) \sum_j w_{ji}\delta_j\qquad(5.56)$$<p>が得られます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>また、ネットワークの出力部における $\delta$ の値は直接計算する事が出来るので、そこから逆にネットワークを辿りながら各 $\delta$ を計算する事が可能になります。</p>
+<p>このネットワークを逆に辿る過程で各 $w_{ji}$ に対する $W$ 個の偏導関数を一回の誤差伝播で求めてしまう事が出来るので、<b>大変効率の良いアルゴリズム</b>となっています。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<div class="frame">
+<h3>【まとめ】</h3>
+<ol>
+<li>データ $\mathbf{x}_n$ を入力した時の、各素子への入力 $a_i$ 出力 $z_i$ を求める</li>
+<li>ネットワークの出力部における誤差 $\delta_i$ を計算する</li>
+<li>逆伝播公式を利用して各素子における $\delta_i$ を計算する。
+    $$\delta_i = h_i'(a_i) \sum_j w_{ji}\delta_j$$</li>
+<li>以下を利用して必要な偏微分係数を求める。
+    $$\frac{\partial E_n}{\partial w_{ji}} = \delta_j z_i$$</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="anchor4">4. 実装 (Implementation)</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="初期化">初期化<a class="anchor-link" href="#初期化">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">Zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">RandomNormal</span><span class="p">(</span><span class="n">shape</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="n">InitializeHandler</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'zeros'</span><span class="p">:</span> <span class="n">Zeros</span><span class="p">,</span>
+    <span class="s1">'random_normal'</span><span class="p">:</span> <span class="n">RandomNormal</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">Initializer</span><span class="p">(</span><span class="n">initializer_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">InitializeHandler</span><span class="p">[</span><span class="n">initializer_name</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="誤差関数">誤差関数<a class="anchor-link" href="#誤差関数">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">mean_squared_error</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">-</span> <span class="n">y_true</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">y_pred</span><span class="o">-</span><span class="n">y_true</span>
+
+<span class="n">LossHandler</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'mean_squared_error'</span> <span class="p">:</span> <span class="n">mean_squared_error</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">LossFunc</span><span class="p">(</span><span class="n">loss_func_name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">LossHandler</span><span class="p">[</span><span class="n">loss_func_name</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="各層">各層<a class="anchor-link" href="#各層">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Layers</span><span class="p">():</span>
+    <span class="n">NLayers</span><span class="o">=</span><span class="mi">1</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">"Layer</span><span class="si">{Layers.NLayers}</span><span class="s2">.</span><span class="si">{name}</span><span class="s2">"</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outdim</span><span class="o">=</span><span class="n">units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">Layers</span><span class="o">.</span><span class="n">NLayers</span><span class="o">+=</span><span class="mi">1</span>
+        
+    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indim</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indim</span> <span class="o">=</span> <span class="n">indim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel_initializer</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdim</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">indim</span><span class="p">)),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bias_initializer</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outdim</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+        <span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">Layers</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputdim</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">"inputs"</span><span class="p">,</span> <span class="n">inputdim</span><span class="p">)</span>
+        
+<span class="k">class</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">Layers</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'linear'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">'random_normal'</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">'zeros'</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        @param units             : (tuple) dimensionality of the (input space, output space).</span>
+<span class="sd">        @param activation        : (str) Activation function to use.</span>
+<span class="sd">        @param kernel_initializer: (str) Initializer for the `kernel` weights matrix.</span>
+<span class="sd">        @param bias_initializer  : (str) Initializer for the bias vector.</span>
+<span class="sd">        """</span>        
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">"dense"</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_initializer</span> <span class="o">=</span> <span class="n">Initializer</span><span class="p">(</span><span class="n">kernel_initializer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias_initializer</span>   <span class="o">=</span> <span class="n">Initializer</span><span class="p">(</span><span class="n">bias_initializer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">h</span> <span class="o">=</span> <span class="n">ActivationFunc</span><span class="p">(</span><span class="n">activation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="kc">None</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="sd">""" @param input: shape=(Din,) """</span>
+        <span class="n">z_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># shape=(Din+1,)            </span>
+        <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">z_in</span><span class="p">)</span>      <span class="c1"># (Dout,Din+1) @ (Din+1,) = (Dout,)</span>
+        <span class="n">z_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1"># shape=(Dout,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="k">return</span> <span class="n">z_out</span>
+    
+    <span class="k">def</span> <span class="nf">backprop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dEdz_out</span><span class="p">):</span>
+        <span class="sd">""" @param dEdz_out: shape=(Dout,) """</span>
+        <span class="n">dEda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">h</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="n">dEdz_out</span> <span class="c1"># δ, shape=(Dout,)</span>
+        <span class="n">dEdz_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dEda</span><span class="p">)</span>        <span class="c1"># (Din+1,Dout) @ (Dout,) = (Din+1,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dEda</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dEdz_in</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>                 <span class="c1"># shape=(Din,) term of bias is not propagated.</span>
+    
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">ALPHA</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="sd">""" @param delta: shape=(Dout,) """</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="c1"># (Dout,) × (Din+1,) = (Dout,Din+1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">-=</span> <span class="n">ALPHA</span><span class="o">*</span><span class="n">dw</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="モデル（各層のスタック）">モデル（各層のスタック）<a class="anchor-link" href="#モデル（各層のスタック）">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Sequential</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="kc">None</span>
+            
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+        <span class="sd">"""Adds a layer instance."""</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">""" Creates the layer weights. """</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">LossFunc</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">outdim</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">"inputs"</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">indim</span><span class="o">=</span><span class="n">units</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+        <span class="n">goal_epochs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">+</span><span class="n">epochs</span>
+        <span class="n">digit</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">):</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">backprop</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+            <span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_pred</span><span class="o">-</span><span class="n">y_train</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">99</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">'[{self.epochs+1:</span><span class="si">{digit}</span><span class="s1">d}/{goal_epochs:</span><span class="si">{digit}</span><span class="s1">d}] mse={mse:</span><span class="si">{4}</span><span class="s1">f}'</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">out</span><span class="o">=</span><span class="nb">input</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">"inputs"</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">out</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>            
+        <span class="k">return</span> <span class="n">out</span>
+        
+    <span class="k">def</span> <span class="nf">backprop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+        <span class="n">dEdz_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">"inputs"</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="n">dEdz_out</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">backprop</span><span class="p">(</span><span class="n">dEdz_out</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_train</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">ndim</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> 
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">x_train</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="実装例">実装例<a class="anchor-link" href="#実装例">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [7]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s2">"random_normal"</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s2">"zeros"</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s2">"random_normal"</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s2">"zeros"</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [8]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">"Units:   </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">outdim</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Layers:  </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Weights: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">w</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">]))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s2">"mean_squared_error"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Weights: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">l</span><span class="o">.</span><span class="n">w</span><span class="o">.</span><span class="n">shape</span> <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">w</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Units:   [1, 3, 3, 1]
+Layers:  ['Layer1.inputs', 'Layer2.dense', 'Layer3.dense', 'Layer4.dense']
+Weights: [None, None, None, None]
+Weights: [None, (3, 2), (3, 4), (1, 4)]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [9]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [10]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[100/1000] mse=0.010276
+[200/1000] mse=0.006744
+[300/1000] mse=0.001597
+[400/1000] mse=0.000826
+[500/1000] mse=0.000794
+[600/1000] mse=0.000754
+[700/1000] mse=0.000715
+[800/1000] mse=0.000685
+[900/1000] mse=0.000664
+[1000/1000] mse=0.000646
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [11]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">Y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [12]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Neural Network"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"y"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYUAAAEKCAYAAAD9xUlFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMi40LCBodHRwOi8vbWF0cGxvdGxpYi5vcmcv7US4rQAAIABJREFUeJzt3XucjOX7wPHPtSfLJqeVDghhS87WKd9FR4mUUlF9SymUrXQg9e2HlA5LCSsk0oFUijaHlHJKlE1S0rJZsjrtrLN1Wu7fH/fMGuyymNlnZud6v17z2pnnuWfm8sx4rrkPz32LMQallFIKIMzpAJRSSgUOTQpKKaXyaFJQSimVR5OCUkqpPJoUlFJK5dGkoJRSKo8mBaWUUnk0KSillMqjSUEppVSeCKcDOFWxsbGmWrVqToehlFJB5YcffnAZYyqerFzQJYVq1aqRmprqdBhKKRVURGRTYcpp85FSSqk8mhSUUkrl0aSglFIqT9D1KajgdfDgQTIzM9m3b5/ToajTEB0dTeXKlYmMjHQ6FOVHmhRUkcnMzKR06dJUq1YNEXE6HHUKjDFkZ2eTmZlJ9erVnQ5H+ZHfmo9EZJKI/CsivxSwX0RklIiki8hqEWnsr1hUYNi3bx8VKlTQhBCERIQKFSpoLS8E+LNPYTJw7Qn2twdquW89gbF+jEUFCE0IwUs/u9Dgt6RgjFkMbD1BkRuAd4y1HCgrIuf5Kx6llFIn5+ToowuAzV6PM93b/CYtDTp0sH9VaBIRHn/88bzHw4cPZ/DgwX5/37Zt2+Z70WXbtm2Jj4/Pe5yamkrbtm1P+FobN25k6tSpvg6RjRs3UrduXZ+/rjpzRXnuCoohqSLSU0RSRSQ1KyvrtF8nMRHmzLF/VWgqUaIEn3zyCS6Xy6eva4zh8OHDp/Xcf//9l7lz5xa6vD+SQm5urk9fT/lWUZ67nEwKW4AqXo8ru7cdxxjzhjEm3hgTX7HiSafuKFCjRvbvwYPg43OCChIRERH07NmTESNGHLcvKyuLm2++maZNm9K0aVOWLl0KwODBgxk+fHheubp167Jx40Y2btxIXFwcd911F3Xr1mXz5s088MADxMfHc+mllzJo0KBCxdSvXz+GDh163PZDhw7Rr18/mjZtSv369Rk/fjwAAwYMYMmSJTRs2JARI0bQoUMHVq9eDUCjRo0YMmQIAAMHDmTChAkYY+jXrx9169alXr16fPDBBwAsXLiQhIQEOnXqRJ06dY567w0bNtCoUSNWrFhRqH+D8h+XCw4csPc95zB/cnJIagqQKCLTgObADmPMX/58w/794ccfYf58SE6GImg1UAXp2xdWrfLtazZsCK+9dtJiffr0oX79+vTv3/+o7Y888giPPvoo//nPf/jjjz9o164da9euPeFrrV+/nrfffpsWLVoAMHToUMqXL8+hQ4e48sorWb16NfXr1z/ha7Rs2ZIZM2awYMECSpcunbd94sSJlClThhUrVrB//35atWrFNddcw0svvcTw4cOZNWsWAPv372fJkiVceOGFRERE5CWzJUuWMG7cOD755BNWrVrFTz/9hMvlomnTprRu3RqAlStX8ssvv1C9enU2btwIQFpaGl27dmXy5Mk0aNDgpMdT+VdyMixeDFddZc9h/ubPIanvA8uAOBHJFJEeItJbRHq7i8wBNgDpwATgQX/F4hEbeyTTLlyotYVQdfbZZ3PXXXcxatSoo7bPnz+fxMREGjZsSKdOndi5cye7d+8+4WtdeOGFeQkB4MMPP6Rx48Y0atSINWvW8OuvvxYqpmeeeYbnn3/+qG1ffPEF77zzDg0bNqR58+ZkZ2ezfv36456bkJDA4sWLWbp0KR06dGD37t3k5OSQkZFBXFwc33zzDd26dSM8PJxKlSrRpk2bvBpAs2bNjrruICsrixtuuIEpU6ZoQggALhcsWGDvN2pkz2H+5reagjGm20n2G6CPv96/IKVK2b+LFmltwVGF+EXvT3379qVx48bcc889edsOHz7M8uXLiY6OPqpsRETEUf0F3mP1Y2Ji8u5nZGQwfPhwVqxYQbly5ejevXuhx/VfccUVPPPMMyxfvjxvmzGG0aNH065du6PKLly48KjHTZs2JTU1lRo1anD11VfjcrmYMGECTZo0Oen7escPUKZMGapWrco333xzXJOSKnqeWgIcOXf5W1B0NPtSYiK4a87k5Dgbi3JO+fLlufXWW5k4cWLetmuuuYbRo0fnPV7lbt6qVq0aK1euBGxzS0ZGRr6vuXPnTmJiYihTpgz//PPPKXUeg60tJCUl5T1u164dY8eO5eDBgwCsW7eOPXv2ULp0aXbt2pVXLioqiipVqvDRRx/RsmVLEhISGD58eF4TUUJCAh988AGH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
+" />
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<style>
+/*蛍光ペン(pink)*/
+.marker-pink {
+  color: #c45a5a;
+  background: linear-gradient(transparent 70%, #ff66ff 60%);
+  font-weight: bold;
+}
+/*蛍光ペン(blue) & hover info*/
+.marker-info {
+    color: #5C7DC4;
+    background: linear-gradient(transparent 70%, #66FFCC 60%);
+    font-weight: bold;
+    position: relative;
+    cursor: pointer;
+}
+.marker-info:hover:before {
+    opacity: 1;
+}
+.marker-info:before {
+  content: attr(aria-label);
+  opacity: 0;
+  position: absolute;
+  top: 30px;
+  right: -90px;
+  font-size: 14px;
+  width: 300px;
+  padding: 10px;
+  color: #fff;
+  background-color: #555;
+  border-radius: 3px;
+  pointer-events: none;
+}
+</style>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+    
+        </section>
+    </div>
+</div>
+          </div>
+
+          <footer class="show-for-large-up">
+<div class="row">
+    <div class="small-6 medium-3 columns">
+        <ul class="left-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
+        </ul>
+    </div>
+    <div class="small-6 medium-3 medium-push-6 columns">
+        <ul class="right-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
+        </ul>
+    </div>
+    <div class="small-12 medium-6 medium-pull-3 columns text-center">
+        <p class="tag-cloud">
+            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
+            &nbsp;&hellip;
+        </p>
+    </div>
+    <div class="small-12 columns sub-footer">
+        <hr>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-left">
+                &copy; 2019 Shuto 
+                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
+            </p>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-right">
+                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+            </p>
+        </div>
+    </div>
+</div>          </footer>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <footer class="hide-for-large-up">
+<div class="row">
+    <div class="small-6 medium-3 columns">
+        <ul class="left-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
+        </ul>
+    </div>
+    <div class="small-6 medium-3 medium-push-6 columns">
+        <ul class="right-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
+        </ul>
+    </div>
+    <div class="small-12 medium-6 medium-pull-3 columns text-center">
+        <p class="tag-cloud">
+            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
+            &nbsp;&hellip;
+        </p>
+    </div>
+    <div class="small-12 columns sub-footer">
+        <hr>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-left">
+                &copy; 2019 Shuto 
+                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
+            </p>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-right">
+                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+            </p>
+        </div>
+    </div>
+</div>        </footer>
+      </div>
+
+
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery.min.js"></script>
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/foundation.min.js"></script>
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/app.js"></script>
+      <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css" media="screen">
+    </body>
+
+</html>

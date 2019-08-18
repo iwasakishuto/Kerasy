@@ -7415,7 +7415,7 @@ th.hide-for-touch {
 }
 */
 .article p img {
-  float: left;
+  /* float: left; */
   margin: 5px;
   border: solid 4px #FFFFFF;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2); }

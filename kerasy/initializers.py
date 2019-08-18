@@ -1,4 +1,5 @@
 # coding: utf-8
+import numpy as np
 
 def Zeros(shape, dtype=None):
     return np.zeros(shape=shape, dtype=dtype)

@@ -1,4 +1,5 @@
 # coding: utf-8
+import numpy as np
 
 class mean_squared_error():
     def loss(y_true, y_pred):

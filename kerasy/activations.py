@@ -10,10 +10,8 @@ class Linear():
 
 class Softmax():
     def forward(input):
-        if np.ndim(input) == 1:
-            return np.exp(input)/np.sum(np.exp(input), axis=0)
-        elif np.ndim(input) == 2:
-            print(input)
+        exps = np.exp(input - np.max(input)) # For avoiding overflowing.
+        return exps/np.sum(exps)
 
     def diff(delta):
         return 0

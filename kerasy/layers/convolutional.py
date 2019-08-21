@@ -1,5 +1,12 @@
 # coding: utf-8
+from __future__ import absolute_import
+
 import numpy as np
+
+from ..activations import ActivationFunc
+from ..initializers import Initializer
+from ..losses import LossFunc
+from ..layers.core import Input, Dense
 
 class Input():
     def __init__(self, input_shape):
@@ -166,11 +173,22 @@ class Sequential():
             out=l.forward(out)
         return out
 
+    def backprop(self, y_true, out):
+        delta_times_w = self.loss.diff(y_true, out)
+        if self.is_valid:
+            for l in reversed(self.layers):
+                for l in self.layers[1:]:
+                    delta_times_w = l.backprop(delta_times_w)
+
 class Flatten():
-    def __init__():
+    def __init__(self):
         self.input=None
+        
+    def build(self, input_shape):
+        self.input_shape = input_shape
+        self.output_shape = (np.prod(list(input_shape)),)
+        
     def forward(self, input):
-        self.input_shape = input.shape # Memorize!!
         return input.flatten()
 
     def backprop(delta):
@@ -195,13 +213,21 @@ class MaxPooling2D():
     def __init__(self, pool_size=(2, 2)):
         self.input = None
         self.pool_size = pool_size
+        
+    def build(self, input_shape):
+        self.H, self.W, self.F = input_shape
+        ph,pw = self.pool_size
+        self.OH = self.H//ph
+        self.OW = self.W//pw
+        self.OF = self.F
+        self.output_shape=(self.OH, self.OW, self.OF)
 
     def _generator(self, image):
         """ Generator for training. """
         h,w,_ = image.shape
         ph,pw = self.pool_size
-        for i in range(h//ph):
-            for j in range(w//pw):
+        for i in range(self.H//ph):
+            for j in range(self.W//pw):
                 crip_image = image[i*ph:(i+1)*ph,j*pw:(j+1)*pw]
                 yield crip_image, i, j
 
@@ -218,6 +244,50 @@ class MaxPooling2D():
         """ Loss only flows to the pixel that takes the maximum value in pooling block. """
         Next_delta = np.zeros(self.input.shape)
         for crip_image, i, j in self._generator(self.input):
-            Next_delta[i*ph:(i+1)*ph,j*pw:(j+1)*pw] = np.where(crip_image==np.amax(crip_image, axis=(0, 1)), Pre_delta[i,j,;], 0)
+            Next_delta[i*ph:(i+1)*ph,j*pw:(j+1)*pw] = np.where(crip_image==np.max(crip_image), np.max(crip_image), 0)
 
         return Next_delta
+
+class Dense():
+    def __init__(self, units, activation='linear', kernel_initializer='random_normal', bias_initializer='zeros'):
+        """
+        @param units             : (tuple) dimensionality of the (input space, output space).
+        @param activation        : (str) Activation function to use.
+        @param kernel_initializer: (str) Initializer for the `kernel` weights matrix.
+        @param bias_initializer  : (str) Initializer for the bias vector.
+        """
+        self.output_shape=(units,)
+        self.kernel_initializer = Initializer(kernel_initializer)
+        self.bias_initializer   = Initializer(bias_initializer)
+        self.h = ActivationFunc(activation)
+        self.w = None
+        self.z = None
+        self.a = None
+    
+    def build(self, input_shape):
+        self.input_shape = input_shape
+        self.w = np.c_[
+            self.kernel_initializer(shape=(self.output_shape[0],self.input_shape[0])),
+            self.bias_initializer(shape=(self.output_shape[0],1))
+        ]
+
+    def forward(self, input):
+        """ @param input: shape=(Din,) """
+        z_in = np.append(input,1) # shape=(Din+1,)
+        a = self.w.dot(z_in)      # (Dout,Din+1) @ (Din+1,) = (Dout,)
+        z_out = self.h.forward(a) # shape=(Dout,)
+        self.z = z_in
+        self.a = a
+        return z_out
+
+    def backprop(self, dEdz_out):
+        """ @param dEdz_out: shape=(Dout,) """
+        dEda = self.h.diff(self.a)*dEdz_out # δ, shape=(Dout,)
+        dEdz_in = self.w.T.dot(dEda)        # (Din+1,Dout) @ (Dout,) = (Din+1,)
+        self.update(dEda)
+        return dEdz_in[:-1]                 # shape=(Din,) term of bias is not propagated.
+
+    def update(self, delta, ALPHA=0.01):
+        """ @param delta: shape=(Dout,) """
+        dw = np.outer(delta, self.z) # (Dout,) × (Din+1,) = (Dout,Din+1)
+        self.w -= ALPHA*dw # update. w → w + ALPHA*dw

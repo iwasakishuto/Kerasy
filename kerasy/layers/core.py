@@ -1,5 +1,11 @@
 # coding: utf-8
+from __future__ import absolute_import
+
 import numpy as np
+
+from ..activations import ActivationFunc
+from ..initializers import Initializer
+from ..losses import LossFunc
 
 class Layers():
     NLayers=1

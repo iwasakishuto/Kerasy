@@ -1,4 +1,12 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import
+
 import numpy as np
+
+from ..activations import ActivationFunc
+from ..losses import LossFunc
+from ..layers.core import Input, Dense
 
 class Sequential():
     def __init__(self, layer=None):

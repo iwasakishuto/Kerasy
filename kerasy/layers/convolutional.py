@@ -224,7 +224,6 @@ class MaxPooling2D():
 
     def _generator(self, image):
         """ Generator for training. """
-        h,w,_ = image.shape
         ph,pw = self.pool_size
         for i in range(self.H//ph):
             for j in range(self.W//pw):
@@ -233,10 +232,9 @@ class MaxPooling2D():
 
     def forward(self, input):
         self.input = input # Memorize the input array. (not shape)
-        h,w,f = image.shape
         ph,pw = self.pool_size
-        out = np.zeros((h//ph, w//pw, f)) # output image shape.
-        for crip_image, i, j in self._generator(image):
+        out = np.zeros((self.H//ph, self.W//pw, self.F)) # output image shape.
+        for crip_image, i, j in self._generator(input):
             out[i][j] = np.amax(crip_image, axis=(0, 1))
         return out
 

@@ -12,14 +12,14 @@ class Softmax():
     def __init__(self):
         self.exps = None
         self.S = None
-
+        
     def forward(self, input):
         """ @param input shape=(class,) """
         exps = np.exp(input - np.max(input)) # For avoiding overflowing.
         self.exps = exps # Memorize.
         self.S = np.sum(exps)
         return exps/np.sum(exps)
-
+    
     def diff(self, delta):
         """ @param delta shape=(class,) """
         return (-np.sum(delta*self.exps)/self.S**2 + delta/self.S)*self.exps
@@ -52,10 +52,10 @@ class Sigmoid():
 
 ActivationHandler = {
     'linear' : Linear,
-    'softmax': Softmax,
+    'softmax': Softmax(),
     'tanh'   : Tanh,
     'relu'   : Relu,
-    'sigmoid': Sigmoid,
+    'sigmoid': Sigmoid(),
 }
 
 def ActivationFunc(activation_func_name):

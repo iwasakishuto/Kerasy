@@ -114,7 +114,118 @@
     <div class="small-12 columns">
         <h2>All Articles</h2>
           <section class="summary">
-    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/NeuralNetworks.html" rel="bookmark" title="Permalink to NeuralNetworks">NeuralNetworks</a></h3>
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/Computational-Graph.html" rel="bookmark" title="Permalink to Computational Graph">Computational Graph</a></h3>
+    <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-23(金)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/deeplearningfromscratch.html"><span class="label">DeepLearningfromScratch</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+    <div class="row summary">
+        <div class="small-12 medium-12 columns">
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="計算グラフ(Computational-Graph)">計算グラフ(Computational Graph)<a class="anchor-link" href="#計算グラフ(Computational-Graph)">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>計算の過程をグラフによって表現したもの。<ul>
+<li>ノード：<span aria-label="機械語の1個の命令の部分で、実行する操作(operation)の種類を指定する部分のこと、およびそのコード（符号）のこと。数式における演算子に相当する。" class="marker-info">オペコード</span></li>
+<li>エッジ：<span aria-label="コンピュータの演算における値や変数のこと。オぺランドは演算の種類や内容を表す演算子（オペレータ）によって演算対象となるもので、例えば「7×3」という計算式があれば、「7」と「3」がオペランドとなる。" class="marker-info">オペランド</span></li>
+</ul>
+</li>
+<li>途中の計算結果を全て保持できる。</li>
+<li>局所的な計算を伝播することによって最終的な計算結果を得ることが可能であり、それによって<span class="marker-pink">問題を単純化して理解できる。</span></li>
+<li>特に微分の計算は「計算の局所化」＝<span aria-label="ある関数が合成関数で表される場合、その合成関数の微分は合成関数を構成するそれぞれの関数の微分の積によって表すことができる。" class="marker-info">「連鎖律(chain rule)」</span>であり、相性が良い。</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img alt="計算グラフの逆伝播" src="theme/img/ComputationalGraph/BackPropagation.png" /></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="連鎖律と計算グラフ">連鎖律と計算グラフ<a class="anchor-link" href="#連鎖律と計算グラフ">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="連鎖律(chain-rule)">連鎖律(chain rule)<a class="anchor-link" href="#連鎖律(chain-rule)">¶</a></h3><p>ここでは例として $z=(x+y)^2$ という式を扱う。この式は、次の $2$ 式から構成されていると考えることができる。</p>
+$$
+\begin{cases}
+  z = t^2\\
+  t = x+y
+\end{cases}
+$$<p>この時、連鎖律から<b>「$x$ に関する $z$ の微分 $\frac{\partial z}{\partial x}$」</b>は<b>「$t$ に関する $z$ の微分 $\frac{\partial z}{\partial t}$」</b>と<b>「$x$ に関する $t$ の微分 $\frac{\partial t}{\partial x}$」</b>の積によって表すことができるので、以下のように書くことができる。</p>
+$$
+\frac{\partial z}{\partial x} = \frac{\partial z}{\partial t} \times \frac{\partial t}{\partial x}
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="計算グラフ">計算グラフ<a class="anchor-link" href="#計算グラフ">¶</a></h3><p>上で数式的に考えた連鎖律の計算を計算グラフで表すと、以下のようになる。</p>
+<p><img alt="連鎖律" src="theme/img/ComputationalGraph/ChainRule.png" /></p>
+<p>これによって、局所的な微分計算の積によって合成関数の微分が行われていることが視覚的に理解できる。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="色々なノードにおける逆伝播">色々なノードにおける逆伝播<a class="anchor-link" href="#色々なノードにおける逆伝播">¶</a></h2><p>ここから、様々なオペコードにおける逆伝播を考える。</p>
+<div class="frame">
+<li><a href="#add">加算ノード</a></li>
+<li><a href="#multiple">乗算ノード</a></li>
+<li><a href="#inverse">逆数ノード</a></li>
+<li><a href="#exp">expノード</a></li>
+<li><a href="#dot">dotノード</a></li>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="add">加算ノード</h3><p>$z=x+y$ という数式を考えと、この式の微分は次のように計算できる。</p>
+$$
+\begin{cases}
+  \begin{aligned}
+    \frac{\partial z}{\partial x} = 1\\
+    \frac{\partial z}{\partial y} = 1\\
+  \end{aligned}
+\end{cases}
+$$<p>したがって、加算ノードの逆伝播は以下のように表される。</p>
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/Computational-Graph.html">Continue reading&hellip;</a></p>
+        </div>
+    </div>
+</section>
+  <section class="summary">
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/Neural-Network.html" rel="bookmark" title="Permalink to Neural Network">Neural Network</a></h3>
     <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
@@ -205,7 +316,7 @@ $$h(\mathbf{a}) = \frac{\exp(a_i)}{\sum_j \exp(a_i)}\qquad (4.63)$$</li>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/NeuralNetworks.html">Continue reading&hellip;</a></p>
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/Neural-Network.html">Continue reading&hellip;</a></p>
         </div>
     </div>
 </section>

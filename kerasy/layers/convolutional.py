@@ -171,10 +171,11 @@ class Sequential():
             out=input
         for l in self.layers[1:]:
             out=l.forward(out)
+            print(f"layer:{l} out shape:{out.shape}")
         return out
 
-    def backprop(self, y_true, out):
-        delta_times_w = self.loss.diff(y_true, out)
+    def backprop(self, y_true, y_pred):
+        delta_times_w = self.loss.diff(y_true, y_pred)
         if self.is_valid:
             for l in reversed(self.layers):
                 for l in self.layers[1:]:
@@ -271,9 +272,9 @@ class Dense():
 
     def forward(self, input):
         """ @param input: shape=(Din,) """
-        z_in = np.append(input,1) # shape=(Din+1,)
-        a = self.w.dot(z_in)      # (Dout,Din+1) @ (Din+1,) = (Dout,)
-        z_out = self.h.forward(a) # shape=(Dout,)
+        z_in = np.append(input,1)       # shape=(Din+1,)
+        a = self.w.dot(z_in)            # (Dout,Din+1) @ (Din+1,) = (Dout,)
+        z_out = self.h.forward(input=a) # shape=(Dout,)
         self.z = z_in
         self.a = a
         return z_out

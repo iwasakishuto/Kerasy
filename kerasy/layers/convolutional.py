@@ -100,7 +100,6 @@ class Conv2D():
         """ @param delta_times_w: (ndarray) 3-D array. shape=(OH,OW,OF) """
         delta = self.h.diff(self.a) * delta_times_w # shape=(OH,OW,OF)
         delta_times_w = np.zeros(shape=(self.H,self.W,self.F))
-
         delta_padd = np.zeros(shape=(self.H+self.kh, self.W+self.kw, self.OF))
         """
         [Aim] ex.) i=1,j=2,M=3,N=3
@@ -110,18 +109,18 @@ class Conv2D():
         δ[1-2][2-0], δ[1-2][2-1], δ[1-2][2-2]              0,       0,      0
         """
         delta_padd[self.kh-1:self.kh-1+self.OH, self.kw-1:self.kw-1+self.OW, :] = delta[:self.H, :self.W, :]
-        for i in range(self.kh-1,self.kh-1+self.H):
-            for j in range(self.kw-1,self.kw-1+self.W):
+        for i in range(self.H):
+            for j in range(self.W):
                 for f in range(self.F):
                     delta_times_w[i][j][f] = np.sum(np.flip(delta_padd[i:i+self.kh,j:j+self.kw,:])*self.kernel[:,:,f,:])
 
-        self.update(delta)
+        # self.update(delta)
         return delta_times_w
 
     def update(self, delta, ALPHA=0.01):
         """ @param delta: shape=(OH,OW,OF) """
         # Kernels
-        z_padd = np.zeros(shape=(self.H+self.kh-1, self.W+self.kw-1, F))
+        z_padd = np.zeros(shape=(self.H+self.kh-1, self.W+self.kw-1, self.F))
         z_padd[:self.H,:self.W,:] = self.z
 
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)

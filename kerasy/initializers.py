@@ -30,7 +30,7 @@ def TruncatedNormal(shape, mean=0.0, stddev=0.05, seed=None):
 def VarianceScaling(shape, scale=1.0, mode='fan_in', distribution='normal', seed=None):
     n = "入力ユニットの数" if mode=="fan_in" else "出力ユニットの数" if mode=="fan_out" else "入力ユニットと出力ユニットの数の平均" 
 
-    if distribution='normal':
+    if distribution=='normal':
         stddev = np.sqrt(scale / n)
         return TruncatedNormal(shape=shape, mean=0.0, stddev=stddev, seed=seed)
     else:

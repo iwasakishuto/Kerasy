@@ -84,7 +84,7 @@ class Conv2D():
         return a
         """
         [Memo: Broadcasting]
-        ====================
+        =================================================
             x = np.zeros(shape=(2,2,3)) # shape=(2,2,3)
             y = np.array([1,2,3])       # shape=(3,)
             z = x + y                   # shape=(2, 2, 3)
@@ -101,10 +101,10 @@ class Conv2D():
         delta = self.h.diff(self.a) * delta_times_w # shape=(OH,OW,OF)
         delta_times_w = np.zeros(shape=(self.H,self.W,self.F))
 
-        delta_padd = np.zeros(shape=(self.H+self.kh-1, self.W+self.kw-1, OF))
+        delta_padd = np.zeros(shape=(self.H+self.kh, self.W+self.kw, self.OF))
         """
         [Aim] ex.) i=1,j=2,M=3,N=3
-        =========================
+        ==========================================================================
         δ[1-0][2-0], δ[1-0][2-1], δ[1-0][2-2]        δ[1][2], δ[1][1], δ[1][0]
         δ[1-1][2-0], δ[1-1][2-1], δ[1-1][2-2]  ===>  δ[0][2], δ[0][1], δ[0][0]
         δ[1-2][2-0], δ[1-2][2-1], δ[1-2][2-2]              0,       0,      0
@@ -113,7 +113,7 @@ class Conv2D():
         for i in range(self.kh-1,self.kh-1+self.H):
             for j in range(self.kw-1,self.kw-1+self.W):
                 for f in range(self.F):
-                    delta_times_w[i][j][f] = np.sum(np.flip(delta_padd[i:i+self.kh-1,j:j+self.kw-1,:])*self.w[:,:,f,:])
+                    delta_times_w[i][j][f] = np.sum(np.flip(delta_padd[i:i+self.kh,j:j+self.kw,:])*self.kernel[:,:,f,:])
 
         self.update(delta)
         return delta_times_w
@@ -171,15 +171,15 @@ class Sequential():
             out=input
         for l in self.layers[1:]:
             out=l.forward(out)
-            print(f"layer:{l} out shape:{out.shape}")
         return out
 
     def backprop(self, y_true, y_pred):
         delta_times_w = self.loss.diff(y_true, y_pred)
         if self.is_valid:
-            for l in reversed(self.layers):
-                for l in self.layers[1:]:
-                    delta_times_w = l.backprop(delta_times_w)
+            for l in reversed(self.layers[1:]):
+                print(f"Layer: {l}")
+                delta_times_w = l.backprop(delta_times_w)
+                print(f"delta.shape={delta_times_w.shape}")
 
 class Flatten():
     def __init__(self):
@@ -192,7 +192,7 @@ class Flatten():
     def forward(self, input):
         return input.flatten()
 
-    def backprop(delta):
+    def backprop(self, delta):
         return delta.reshape(self.input_shape)
 
 class MaxPooling2D():
@@ -242,6 +242,7 @@ class MaxPooling2D():
     def backprop(self, Pre_delta, lr=1e-3):
         """ Loss only flows to the pixel that takes the maximum value in pooling block. """
         Next_delta = np.zeros(self.input.shape)
+        ph,pw = self.pool_size
         for crip_image, i, j in self._generator(self.input):
             Next_delta[i*ph:(i+1)*ph,j*pw:(j+1)*pw] = np.where(crip_image==np.max(crip_image), np.max(crip_image), 0)
 

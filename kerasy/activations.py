@@ -36,7 +36,7 @@ class Relu():
         return np.where(input>0, input, 0)
 
     def diff(delta):
-        return np.where(input>0, 1, 0)
+        return np.where(delta>0, 1, 0)
 
 class Sigmoid():
     def __init__(self):

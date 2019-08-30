@@ -104,27 +104,22 @@ class Conv2D():
         @return delta_times_w: shape=(H,W,F)
         """
         delta = self.h.diff(self.a) * delta_times_w # shape=(OH,OW,OF)
-        delta_padd = np.zeros(shape=(self.H+self.kh, self.W+self.kw, self.OF))
-        delta_padd[self.kh-1:self.kh-1+self.OH, self.kw-1:self.kw-1+self.OW, :] = delta[:self.H, :self.W, :]
-        """
-        [Aim] ex.) i=1,j=2,M=3,N=3
-        ==========================================================================
-        δ[1-0][2-0], δ[1-0][2-1], δ[1-0][2-2]        δ[1][2], δ[1][1], δ[1][0]
-        δ[1-1][2-0], δ[1-1][2-1], δ[1-1][2-2]  ===>  δ[0][2], δ[0][1], δ[0][0]
-        δ[1-2][2-0], δ[1-2][2-1], δ[1-2][2-2]              0,       0,      0
-        """
+        delta_padd = np.zeros(shape=(self.OH+2*(self.kh-1), self.OW+2*(self.kw-1), self.OF))
+        delta_padd[self.kh-1:-(self.kh-1), self.kw-1:-(self.kw-1), :] = delta
+        
         delta_times_w = np.zeros(shape=(self.H,self.W,self.F)) # output.
+        
         for i in range(self.H):
             for j in range(self.W):
                 for f in range(self.F):
-                    delta_times_w[i][j][f] = np.sum(np.flip(delta_padd[i:i+self.kh,j:j+self.kw,:])*self.kernel[:,:,f,:])
+                    delta_times_w[i][j][f] = np.sum(delta_padd[i:i+self.kh,j:j+self.kw,:] * np.flip(self.kernel[:,:,f,:], axis=(0,1)))
 
         if self.trainable:
             self.update(delta)
         
         return delta_times_w
 
-    def update(self, delta, ALPHA=0.0001):
+    def update(self, delta, ALPHA=0.00001):
         """ @param delta: shape=(OH,OW,OF) """
         # Kernels
         z_padd = np.zeros(shape=(self.OH+self.kh-1, self.OW+self.kw-1, self.F))

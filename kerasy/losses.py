@@ -9,11 +9,10 @@ class mean_squared_error():
 
 class categorical_crossentropy():
     def loss(y_true, y_pred):
-        small_val = 1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
+        small_val = 0 #1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
         return -np.sum(y_true * np.log(y_pred+small_val))
     def diff(y_true, y_pred):
-        """ @param y_true:  """
-        small_val = 1e-7
+        small_val = 0 #1e-7
         return -y_true/(y_pred+small_val)
 
 LossHandler = {

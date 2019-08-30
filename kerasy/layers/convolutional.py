@@ -31,6 +31,7 @@ class Conv2D():
         self.h = ActivationFunc(activation)
         self.kernel_initializer = Initializer(kernel_initializer)
         self.bias_initializer   = Initializer(bias_initializer)
+        self.trainable = True
 
     def build(self, input_shape):
         """ @params input_shape: (H,W,F) of input image. """
@@ -97,10 +98,14 @@ class Conv2D():
         """
 
     def backprop(self, delta_times_w, lr=1e-3):
-        """ @param delta_times_w: (ndarray) 3-D array. shape=(OH,OW,OF) """
+        """ 
+        @param  delta_times_w: shape=(OH,OW,OF)
+        @param  self.kernel  : shape=(self.kh, self.kw, self.F, self.OF)
+        @return delta_times_w: shape=(H,W,F)
+        """
         delta = self.h.diff(self.a) * delta_times_w # shape=(OH,OW,OF)
-        delta_times_w = np.zeros(shape=(self.H,self.W,self.F))
         delta_padd = np.zeros(shape=(self.H+self.kh, self.W+self.kw, self.OF))
+        delta_padd[self.kh-1:self.kh-1+self.OH, self.kw-1:self.kw-1+self.OW, :] = delta[:self.H, :self.W, :]
         """
         [Aim] ex.) i=1,j=2,M=3,N=3
         ==========================================================================
@@ -108,29 +113,33 @@ class Conv2D():
         δ[1-1][2-0], δ[1-1][2-1], δ[1-1][2-2]  ===>  δ[0][2], δ[0][1], δ[0][0]
         δ[1-2][2-0], δ[1-2][2-1], δ[1-2][2-2]              0,       0,      0
         """
-        delta_padd[self.kh-1:self.kh-1+self.OH, self.kw-1:self.kw-1+self.OW, :] = delta[:self.H, :self.W, :]
+        delta_times_w = np.zeros(shape=(self.H,self.W,self.F)) # output.
         for i in range(self.H):
             for j in range(self.W):
                 for f in range(self.F):
                     delta_times_w[i][j][f] = np.sum(np.flip(delta_padd[i:i+self.kh,j:j+self.kw,:])*self.kernel[:,:,f,:])
 
-        # self.update(delta)
+        if self.trainable:
+            self.update(delta)
+        
         return delta_times_w
 
-    def update(self, delta, ALPHA=0.01):
+    def update(self, delta, ALPHA=0.0001):
         """ @param delta: shape=(OH,OW,OF) """
         # Kernels
-        z_padd = np.zeros(shape=(self.H+self.kh-1, self.W+self.kw-1, self.F))
+        z_padd = np.zeros(shape=(self.OH+self.kh-1, self.OW+self.kw-1, self.F))
         z_padd[:self.H,:self.W,:] = self.z
 
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)
         for m in range(self.kh):
             for n in range(self.kw):
-                dEdw[m][n][f] = np.sum(np.expand_dims(z_padd[m:m+self.H,n:n+self.W,:], axis=3)*np.expand_dims(delta[i,j,:], axis=2))
+                for c in range(self.F):
+                    for c_ in range(self.OF):
+                        dEdw[m][n][c][c_] = np.sum(z_padd[m:m+self.OH,n:n+self.OW,c] * delta[:,:,c_])
         self.kernel -= ALPHA*dEdw
 
         # bias
-        self.bias -= ALPHA*np.sum(delta, axis=(1,2))
+        self.bias -= ALPHA*np.sum(delta, axis=(0,1))
 
 
 class Sequential():
@@ -176,9 +185,7 @@ class Sequential():
         delta_times_w = self.loss.diff(y_true, y_pred)
         if self.is_valid:
             for l in reversed(self.layers[1:]):
-                print(f"Layer: {l}")
                 delta_times_w = l.backprop(delta_times_w)
-                print(f"delta.shape={delta_times_w.shape}")
 
 class Flatten():
     def __init__(self):
@@ -262,6 +269,7 @@ class Dense():
         self.w = None
         self.z = None
         self.a = None
+        self.trainable = True
     
     def build(self, input_shape):
         self.input_shape = input_shape
@@ -281,12 +289,19 @@ class Dense():
 
     def backprop(self, dEdz_out):
         """ @param dEdz_out: shape=(Dout,) """
-        dEda = self.h.diff(self.a)*dEdz_out # δ, shape=(Dout,)
+        dz_outda = self.h.diff(self.a)
+        if len(dz_outda.shape) == 1:
+            dEda = dz_outda*dEdz_out      # δ, shape=(Dout,)
+        elif len(dz_outda.shape) == 2:
+            dEda = np.sum(dz_outda*dEdz_out, axis=1) # δ, shape=(Dout,)
+        else:
+            raise ValueError("Couldn't understand the shape of dz_out/da. It's shape must be 1D or 2D.")
         dEdz_in = self.w.T.dot(dEda)        # (Din+1,Dout) @ (Dout,) = (Din+1,)
-        self.update(dEda)
+        if self.trainable:
+            self.update(dEda)
         return dEdz_in[:-1]                 # shape=(Din,) term of bias is not propagated.
 
     def update(self, delta, ALPHA=0.01):
         """ @param delta: shape=(Dout,) """
         dw = np.outer(delta, self.z) # (Dout,) × (Din+1,) = (Dout,Din+1)
-        self.w -= ALPHA*dw # update. w → w + ALPHA*dw
+        self.w -= ALPHA*dw # update.

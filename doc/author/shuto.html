@@ -114,6 +114,140 @@
     <div class="small-12 columns">
         <h2>Articles by Shuto</h2>
           <section class="summary">
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/CNN.html" rel="bookmark" title="Permalink to CNN">CNN</a></h3>
+    <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-30(金)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+    <div class="row summary">
+        <div class="small-12 medium-12 columns">
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="CNN:-Convolutional-Neural-Network">CNN: Convolutional Neural Network<a class="anchor-link" href="#CNN:-Convolutional-Neural-Network">¶</a></h1><p><strong>（編集中）</strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/CNN.html">Continue reading&hellip;</a></p>
+        </div>
+    </div>
+</section>
+  <section class="summary">
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/Initializers.html" rel="bookmark" title="Permalink to Initializers">Initializers</a></h3>
+    <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-28(水)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+    <div class="row summary">
+        <div class="small-12 medium-12 columns">
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="初期化(Initializers)">初期化(Initializers)<a class="anchor-link" href="#初期化(Initializers)">¶</a></h1><p><strong>（編集中）</strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/Initializers.html">Continue reading&hellip;</a></p>
+        </div>
+    </div>
+</section>
+  <section class="summary">
+    <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/Optimizers.html" rel="bookmark" title="Permalink to Optimizers">Optimizers</a></h3>
+    <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-26(月)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+    <div class="row summary">
+        <div class="small-12 medium-12 columns">
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="最適化(Optimization)">最適化(Optimization)<a class="anchor-link" href="#最適化(Optimization)">¶</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>機械学習では、モデルを定義し、重みパラメータを調整して損失関数の値を減少させることで、性能を高めます。</p>
+<p>この時、<b>「いつ」</b>・<b>「どのようにして」</b>・<b>「どのぐらい」</b>重みパラメータを調整するのか、を決めるのが <code>optimizers</code> の役割です。</p>
+<p>ここでは、最適化の基本である<span class="marker-pink">勾配降下法(Gradient Decent)</span>のパラメータ更新方法を見ていき、その後勾配降下法の欠点を修正した様々な最適化手法を紹介します。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="勾配降下法(Gradient-Decent)">勾配降下法(Gradient Decent)<a class="anchor-link" href="#勾配降下法(Gradient-Decent)">¶</a></h2><p><a href="http://www.deepideas.net/deep-learning-from-scratch-iv-gradient-descent-and-backpropagation/"><img src="http://www.deepideas.net/wp-content/uploads/2017/08/gradient_descent.png" /></a></p>
+<p>勾配降下法は非常に単純なアイデアで、損失関数の<span class="marker-pink">勾配ベクトル（最も傾きが急な方向）</span>に注目し、その逆方向に進めば関数の最小値にたどり着くことができるだろう、というものです。</p>
+<p>更新式は以下のようになります。</p>
+$$\mathbf{w} \leftarrow \mathbf{w} - \eta \frac{\partial E}{\partial \mathbf{w}}$$<p>この時、$\eta$ は<span class="marker-pink">学習率</span>と呼ばれ、どの程度勾配を下るかを決めるパラメータです。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="$\eta$-と学習の関係">$\eta$ と学習の関係<a class="anchor-link" href="#$\eta$-と学習の関係">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>$\eta$ の値を変化させた時にどのように値が変化するかを、二乗和誤差 $E(\mathbf{w}) = \left\|\mathbf{y} - \mathbf{X}\mathbf{w}\right\|^2$ に対する線形回帰の場合で見ていきます。</p>
+<p>この時、損失関数の勾配ベクトルは以下によって求まります。</p>
+$$
+\begin{aligned}
+  \frac{\partial}{\partial \mathbf{w}}E(\mathbf{w}) 
+  &= \frac{\partial}{\partial \mathbf{w}}\left\|\mathbf{y} - \mathbf{X}\mathbf{w}\right\|^2\\
+  &= \frac{\partial}{\partial \mathbf{w}}\left( \left\|\mathbf{y}\right\|^2 -2\mathbf{w}^{\mathrm{T}}\mathbf{X}^{\mathrm{T}}\mathbf{y} + \|\mathbf{Xw}\|^2\right)\\
+  &= -2\mathbf{X}^{\mathrm{T}}\mathbf{y} + \frac{\partial}{\partial \mathbf{w}}\left(\left(\mathbf{Xw}\right)^{\mathrm{T}}\left(\mathbf{Xw}\right)\right)\\
+  &= -2\mathbf{X}^{\mathrm{T}}\mathbf{y} + \frac{\partial}{\partial \mathbf{w}}\left(\mathbf{w}^{\mathrm{T}}\mathbf{X}^{\mathrm{T}}\mathbf{Xw}\right)\\
+  &= -2\mathbf{X}^{\mathrm{T}}\mathbf{y} + \left(\mathbf{X}^{\mathrm{T}}\mathbf{X} + \left(\mathbf{X}^{\mathrm{T}}\mathbf{X}\right)^{\mathrm{T}}\right)\mathbf{w}\\
+  &= 2\mathbf{X}^{\mathrm{T}}\left(\mathbf{Xw} - \mathbf{y}\right)
+\end{aligned}
+$$
+</div>
+            <p class='text-right'><a href="https://iwasakishuto.github.io/Kerasy/doc/Optimizers.html">Continue reading&hellip;</a></p>
+        </div>
+    </div>
+</section>
+  <section class="summary">
     <h3><a href="https://iwasakishuto.github.io/Kerasy/doc/Computational-Graph.html" rel="bookmark" title="Permalink to Computational Graph">Computational Graph</a></h3>
     <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">

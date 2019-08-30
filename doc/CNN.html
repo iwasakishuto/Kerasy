@@ -1,0 +1,2012 @@
+<!doctype html>
+<html class="no-js" lang="en">
+    <head>
+        <link rel="shortcut icon" href="https://iwasakishuto.github.io/Kerasy/doc/theme/img/apple-touch-icon-152x152.png" />
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Shuto" />
+        <title>CNN</title>
+
+<meta name="description" content="&lt;div class=&#34;cell border-box-sizing text_cell rendered&#34;&gt;&lt;div class=&#34;prompt input_prompt&#34;&gt;
+&lt;/div&gt;&lt;div class=&#34;inner_cell&#34;&gt;
+&lt;div class=&#34;text_cell_render border-box-sizing rendered_html&#34;&gt;
+&lt;h1 id=&#34;CNN:-Convolutional-Neural-Network&#34;&gt;CNN: Convolutional Neural Network&lt;a class=&#34;anchor-link&#34; href=&#34;#CNN:-Convolutional-Neural-Network&#34;&gt;¶&lt;/a&gt;&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;（編集中）&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&#34;cell border-box-sizing code_cell rendered&#34;&gt;
+&lt;div class=&#34;input&#34;&gt;" />
+<meta name="keywords" content=" Kerasy  "/>
+
+        <!--[if !IE 7]>
+        <style type="text/css">
+            #main-content {display:table;height:100%}
+        </style>
+        <![endif]-->
+        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/backdrop.css" />
+        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/pygments.css" />
+        <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr.js"></script>
+
+        <!-- Added by Shuto Iwasaki. -->
+        <!-- Custom CSS -->
+        <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
+        <!-- Syntax highlight -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <!-- LaTex -->
+        <!-- Github env -->
+        <!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+        <script type="text/x-mathjax-config">
+        	MathJax.Hub.Config({
+        		tex2jax: {
+        			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        			displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        		}
+        	});
+        </script>
+        <script src="https://iwasakishuto.github.io/js/jquery.color.js"></script>
+    </head>
+
+
+    <body>
+      <div class="master-row">
+
+        <div class="image-pane main-content" style="background: url('https://iwasakishuto.github.io/Kerasy/doc/theme/img/background.png'); background-size:cover; background-position: right;">
+          <div class="row">
+            <div class="small-12 medium-4 large-12 columns">
+              <h5 class='text-center'>About</h5>
+              <div class="about-me">
+                <div class="hide-for-medium-only small-3 columns no-buffer">
+                  <a class="th" href="https://iwasakishuto.github.io/Kerasy/doc/theme/img/profile.png">
+                    <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/profile.png">
+                  </a>
+                </div>
+                <div class="small-9 medium-12 large-9 columns text-justify">
+                  Bioinformatics/Deep learning/Augmented Human/The University of Tokyo
+                </div>
+                <div class="small-12 columns">
+                  <ul class="inline-center social-list">
+                    <li><a href="https://twitter.com/cabernet_rock"><i class="fa fa-twitter"></i>&nbsp; twitter</a></li>
+                    <li><a href="https://github.com/iwasakishuto"><i class="fa fa-github"></i>&nbsp; github</a></li>
+                    <li><a href="https://www.facebook.com/iwasakishuto"><i class="fa fa-facebook"></i>&nbsp; facebook</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="small-12 medium-4  large-12 columns link-list">
+              <h5 class='text-center'>Links</h5>
+              <ul class="inline-center">
+                <li><a href="https://iwasakishuto.github.io">Home</a></li>
+                <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li>
+                <li><a href="https://iwasakishuto.github.io/University/notes/index.html">Notes</a></li>
+                <li><a href="https://iwasakishuto.github.io/kerasy/doc/index.html">Kerasy</a></li>
+              </ul>
+            </div>
+
+<!--
+            <div class="small-12 medium-3 large-12 columns">
+            </div>
+-->
+          </div>
+        </div>
+
+        <div class="content-pane main-content">
+          <nav class="top-bar" data-topbar role="navigation">
+            <ul class="title-area">
+              <li class="name"><!-- Leave this empty --></li>
+              <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
+            </ul>
+            <section class="top-bar-section">
+              <ul class="left">
+              </ul>
+              <ul class="right">
+                <li class="active"><a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></li>
+              </ul>
+            </section>
+          </nav>
+
+          <div class="row title-bar">
+            <div class="small-12 columns">
+              <h1><a href="https://iwasakishuto.github.io/Kerasy/doc">Kerasy</a></h1>
+              <h2> <small>Imitating to deepen my understanding of deep learning</small></h2>
+              <hr>
+            </div>
+          </div>
+
+          <div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <h2>CNN</h2>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-30(金)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></span></li>
+            <li>
+                <span>
+                    <i class="fa fa-tags"></i>&nbsp;
+                    <a href="https://iwasakishuto.github.io/Kerasy/doc/tag/kerasy.html"><span class="label">Kerasy</span></a>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI escape sequences */
+/* The color values are a mix of
+   http://www.xcolors.net/dl/baskerville-ivorylight and
+   http://www.xcolors.net/dl/euphrasia */
+.ansi-black-fg {
+  color: #3E424D;
+}
+.ansi-black-bg {
+  background-color: #3E424D;
+}
+.ansi-black-intense-fg {
+  color: #282C36;
+}
+.ansi-black-intense-bg {
+  background-color: #282C36;
+}
+.ansi-red-fg {
+  color: #E75C58;
+}
+.ansi-red-bg {
+  background-color: #E75C58;
+}
+.ansi-red-intense-fg {
+  color: #B22B31;
+}
+.ansi-red-intense-bg {
+  background-color: #B22B31;
+}
+.ansi-green-fg {
+  color: #00A250;
+}
+.ansi-green-bg {
+  background-color: #00A250;
+}
+.ansi-green-intense-fg {
+  color: #007427;
+}
+.ansi-green-intense-bg {
+  background-color: #007427;
+}
+.ansi-yellow-fg {
+  color: #DDB62B;
+}
+.ansi-yellow-bg {
+  background-color: #DDB62B;
+}
+.ansi-yellow-intense-fg {
+  color: #B27D12;
+}
+.ansi-yellow-intense-bg {
+  background-color: #B27D12;
+}
+.ansi-blue-fg {
+  color: #208FFB;
+}
+.ansi-blue-bg {
+  background-color: #208FFB;
+}
+.ansi-blue-intense-fg {
+  color: #0065CA;
+}
+.ansi-blue-intense-bg {
+  background-color: #0065CA;
+}
+.ansi-magenta-fg {
+  color: #D160C4;
+}
+.ansi-magenta-bg {
+  background-color: #D160C4;
+}
+.ansi-magenta-intense-fg {
+  color: #A03196;
+}
+.ansi-magenta-intense-bg {
+  background-color: #A03196;
+}
+.ansi-cyan-fg {
+  color: #60C6C8;
+}
+.ansi-cyan-bg {
+  background-color: #60C6C8;
+}
+.ansi-cyan-intense-fg {
+  color: #258F8F;
+}
+.ansi-cyan-intense-bg {
+  background-color: #258F8F;
+}
+.ansi-white-fg {
+  color: #C5C1B4;
+}
+.ansi-white-bg {
+  background-color: #C5C1B4;
+}
+.ansi-white-intense-fg {
+  color: #A1A6B2;
+}
+.ansi-white-intense-bg {
+  background-color: #A1A6B2;
+}
+.ansi-default-inverse-fg {
+  color: #FFFFFF;
+}
+.ansi-default-inverse-bg {
+  background-color: #000000;
+}
+.ansi-bold {
+  font-weight: bold;
+}
+.ansi-underline {
+  text-decoration: underline;
+}
+/* The following styles are deprecated an will be removed in a future version */
+.ansibold {
+  font-weight: bold;
+}
+.ansi-inverse {
+  outline: 0.5px dotted;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  position: relative;
+  overflow: visible;
+}
+div.cell:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: transparent;
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected,
+div.cell.selected.jupyter-soft-selected {
+  border-color: #ababab;
+}
+div.cell.selected:before,
+div.cell.selected.jupyter-soft-selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #42A5F5;
+}
+@media print {
+  div.cell.selected,
+  div.cell.selected.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+}
+.edit_mode div.cell.selected:before {
+  position: absolute;
+  display: block;
+  top: -1px;
+  left: -1px;
+  width: 5px;
+  height: calc(100% +  2px);
+  content: '';
+  background: #66BB6A;
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  /* Note that this should set vertical padding only, since CodeMirror assumes
+       that horizontal padding will be set on CodeMirror pre */
+  padding: 0.4em 0;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. This sets horizontal padding only,
+    use .CodeMirror-lines for vertical */
+  padding: 0 0.4em;
+  border: 0;
+  border-radius: 0;
+}
+.CodeMirror-cursor {
+  border-left: 1.4px solid black;
+}
+@media screen and (min-width: 2138px) and (max-width: 4319px) {
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+}
+@media screen and (min-width: 4320px) {
+  .CodeMirror-cursor {
+    border-left: 4px solid black;
+  }
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+div.output_area .mglyph > img {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 1px 0 1px 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+.rendered_html ul:not(.list-inline),
+.rendered_html ol:not(.list-inline) {
+  padding-left: 2em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+
+
+
+.rendered_html pre,
+
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+
+.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+
+.rendered_html * + .alert {
+  margin-top: 1em;
+}
+[dir="rtl"] 
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.rendered .rendered_html tr,
+.text_cell.rendered .rendered_html th,
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.text_cell .dropzone .input_area {
+  border: 2px dashed #bababa;
+  margin: -1px;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="CNN:-Convolutional-Neural-Network">CNN: Convolutional Neural Network<a class="anchor-link" href="#CNN:-Convolutional-Neural-Network">¶</a></h1><p><strong>（編集中）</strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [1]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">load_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">imporat</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [3]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"/Users/iwasakishuto/Github/portfolio/Kerasy"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [4]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">kerasy.initializers</span> <span class="k">import</span> <span class="n">Initializer</span>
+<span class="kn">from</span> <span class="nn">kerasy.activations</span> <span class="k">import</span> <span class="n">ActivationFunc</span>
+<span class="kn">from</span> <span class="nn">kerasy.losses</span> <span class="k">import</span> <span class="n">LossFunc</span>
+<span class="kn">from</span> <span class="nn">kerasy.layers.convolutional</span> <span class="k">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Conv2D</span><span class="p">,</span> <span class="n">Flatten</span><span class="p">,</span> <span class="n">MaxPooling2D</span><span class="p">,</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Sequential</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>CNNは、画像認識や音声認識などの分野で高い精度を誇るニューラルネットワークの一つです。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Convolution-Layer（畳み込み層）">Convolution Layer（畳み込み層）<a class="anchor-link" href="#Convolution-Layer（畳み込み層）">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:center">Mono</th>
+<th style="text-align:center">Multi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="Convolution-Mono-cha.png" src="theme/img/CNN/Convolution-Mono-cha.png" /></td>
+<td style="text-align:center"><img alt="Convolution-Multi-cha.png" src="theme/img/CNN/Convolution-Multi-cha.png" /></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="forward">forward<a class="anchor-link" href="#forward">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:center"><img alt="forward1.png" src="theme/img/CNN/forward1.png" /></th>
+<th style="text-align:center"><img alt="forward2.png" src="theme/img/CNN/forward2.png" /></th>
+<th style="text-align:center"><img alt="forward3.png" src="theme/img/CNN/forward3.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="forward4.png" src="theme/img/CNN/forward4.png" /></td>
+<td style="text-align:center"><img alt="forward5.png" src="theme/img/CNN/forward5.png" /></td>
+<td style="text-align:center"><img alt="forward6.png" src="theme/img/CNN/forward6.png" /></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$
+\begin{cases}
+    \begin{aligned}
+        a_{i,j,c'}^{{k+1}} 
+        &= \sum_c\sum_{m=0}^{M-1}\sum_{n=0}^{N-1}w_{m,n,c,c'}^{k+1}z_{i+m,j+n,c}^{k} + b_{c'}^{k+1}\\
+        z_{i,j,c'}^{{k}} 
+        &= h^{k}\left(a_{i,j,c'}^{{k}}\right)
+    \end{aligned}
+\end{cases}
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="backprop">backprop<a class="anchor-link" href="#backprop">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:center"><img alt="backprop1.png" src="theme/img/CNN/backprop1.png" /></th>
+<th style="text-align:center"><img alt="backprop2.png" src="theme/img/CNN/backprop2.png" /></th>
+<th style="text-align:center"><img alt="backprop3.png" src="theme/img/CNN/backprop3.png" /></th>
+<th style="text-align:center"><img alt="backprop4.png" src="theme/img/CNN/backprop4.png" /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="backprop5.png" src="theme/img/CNN/backprop5.png" /></td>
+<td style="text-align:center"><img alt="backprop6.png" src="theme/img/CNN/backprop6.png" /></td>
+<td style="text-align:center"><img alt="backprop7.png" src="theme/img/CNN/backprop7.png" /></td>
+<td style="text-align:center"><img alt="backprop8.png" src="theme/img/CNN/backprop8.png" /></td>
+</tr>
+<tr>
+<td style="text-align:center"><img alt="backprop9.png" src="theme/img/CNN/backprop9.png" /></td>
+<td style="text-align:center"><img alt="backprop10.png" src="theme/img/CNN/backprop10.png" /></td>
+<td style="text-align:center"><img alt="backprop11.png" src="theme/img/CNN/backprop11.png" /></td>
+<td style="text-align:center"><img alt="backprop12.png" src="theme/img/CNN/backprop12.png" /></td>
+</tr>
+<tr>
+<td style="text-align:center"><img alt="backprop13.png" src="theme/img/CNN/backprop13.png" /></td>
+<td style="text-align:center"><img alt="backprop14.png" src="theme/img/CNN/backprop14.png" /></td>
+<td style="text-align:center"><img alt="backprop15.png" src="theme/img/CNN/backprop15.png" /></td>
+<td style="text-align:center"><img alt="backprop16.png" src="theme/img/CNN/backprop16.png" /></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="$w_{m,n,c,c'}^k,-b_{c'}^k$">$w_{m,n,c,c'}^k, b_{c'}^k$<a class="anchor-link" href="#$w_{m,n,c,c'}^k,-b_{c'}^k$">¶</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$
+\begin{aligned}
+\frac{\partial E}{\partial w_{m,n,c,c'}^{k+1}} 
+&= \sum_{i}\sum_{j}\frac{\partial E}{\partial a_{i,j,c'}^{k+1}}\frac{\partial a_{i,j,c'}^{k+1}}{\partial w_{m,n,c,c'}^{k+1}}\\
+&= \sum_{i}\sum_{j}\frac{\partial E}{\partial a_{i,j,c'}^{k+1}}z_{i+m,j+n,c}^{k}\\
+&= \sum_{i}\sum_{j}\delta_{i,j,c'}^{k+1}\cdot z_{i+m,j+n,c}^{k}\\
+\frac{\partial E}{\partial b_{c'}^{k+1}} 
+&= \sum_{i}\sum_{j}\delta_{i,j,c'}^{k+1}
+\end{aligned}
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="$\delta_{i,j,c}^k$">$\delta_{i,j,c}^k$<a class="anchor-link" href="#$\delta_{i,j,c}^k$">¶</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+$$
+\begin{aligned}
+\delta_{i,j,c}^{k} 
+&= \frac{\partial E}{\partial a_{i,j,c}^{k}} \\
+&= \sum_{c}\sum_{m=0}^{M-1}\sum_{n=0}^{N-1}\left(\frac{\partial E}{\partial a_{i-m,j-n,c'}^{k+1}}\right)\left(\frac{\partial a_{i-m,j-n,c'}^{k+1}}{\partial a_{i,j,c}^k}\right)\\ 
+&= \sum_{c}\sum_{m=0}^{M-1}\sum_{n=0}^{N-1} \left(\delta_{i-m,j-n,c'}^{k+1}\right)\left(w_{m,n,c,c'}^{k+1}h'\left(a_{i,j,c}^k\right)\right) \\
+&= h'\left(a_{i,j,c}^k\right)\sum_{c'}\sum_{m=0}^{M-1}\sum_{n=0}^{N-1} \delta_{i-m,j-n,c'}^{k+1}\cdot w_{m,n,c,c'}^{k+1}
+\end{aligned}
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Pooling-Layer（プーリング層）">Pooling Layer（プーリング層）<a class="anchor-link" href="#Pooling-Layer（プーリング層）">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Pooling Layerには、<b>Max</b>・<b>Avg</b>・<b>Global-Max</b>・<b>Global-Avg</b>などの種類があるが、ここでは簡単のために<span class="marker-pink">Max-Pooling</span>についてのみ紹介する。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="forward">forward<a class="anchor-link" href="#forward">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="backprop">backprop<a class="anchor-link" href="#backprop">¶</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="MNIST">MNIST<a class="anchor-link" href="#MNIST">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:center">0</th>
+<th style="text-align:center">1</th>
+<th style="text-align:center">2</th>
+<th style="text-align:center">3</th>
+<th style="text-align:center">4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img alt="MNIST sample0" src="them/img/MNIST-sample/0.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample1" src="MNIST_sample/1.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample2" src="MNIST_sample/2.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample3" src="MNIST_sample/3.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample4" src="MNIST_sample/4.png" /></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">9</td>
+</tr>
+<tr>
+<td style="text-align:center"><img alt="MNIST sample5" src="MNIST_sample/5.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample6" src="MNIST_sample/6.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample7" src="MNIST_sample/7.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample8" src="MNIST_sample/8.png" /></td>
+<td style="text-align:center"><img alt="MNIST sample9" src="MNIST_sample/9.png" /></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [5]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [6]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">cv2</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">"/Users/iwasakishuto/Github/portfolio/Kerasy/doc/theme/img/MNIST-sample/0.png"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">"image.shape=</span><span class="si">{image.shape}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>image.shape=(28, 28, 1)
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [395]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">MaxPooling2D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Flatten</span><span class="p">())</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'tanh'</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'softmax'</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [397]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s2">"categorical_crossentropy"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [398]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [402]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">y_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,))</span>
+<span class="n">y_true</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">image</span><span class="p">))]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">"y_true: {np.argmax(y_true)}"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>y_true: 0
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [406]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="n">image</span><span class="p">)</span>
+<span class="c1">#     plt.bar([i for i in range(10)],y_pred)</span>
+<span class="c1">#     plt.show()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">"predict: {np.argmax(y_pred)}"</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">backprop</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">y_pred</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">y_pred</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+predict: 7
+[0.07421762 0.06343614 0.07558773 0.11820501 0.05796825 0.11964388
+ 0.08153862 0.18950934 0.09204471 0.12784869]
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr />
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training-Only-Dense">Training Only Dense<a class="anchor-link" href="#Training-Only-Dense">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [20]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,)))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s2">"random_normal"</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s2">"zeros"</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s2">"random_normal"</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s2">"zeros"</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">"tanh"</span><span class="p">))</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s2">"mean_squared_error"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [21]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># model.layers[-1].trainable = False</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [22]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="n">func</span><span class="p">)(</span><span class="n">X</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [23]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">1000</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">backprop</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+    <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+    <span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_pred</span><span class="o">-</span><span class="n">Y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">"{e+1}/</span><span class="si">{epochs}</span><span class="s2"> mse=</span><span class="si">{mse:.3f}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>1/1000 mse=0.198
+2/1000 mse=0.195
+3/1000 mse=0.192
+4/1000 mse=0.190
+5/1000 mse=0.188
+6/1000 mse=0.186
+7/1000 mse=0.184
+8/1000 mse=0.182
+9/1000 mse=0.181
+10/1000 mse=0.180
+11/1000 mse=0.179
+12/1000 mse=0.178
+13/1000 mse=0.177
+14/1000 mse=0.176
+15/1000 mse=0.175
+16/1000 mse=0.175
+17/1000 mse=0.174
+18/1000 mse=0.174
+19/1000 mse=0.173
+20/1000 mse=0.173
+21/1000 mse=0.172
+22/1000 mse=0.172
+23/1000 mse=0.172
+24/1000 mse=0.171
+25/1000 mse=0.171
+26/1000 mse=0.171
+27/1000 mse=0.171
+28/1000 mse=0.170
+29/1000 mse=0.170
+30/1000 mse=0.170
+31/1000 mse=0.170
+32/1000 mse=0.170
+33/1000 mse=0.169
+34/1000 mse=0.169
+35/1000 mse=0.169
+36/1000 mse=0.169
+37/1000 mse=0.169
+38/1000 mse=0.169
+39/1000 mse=0.168
+40/1000 mse=0.168
+41/1000 mse=0.168
+42/1000 mse=0.168
+43/1000 mse=0.168
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [19]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Neural Network"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"red"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"data"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">"x"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">"y"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="output_wrapper">
+<div class="output">
+<div class="output_area">
+<div class="prompt"></div>
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAYUAAAEKCAYAAAD9xUlFAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMi40LCBodHRwOi8vbWF0cGxvdGxpYi5vcmcv7US4rQAAIABJREFUeJzt3X18jfX/wPHXe5sZQmbSjfu7Se6bu9yWItWXJKWbXxGRmlQi3eGrdDOkL1NuIilFKb4qUr6IZDIlty1zl3XHhtzMzdjn98fnnO1gYzhn1zk77+fjcR67znWunfPedc6u9/ncizEGpZRSCiDE6QCUUkr5D00KSimlsmhSUEoplUWTglJKqSyaFJRSSmXRpKCUUiqLJgWllFJZNCkopZTKoklBKaVUljCnAzhfUVFRplKlSk6HoZRSAWXNmjWpxpgy5zou4JJCpUqVSExMdDoMpZQKKCKyMy/HafWRUkqpLJoUlFJKZdGkoJRSKkvAtSmowJWRkUFKSgpHjx51OhR1ASIiIihXrhyFChVyOhTlQ5oUVL5JSUmhePHiVKpUCRFxOhx1HowxpKWlkZKSQuXKlZ0OR/mQz6qPRGSqiOwWkQ25PC4iMlZEkkVknYg09FUsyj8cPXqU0qVLa0IIQCJC6dKltZQXBHzZpjANuPksj3cAqrtuvYG3fRiL8hOaEAKXvnfBwWdJwRizDNh7lkM6AdONlQBcKiJX+CoepZRS5+Zk76OrgF0e91Nc+3wmKQluvdX+VMFJRBgwYEDW/VGjRjFs2DCfv26bNm1yHHTZpk0bYmJisu4nJibSpk2bsz7Xjh07+PDDD70dIjt27KB27dpef1518fLz2hUQXVJFpLeIJIpI4p49ey74eWJjYf58+1MFp8KFC/PZZ5+Rmprq1ec1xpCZmXlBv7t7924WLFiQ5+N9kRROnDjh1edT3pWf1y4nk8LvQHmP++Vc+85gjJlkjIkxxsSUKXPOqTty1aCB/ZmRAV6+JqgAERYWRu/evRkzZswZj+3Zs4cuXbrQqFEjGjVqxIoVKwAYNmwYo0aNyjqudu3a7Nixgx07dhAdHc0DDzxA7dq12bVrF3379iUmJoZrrrmGoUOH5immgQMHMmLEiDP2nzx5koEDB9KoUSPq1q3LxIkTARg8eDDLly+nfv36jBkzhltvvZV169YB0KBBA4YPHw7AkCFDmDx5MsYYBg4cSO3atalTpw6zZs0CYOnSpbRs2ZKOHTtSq1atU15727ZtNGjQgNWrV+fpb1C+k5oKx4/bbfc1zJec7JI6D4gVkZlAE+AfY8yfvnzBQYPgp59g0SKIj4d8qDVQuXniCVi71rvPWb8+vPnmOQ977LHHqFu3LoMGDTplf//+/XnyySdp0aIFv/32G+3bt2fz5s1nfa4tW7bw3nvv0bRpUwBGjBhBZGQkJ0+epG3btqxbt466deue9TmaNWvGnDlzWLJkCcWLF8/aP2XKFEqWLMnq1as5duwYzZs3p127drz22muMGjWKL774AoBjx46xfPlyKlasSFhYWFYyW758ORMmTOCzzz5j7dq1/Pzzz6SmptKoUSNatWoFwI8//siGDRuoXLkyO3bsACApKYlu3boxbdo06tWrd87zqXwrPh6WLYMbb7TXMF/zZZfUj4CVQLSIpIhITxF5REQecR0yH9gGJAOTgUd9FYtbVFR2pl26VEsLwapEiRI88MADjB079pT9ixYtIjY2lvr169OxY0cOHDjAoUOHzvpcFStWzEoIAB9//DENGzakQYMGbNy4kU2bNuUpphdeeIGXX375lH1ff/0106dPp379+jRp0oS0tDS2bNlyxu+2bNmSZcuWsWLFCm699VYOHTpEeno627dvJzo6mu+++4577rmH0NBQypYtS+vWrbNKAI0bNz5l3MGePXvo1KkTM2bM0ITgB1JTYckSu92ggb2G+ZrPSgrGmHvO8bgBHvPV6+emaFH789tvtbTgqDx8o/elJ554goYNG9KjR4+sfZmZmSQkJBAREXHKsWFhYae0F3j21S9WrFjW9vbt2xk1ahSrV6+mVKlSdO/ePc/9+m+44QZeeOEFEhISsvYZYxg3bhzt27c/5dilS5eecr9Ro0YkJiZSpUoVbrrpJlJTU5k8eTLXXnvtOV/XM36AkiVLUqFCBb777rszqpRU/nOXEiD72uVrAdHQ7E2xseAqOZOe7mwsyjmRkZHcddddTJkyJWtfu3btGDduXNb9ta7qrUqVKvHjjz8Ctrpl+/btOT7ngQMHKFasGCVLluTvv/8+r8ZjsKWFuLi4rPvt27fn7bffJiMjA4Bff/2Vw4cPU7x4cQ4ePJh1XHh4OOXLl+eTTz6hWbNmtGzZklGjRmVVEbVs2ZJZs2Zx8uRJ9uzZw7Jly2jcuHGOMYSHhzNnzhymT5/ukx5O6vy4r1GtW+dfB5mgSwpRUXD99XZ7zhztnhrMBgwYcEovpLFjx5KYmEjdunWpVasWEyZMAKBLly7s3buXa665hvj4eGrUqJHj89WrV48GDRpQs2ZN7r33Xpo3b35e8dxyyy14dqTo1asXtWrVomHDhtSuXZs+ffpw4sQJ6tatS2hoKPXq1ctqMG/ZsiWXXXYZRYoUoWXLlqSkpNCyZUsAOnfuTN26dalXrx433HADcXFxXH755bnGUaxYMb744gvGjBnDvHnzzutvUN6TlGSvUQBt2uRP1RGA2FqcwBETE2MudpGd1FRo1gySk23jzTffeCk4dVabN2/m6quvdjoMdRH0Pcw/N91kO8VUqwYrV158UhCRNcaYmHMdF3QlBbAn111NGx3tbCxKKZUT97Wpffv8KyVAkCYFyD7JSUnaC0kp5V9SU7OrtvMzIUAQJwV3g/OiReDRtqeUUo6Li7PXpvxsYHYL2qQQFQXh4XZ7zhwtLSil/ENqanYDc6FCWlLIV/HxthEnOdluK6WU0+Lj7TWpWrXTrkv5tJZFUCeF6Gjo3Nlu6whnpZTTPEcwd+7samw2BgYPtv1S82FwVVAnBThzhLMKHqdPdHe6uXPn5nmaCqW84YwRzBkZ0L07vP66neeicGGfxxD0SUFHOKvcaFJQ+e2UEcx9MuDuu2H6dBg+HN56C0JDfR5D0CeFqCho0sRu//CDViEVdCNGjKBGjRq0aNGCJFefv8mTJ9OoUSPq1atHly5dSE9P5/vvv2fevHkMHDiQ+vXrs3Xr1hyPU8pbPEcw39DqBFGP32t3vPkmvPgi5NNyqEGfFECrkILFmjVrmDlzJmvXrmX+/PlZM4XecccdrF69mp9//pmrr76aKVOmcN1119GxY0dGjhzJ2rVrqVq1ao7HKeUtsbG2gbl61UwGbXoQZs+G0aOhf/98jUOTAlqF5M9SU2HkSO+U4JYvX07nzp0pWrQoJUqUoGPHjgBs2LCBli1bUqdOHWbMmMHGjRtz/P28HqfUhXCPYI4v+RwRn34Ir7wCTz2V73FoUkAnyfNn775rFxZ5913fvUb37t2Jj49n/fr1DB06NNfprvN6nFLnKykJFi6Eh5lEux9fh759bY8jBwRXUli3zrbm5yA2NnvMgq7h7D969LCjOz2WPbhgrVq1Yu7cuRw5coSDBw/y+eefA3Dw4EGuuOIKMjIymDFjRtbxp09RndtxSl2s2Fgon7yYt3iU4zfeAmPH5lsbwumCJymkpdkm/RtugD/PXPUzKip7zIKu4ew/oqJg4EDvjOps2LAhd999N/Xq1aNDhw40atQIgJdeeokmTZrQvHlzatasmXV8t27dGDlyJA0aNGDr1q25HqfUxUhNhRIHf2cm3UgrXYPwz2ZCmIMrJRtjAup27bXXmgv20UfGFC1qzOWXG7Ns2RkP79ljTKtWxoAxAwde+MuonG3atMnpENRF0vfQ+5556rhZTnOTHlLM7F3hu/MLJJo8XGODp6QA0K2b7XdaooRtRBg//pSHdT4kpVR+Sk2FalOfpQUrGF1rCqWuc36tiuBKCgDXXAOrV8Ott9qKvKefBo/1d3U+JKVUfvliwBJ67R/NjBJ96Tr7bqfDAYIxKYAtKXz2mU0Ko0fbEoSrJ0l0dPYCPFpS8D4TYCv9qWz63nnZP//Q8bPu/Ep11nQb6TcLfjnYmuGw0FDbwl+5MgwYAPv3w9y5ULRoVpfUhQttYsjvqWsLqoiICNLS0ihdujTiUM8KdWGMMaSlpREREeF0KAXG0UeeoOShFDrwPSW2FXM6nCzBmxTAdvl66ikoVQp69oTbboPPPyc+vhgdOtgqpLg4XYTHW8qVK0dKSgp79uxxOhR1ASIiIihXrpzTYRQMX31FxMxpvMzzpFZpwnQ/qqqWQCsSxsTEmMTERO8/8QcfwIMPQvPmsGABN91ezKuLZiulFADp6ZysVZsdf4RTK+NnWt1YmG++8f3LisgaY0zMuY4LzjaFnNx/P3z4IaxYAXfeSfwbx7XBWSnlfS+/TOjO7fTMmECFaoX97vqiScHT3XfDxInw1VdEv9qdO263vZJ0AR6llFds3IgZOZIFZR/kW9pkL6TjRzQpnK5XL3jtNfjoIzovexLQ2VOVUl5gDDz6KEcKleD//raLO7lnaPYnmhRyMmgQPPkkTX8YyxvV3gJ09lSl1EX67DNYtowFLV8ljSi7kI4fzrOmSSEnIna+5ttu4/Gtj9OWRboAj1Lqwh07BoMGcaxGHZ7b2hOwSy77YwcWTQq5CQ2FGTNILXM1n9CVP779VauQlFIXJj4etm1jSLHR/Lo1lGrV/LOUAD5OCiJys4gkiUiyiJwxObiIVBCRJSLyk4isE5FbfBnPeStRgkILPkcKhfEpXVj5v3QtLSilzk9qKrz0EsdvvIXlETcBdtYEfywlgA+TgoiEAuOBDkAt4B4RqXXaYS8AHxtjGgDdgLd8Fc+FimxYic/vnsE1bKTbd49paUEpdX5eegkOHWJyjZGsXGl3+WtCAN+WFBoDycaYbcaY48BMoNNpxxighGu7JPCHD+O5YB3GtGN6hRfpwTRqrZrqdDhKqUDx228wYQL06MHOYvY7sb82MLv5MilcBezyuJ/i2udpGHC/iKQA84F+PozngkVFwc4Hh7CItnRc+BjbP9/gdEhKqUDw8ssAbL33RebMsbv8tYHZzemG5nuAacaYcsAtwPsickZMItJbRBJFJNGpeXMeezyUFyrN4B9Tgsx774fjxx2JQykVIJKTYepU6NOHR16pQHIyft3A7ObLpPA7UN7jfjnXPk89gY8BjDErgQjgjBxqjJlkjIkxxsSUKVPGR+GeXVQUxNxaloeZTNVDP5M+aJgjcSilAsTw4RAeTnLXZ9m61e7q3Nm/Swng26SwGqguIpVFJBzbkDzvtGN+A9oCiMjV2KTgt1NoRkXB53RkCg8RMfZ1+P57p0NSSvmjzZthxgyIjaXv8CvYvt2WEgYNcjqwc/NZUjDGnABigYXAZmwvo40iMlxEOroOGwA8LCI/Ax8B3Y0fT9saGwutWsETvMlfhSty8r7/g0OHnA5LKeVvhg+HokVJ6zmIw4ftLn/uhurJp20Kxpj5xpgaxpiqxpgRrn1DjDHzXNubjDHNjTH1jDH1jTFf+zKeixUVZZd2PkRx7j76HiE7tsOLLzodllLKn2zZAh9/DI89xriPogKiG6onpxuaA467tPAdLVlZv69dvW31aqfDUkr5i7g4CA+HJ5/MmjPN37uhetKkcJ7cpQWAx/55hYyoy+HhhyEjw9nAlFLO+/13eO89eOghkvaXDZhuqJ40KVyA2FjbaLR2e0leuXwc/PwzvPmm02EppZw2ejRkZsLAgcTGEjDdUD1pUrgAUVG2axnA9IOdOdi2EwwdCtu3OxuYUso5qal2ka777iPpWKWA6obqSZPCBRo0yH4D2LZd6H0sHkJCYMAAp8NSSjll3Di78MozzxAbS0B1Q/WkSeECRUXZLmYAO0+W4/ATz8OcObBokbOBKaXy38GDttNJ586kXlYr4LqhetKkcBHcb/bKlTCGJ6FKFejfXxudlQo2774L+/fD4MHExxNw3VA9aVK4CO7uqQCLvovgwL/HwKZN8JbfzQCulPKVzExbddSsGalVGrNkid0dSN1QPWlSuAie3VO//Rbe2PIvaNfONjrv3u1scEqp/LFwoe1m1K8f8fGwbJndHUjdUD1pUrhInqWFpd8K+4a+aae+GD7c2cCUUvlj3Di4/HJSW3cJ+FICaFK4aKeXFv7z9dV2MNvEiXa4u1Kq4NqyBRYsgL59iZ8UHvClBNCk4BWxsdCsmd1OTcVWHxUuDM8/72hcSikfi4+HQoVI69K7QJQSQJOCV0RFQbFidnvhQkgNu9yOWfjkE/jhB2eDU0r5xsGDttfRXXcx7pPLC0QpATQpeE18PFSubNub4uKAp5+Gyy6DZ54B/50NXCl1oaZPt4mhXz9bQ4CtMQjkUgJoUvCa6GioWtVuz5kDqceKw5AhsHSprXNUShUcmZn2m2DjxqRWbcLChXZ3sWKBXUoATQpedUZp4eGHbaZ47jn7IVJKFQyLFsEvv0C/fsTF2f/5KlXsNSDQaVLwojNKCwfCYdgwO4uqew5dpVTgGzcOLruM1Ou7Zv1rV6lirwGBTpOCl51RWrjnHvtJGTZMSwtKFQRbt8KXX0KfPsT9p3CBKiWAJgWvO6O0sC/UJoQNG2D2bEdjU0p5wfjxEBrK3rseKXClBNCk4BNnlBa6doVatWxyOHnS6fCUUhfq0CGYOhXuvJPXpl9Z4EoJoEnBJ6KjoXx5u71qFRDqKi1s3gyzZjkZmlLqYnzwAfzzD/TrZ/+3gXLlCk4pATQp+EyTJvZnSgokJQFdukCdOvDvf8OJE47GppS6AMbYBuaGDUmKbMauXXa3+3+9oNCk4CNZK7Ntg9tug9S9ITYh/PorzJzpdHhKqfO1eDFs2sTBHo9z278kYFdWOxdNCj7iuY5zcrKrzrFTJ6hdG159VXsiKRVoxo2DqCj+89fdJCfbXYG2/nJeaFLwoUGDPKbVXuoqLTz3nF2I57//dTQ2pdR52LEDPv+c9Pt7883yCMBOfFfQSgmgScGnTp9WOz4e2xOpalUYMULnRFIqULz1FogwQfoWmInvcqNJwcfOmFY7LAwGD4Y1a+CbbxyNTSmVB+np8M47HLv1Dv67phwQ+NNjn40mBR/znFZ75kxXT6T/+z+46ipbWlBK+bcZM2DfPqYU61fgSwmgSSFfxMdD6dKQlub6dlG4MAwcaBdz/e47p8NTSuXG3Q21Xj1mpbQA7MDUglpKAE0K+SI6Gh56yG5v2+YqLfTqZb9qvPKKo7Eppc5i2TJYv56/uvZjV4oAcOedBbeUAJoU8o3nuIXYWGyd0pNP2rUWfvrJ6fCUUjkZOxYiI+n5v3sL7LiE0/k0KYjIzSKSJCLJIjI4l2PuEpFNIrJRRD70ZTxO8hy3kFVaePRRKFECXnvN0diUUjn47TeYO5e0Lg+zeUcRoGCOSzidz5KCiIQC44EOQC3gHhGpddox1YFngebGmGuAJ3wVjz8YNMjWR27bBr17A5deCo88YmdP3bbN6fCUUp7efhsD3PF136ApJYBvSwqNgWRjzDZjzHFgJtDptGMeBsYbY/YBGGN2+zAex0VFQYUKdjslxdVF9fHH7YR5Y8Y4GptSysORIzB5Mr/U6MSynRWB4CglgG+TwlXALo/7Ka59nmoANURkhYgkiMjNOT2RiPQWkUQRSdyzZ4+Pws0fEydmlxbi4rBdU++9107Hm5bmdHhKKYCPPoK0NL6u+ThgxxoFQykBnG9oDgOqA22Ae4DJInLp6QcZYyYZY2KMMTFlypTJ5xC9y3MRnqlTXW0LTz9tB8i89ZajsSmlyOqGeqx6bV5a1hqw/UKCoZQAvk0KvwPlPe6Xc+3zlALMM8ZkGGO2A79ik0SBdsa4hdq1oUMH2x/6yBGnw1MquK1YAWvX8lZoP9L2CqVLF6xFdM7Fl0lhNVBdRCqLSDjQDZh32jFzsaUERCQKW51U4Ftccxy3MHAg7NkD06c7GptSQW/cOE6WuJR3jtwH2P/VgrSIzrn4LCkYY04AscBCYDPwsTFmo4gMF5GOrsMWAmkisglYAgw0xgRFxfoZ6y3UbgPXXgujR+uSnUo5JSUF8+mnvBvSi007iwVNjyNPPm1TMMbMN8bUMMZUNcaMcO0bYoyZ59o2xpinjDG1jDF1jDFBs/rMGestjBdbWtiyBT7/3NnglApWEybAyUxG7H8UCJ4eR56cbmgOaoMGnTaDapcuUKkSjBzpZFhKBaejR2HSJNZX+hc7qBxUPY48aVJw0BkzqG4Ng6eegu+/tzelVP6ZNQv27GFYWj8guHocedKk4LAzeiI99BBERmppQan85OqGurPY1cw52Dboehx50qTgsDN6IqUUs3Mi/fe/rm5JSimfW7kS1qzhnYh+gARdjyNPmhT8wOk9kdLuiYXwcJ36Qql8cizuPxwIKckbaQ8EZY8jT5oU/MDpPZHGfVwWHngApk2D3QV6OiilnLdrF4XmfcqkzF6kUywoexx50qTgJ87oiTRgABw7BuPHOxqXUgVd+qi3MMYQTyytWwd3KQE0KfiNM3oiEQ0dO9qkkJ7ubHBKFVTp6ZhJk/gvndhJpQK99nJeaVLwI549kW67Dfb3etremTbN6dCUKpAOTpxBsaN7+Q/9C/zay3mlScGPePZESk6GNxNbQJMm8MYbOvWFUt5mDOmvjWUt9VhGqwK/9nJeaVLwM4MGQatWdnvpt8KB3k/D1q0wd66zgSlVwPwzdwlld2/gP/SndWsJ+rYEN00KfiYqCq6/3m5/+y2M2NQZqlSxg9mMcTY4pQqQlEH/YTdl+Ih7tC3BwzmTgoj0E5FS+RGMsmJj7bgFgCnTQvn7vqdg1Sqd+kIpL9n2zVauTv6cifShfLUIbUvwkJeSQllgtYh8LCI3i4j4OqhgFxUFX3wBpUrZduYHFnfXqS+U8qI1PeI5SSgzL+3LF19oKcHTOZOCMeYF7GpoU4DuwBYReUVEqvo4tqAWHQ1169rt5D+Lkd7jMZg3T6e+UOoipW37h5v/mMondCWq7pVBO51FbvLUpmCMMcBfrtsJoBQwW0TifBhb0Js4ESpXttNfjDrymE59oZQXJDw0ieLmALOuGsCkSU5H43/y0qbQX0TWAHHACqCOMaYvcC3QxcfxBbXoaKjqKo+NnVWW/R116gulLkbS+uM0WP4fFnM96Vdfq6WEHOSlpBAJ3GGMaW+M+cQYkwFgjMkEbvNpdOqUAW13rdKpL5S6UKmp8M6NM7ky83cmFh8YtFNjn0te2hSGGmN25vLYZu+HpDx5Dmj75rdoNlbTqS+UuhBxrxv+b/co1lObin1u1lJCLnScQgAYNMi2LQAMP6xTXyh1vpKSYMfEhdRlPR9cNoBBz2gnytxoUggAUVFw5512++M/W5BylU59odT5iI2FPgdH8qdcyUOL7tUuqGehSSFAZE9/IUwuqVNfKJVXqalw1d8/0pbFrGran+g64U6H5Nc0KQQIz+kvXt7UmbSSOvWFUnkRFwft1o/iAMXZ3KqP0+H4PU0KAcQ9/UUmobx+Qqe+UOpckpLgm8k7uIuP+fjS3jz8dEmnQ/J7mhQCiHv6i9KlYfzh7uwLieTYCJ36QqmcpKbadUke3h9HJiFcP/cJbUvIA00KAcbdRTWdYozLfIxCC3TqC6VyEhcHh5P/oCdT+LFuD6q2Lud0SAFBk0IAcndRHc9jZEg4R17VqS+U8pSaCrNnw9OMIpST1JjyjNMhBQxNCgHI3UV1N2V5zzxA2AfTdOoLpTzExcHB7Xt4hAmsveY+ImOqOB1SwNCkEKAGDbKNzqMZQKGTx0j9t059oRTY2tSpU+FJxhDBUapOftbpkAKKJoUA5W50TisdzX/pSMiE8aT+plNfqODmblw+mbaPfhLPoQ5dKdWsptNhBRSfJgXXojxJIpIsIoPPclwXETEiEuPLeAoad6PzSAYSmZnGih7vOB2SUo6Ki4PkZOjHOIqbg5R47XmnQwo4PksKIhIKjAc6ALWAe0SkVg7HFQf6A6t8FUtBNmgQ/FG5Bd/SisbfxpH6+zGnQ1LKEe5qo5LsZ0DIGI7d3DF7pSqVZ74sKTQGko0x24wxx4GZQKccjnsJeB046sNYCix3o/PLvMAVJ3/n24feczokpRzRp4+dK/L5iDcombmfwq/+2+mQApIvk8JVwC6P+ymufVlEpCFQ3hjzpQ/jKPAGDYIdVW9kFY25dtFrJG084XRISuWrpCRYtw6i2MNjGWOga1eoX9/psAKSYw3NIhICvAEMyMOxvUUkUUQS9+zZ4/vgAkxUFHzxpTCu+PNUytzO5Bs+IjXV6aiUyh/uxuV9+2BoRBxFTDr8W0sJF8qXSeF3oLzH/XKufW7FgdrAUhHZATQF5uXU2GyMmWSMiTHGxJQpU8aHIQeu6Gi4qs9t/Exdeu5+hZGv6bTaKji4G5ev4A/6nIhH7r8frr7a6bACli+TwmqguohUFpFwoBswz/2gMeYfY0yUMaaSMaYSkAB0NMYk+jCmAm3gMyFMLvM8V/MLh97/TEsLqsBzNy4DvF7yFcI4AUOHOhtUgPNZUjDGnABigYXAZuBjY8xGERkuIh199brBLCoKij3QhV+I5uHdI4h7XafVVgWbu3G5Xskd3J8+CenZE6ro6OWL4dM2BWPMfGNMDWNMVWPMCNe+IcaYeTkc20ZLCRdv4OBQpl72LPX5mZSJX+pcearAcjcuA7xWeCgSEgIvvOBsUAWAjmguYKKioOf/7mVnSCWeODic2241Wo2kChzPxuXrS/5I+z3vwxNPQDmdCfViaVIogKJrF2L1Tc/TmNXU3PoFcXFOR6SUd7kbl8EwqeTTSGQkPKtzHHmDJoUCqs27D7KzUFWGM4R3p2RqNZIqMDwbl3tdMZ9qvy2BYcOgpK6q5g2aFAqoqCsKEf7yUBqwllZ759C7t9MRKeUd7sblMqVOEF90IFSvbncqr9CkUIBdMeBedhatyb8Zyqb1J7W0oAKeZ+PyoKipFN66GV5/HQoVcjawAkSTQkEWGkqhl4dRm43ctG8WzZvryp0qcCUlQfPmtnG5cqn9PJH2ArRoAbff7nRoBYomhQLuyv4q8FaiAAAYvUlEQVRd+TOqDsMYxv60E9x2G9obSQUcd2+jtDR7f3rlIYTtT4OxY0HE2eAKGE0KBV1ICMVGD6cGW7ifD0hORnsjqYCT3dsIely7juZrx8Mjj0CDBs4GVgCJMYE16jUmJsYkJuoYt/NiDBkNGvH3xlSqnfiFKytH8MMPdkyDUv7OXW2UlgbVqho2RbWi0NZf7AORkU6HFzBEZI0x5pwLmWlJIRiIUOiNOMqd2Eks8WzfrqUFFTjcvY0iI+HbRz6k0Krv4NVXNSH4iCaFYHHDDRxv24EXQ0ZQir2MHw8JCU4HpdTZJSTADz/Y7cY1D3Dl6KehUSO7Dq3yCU0KQSR8zOuUMP8wNOwV0tPhxhu1N5LyX0lJ9jN65AgUKwYfVXgGdu+Gt96CEL10+Yqe2WBSpw7SvTv9ZBw1I3Zw+DDaG0n5JXdvo8OHoWhRWDVqOZfOnGDnN4o5Z7W4ugiaFILN8OGEhIYwo7KdTTI52c4QoJQ/GTYsu7dR/z5HuWZML6hUCYYPdzKsoKBJIdiUKwdPPknDzTO4oeQaAN59V6uRlP9ISrKfSYDSpeEFXoZff4WJE209kvIpTQrB6Jln4LLLmFvhcYoWMaSnazWS8g/uaqP0dFtttHjMzxQd9zo88AC0a+d0eEFBk0IwKlkSXn2V4uu/Z8r1HwC2qH7nnZoYlHNSU+1n0F1t9HifY9Qd9YDtevrGG84GF0Q0KQSr7t2hcWPuShxE/SoHAPj2Wx2/oJwTF2c/gwDVqsGLJ4bY2e/eecfWI6l8oUkhWIWEwLhxhOz+i/+1eYlSpezu2bO1tKDyn+caCaVLw/+GLqNo/Eh4+GH417+cDS7IaFIIZo0bQ48eRE5/k2c7/wLA9u1ajaTyV2oq3HJL9qjllQsPUOGFB6BKFa02coAmhWD36qtQtCj9t/WnWlU7D5ZWI6n8FBcH27bZ7dq1ofrYfrBrF7z/PlxyibPBBSFNCsGubFkYPpzwpV/z7aOzsqpudRoMlR8SEuxnDWy10cwO78H06fD889CsmbPBBSmdJVXByZPQtCn89htb5m2m/g2RpKfbf9JfftHZVJVvJCXBtdfaUcvFisH6mRupfFcjaNIEFi2C0FCnQyxQdJZUlXehobaHR1oa1ScNpEcPuzstTdsXlG+42xEOH4YiRWDxvENUHtQVSpSADz/UhOAgTQrKqlcPnn4apk5lxI1LqFbN7tb2BeULnu0IjWIMjac9aoulM2bAFVc4G1yQ06Sgsg0dClWrUnJgb76cfUTbF5RPnN6O8HHr8bZReehQaNvW2eCUJgXloUgRO79McjI1pr/AihW2rjc9HVq10sSgLl5Cgv0spafbz9ZPo/5H2VefsGMRXnzR6fAUmhTU6dq2hb59YcwYov/6lkWLICwMMjJ0fiR1cdzzGmVkQKFCsHzaVso/1RVq1oQPPtA1EvyEvgvqTCNH2nkGHnyQprUO0KeP3a0Nz+pCuec1Skuz9x/vfoAGQzuCCMybZxuYlV/QpKDOVKyY7Su+axf078+wYZzS8KyJQZ0Pd0Jwz2tUs2oGryTfZfukzp5tRy4rv+HTpCAiN4tIkogki8jgHB5/SkQ2icg6EfmfiFT0ZTzqPDRtCs8+C9OmEfXdXL74IntOMu2RpM6H50R3pSMNCbV7Eb5kIUyaBNdf72xw6gw+SwoiEgqMBzoAtYB7RKTWaYf9BMQYY+oCswG91PiTIUOgYUPo2ZPoIr+xYgVZE+e9844uzKPO7fSeRkldnqPkf6fDSy/BQw85G5zKkS9LCo2BZGPMNmPMcWAm0MnzAGPMEmNMuutuAlDOh/Go8xUeDrNm2ZbBu+8muvJxevWyD+3bB82ba2JQuUtKsv0W3AvmbHxkHKUnvwZ9+thpLJRf8mVSuArY5XE/xbUvNz2BBT6MR12IatVgyhT7le+55xg0CFq3tg+lpWliUDlLSrKfjXTXV76JTaZSdsTj0KmTLTqIOBugypVfNDSLyP1ADDAyl8d7i0iiiCTu2bMnf4NT0LUrPPYYjB5N1PfzmD1bE4PKnTshuHsavVzzA+5b2ssupzlzpk5h4ed8mRR+B8p73C/n2ncKEbkReB7oaIw5ltMTGWMmGWNijDExZcqU8Umw6hxGj7azlz34IFH7tpyRGHr3djY85T/69MlOCMOunsVzvz6IXH89zJ0LERHOBqfOyZdJYTVQXUQqi0g40A2Y53mAiDQAJmITwm4fxqIuVuHCtvtgWBj8619Ehe0/pTfh6tU64lnZz8APP9jt/mU+ZMiv9yHNm9uxCEWKOBucyhOfJQVjzAkgFlgIbAY+NsZsFJHhItLRddhI4BLgExFZKyLzcnk65Q8qVYJPP4WtW6FbN6IuPcH8+XZYw5EjOhVGsHNPYXHkCDwePoExqfcjLVrAl1/aD4kKCLqegjp/kyfb+qInn4Q33si6GLinL1i2zA5zUMHD8zPwbMjrvJI52M5p8fHHWkLwE7qegvKdhx+Gxx+HMWNgwgSaNrWJwD1HkpYYgstXX9mG5RMZmYwMecYmhHvvhc8+04QQgDQpqAszejTceis8+ijMnk3TpmTNkaSJIXgkJNiPQXjmEWbRjacz4+yEiu+/b4uNKuBoUlAXJizMVg00awb33QeLFzNsmO25WqiQJoZg4K4yisr8myVcz50y235ZGD9eZzwNYPrOqQtXtCh8/jlUrw63307Ubz8SH2+rkjQxFGzuhFAzYx2raEKjiPXIZ5/BU0/pwLQAp0lBXZzISFupXKqUHZy0du0ZbQxt2+rgtoLEPX3F3Rnvk0BTrozKIPS7ZXD77U6HprxAk4K6eOXKweLFtuTQti389NMpbQzp6XZePS0xBL6EBGja4Bij0vvyPg+QclUTwjf8aAc2qgJBk4LyjqpVYelSuOQSmxh+/JFhw7JHPeuSnoEvIQEearmFr4+0oC8T+LD8M0QmfgNlyzodmvIiTQrKe6pUsYmhRAlo25aozcuZPds2Pmt31cCWsNLwXotJrD5Rn2okM6nDHNr9+BpRl4c5HZryMk0KyrsqV7YrqpQtCzfdRNTS2cTHa3fVQJY4fzepzTvx9sk+rKQZox9cT+/5txMV5XRkyhc0KSjvq1gRVqyw9cx33QXjxp3RXbV5c9s+rfxX6h7DtHYfUuHW2txovmZAyBj+++jXPDFKlz0pyDQpKN8oXRoWLbLz5z/+OFH/7kf8mAyWLbNd2DMz7aAnLTH4qW3b2B3Tge7f3Md2KtMsLJGuK55g3PgQLSEUcJoUlO8UKWJnVn3qKYiPh7ZtaVrpL778MjsxtGwJsbF2cXflB44d4/CQ1zkeXZvyv60glnG0Dvuet5fX1vmsgoQmBeVboaF2lOuHH0JiIlx7LTeXXMmKFbYq6cQJOwC2SRMdy+AoY+DTTzlevRbFXhrMlyfaczWbmVQolqXLQzUhBBFNCip/3HMPrFxp12Vo2ZKm37zEssUnKFrUPrxtm50xQxODAxITbd/hO+9k6+9FaMdC7mAO+4qW0xlvg5AmBZV/6tWDH3+Eu++GIUNo+kxr1s/bTqlS9uF9+3SQW77asMEutdqoEcc3JBEbPpE6mWv5hnaUKmXfKk0IwUeTgspfl14KM2bABx/Ahg1Uub0um/uOpWqlk4Ad5KY9k3xs40bbK6xOHTK/WsiCmBe54uAWxh/vzUnCqFLFFuqio50OVDlBk4Jyxn33wbp10Lw5ZV/pz+ZLm/LqXT9lNUDfcos2QHuVMfDdd3DHHVCnDixYQPqTz9Oh5g5uSRzO3hMlCAuz3YZXrdKEEMw0KSjnVKwICxbARx9R6M9dDJ4dw/YOj3K5/I0xtgE6Olqrky5KRgZ89JFtyW/Z0g4sfO45EmfvoNy0l/k6MRKwjf7Ll9tOYtrlNLhpUlDOEoFu3WDzZujblwoLJ5NSpBrDCr1MUQ6zd69WJ12QnTth6FA79ci998I//8Dbb8OuXXzV4mWa3FKaffvsoUWL6hKqKpsmBeUfSpWyX1M3biS0/U0MzXiRXYWqMFhe45LMf+jQAa67TnsnndXx43ZcSPv2drqRl16Ca66xa15s3kzS9Y9w3Y1FufVWW0UHtseXNigrT5oUlH+pUcOu7btiBZFtG/KqeZadVOQlXmD7yj+pU0dLDafIyLAn5KGH7HxTXbvaUteQIbBjB3z1FalNbyP28RAaNLANyJmZdvDgggXw/ffafqBOJcYYp2M4LzExMSYxMdHpMFR+WbOGtIGvUmrJZ5wklLncztv05WjT63l3mgTnBe3IETsb7dy58OmnkJZmZ6a9/XY7HuSmm+ygQWzJql07+O237F+PjIQvv9TSQbARkTXGmJhzHqdJQQWCvau28EOvSTTaMJXS7GUL1ZgVci+t3+5Gy95XOx2e7+3cCfPn26v54sU2MRQrBh072nEf7dtDRETW4ampMGwYTJ1qDwU7fXmfPna/NiYHH00KqkBa9e1Rpt4ym7vS3+V6lhCCYVOhuhR/8A7KP9zBzszq+pYc0HbssD2F3Ldt2+z+KlXsTIK33AJt2pySCNwSEqBDB9i/P3uflg6UJgVVYKWmwjPPwFfv/skdZjbdmEkzVhKC4USpKMI6tLOrv113nW2jCPHzprN9+2DNmuzbqlXZ9T2RkbYraZs29kpfo4btsZWDpCTo0QNWr7ZzSoGWDlQ2TQqqwEtIsDUnf/wBJU+k0o6vuS1kAf8qvJDiR/bYgyIjbRebhg2hdm07cKtaNdsxP7/t32+v3L/8kn1bty67FABQqRI0amRXImrd2vYeOkdSc1cVTZkCR4/afSEhdunsWbO0dKAsTQoqaCQkwA03ZNedC5nUCf+VJ5p8zz0Vvifix+/txdjdDzM83K4pXbFi9q1cOftVOjLS3kqXtnX2hQrlflE+eRKOHbMX+3377G3vXvvzjz8gJQV27cr+6Tk8OyzMJqdrrrFVXu5b6dJ5/rvdJYNNm+wwBLciRWyzgyYD5UmTggoq7gvkTz9lf1sG2ynnmmtg2oSj1Mj8xU4Ct349bNliq2h27jz3XBphYTaRFCpkE8vx4/Z2rv+dUqWgfHl7K1fOtgfUrGlvlStfcGklt781IgIaNIB339VupupMmhRUUEpKgvvvh7Vrs+vVwX7Zv/JK+OSTHL5BHz5sv9mnpdlv+nv32u309OwE4L6FhtqLeXh49q1kSZsAPG9XXGFLGl6UkAB33gl//WULKW6FC9vaMU0G6mw0KaigllvViggUL27HeL32mv83vrr/jh07YM+eUxOduxSkyUDlRV6Tgp93y1DqwkRH29G6ycl2sG/x4rYWyBg4cMA2ylaqZL/k9+rlX7OxJiXZjlNXXmmXoFi5Ev780yYEEZsMevaErVt1RLLyPp8mBRG5WUSSRCRZRAbn8HhhEZnlenyViFTyZTwq+ERF2QRw4ICdBfSqq7KHMRw+nJ0gKle2s0RUrOjMrKwJCfa1y5Y9NREcO2YfDw+HChVsEvjnH3jnHf8v5ajA5LOkICKhwHigA1ALuEdEap12WE9gnzGmGjAGeN1X8SjVtKntCLRxo+2lWrZsdoI4dAh277Ztz82bQ5kycMkl9tu6t9d1SE213/RLlIDLLrNxtGhhX3v37lMTweWX21jXrbNt4tqjSPmaz9oURKQZMMwY0951/1kAY8yrHscsdB2zUkTCgL+AMuYsQWmbgvImzzr7Awds6SEn7jbjokVtFdSRI3ZbxHZIct/3fCy340RsEsrtdYoXtyUXbStQ3pTXNoUwH8ZwFbDL434K0CS3Y4wxJ0TkH6A0cMr3MhHpDfQGqFChgq/iVUHI3fYA2YPA5s6139aPHLH1+MeOZScLz6RxegLJ7bHcEk1IiB2WIGI7NN1+u448Vs7zZVLwGmPMJGAS2JKCw+GoAioqyi7pEB+fvc9dkti2zX6790ZJ4ZJL7JAFLQkof+TLpPA7UN7jfjnXvpyOSXFVH5UE0nwYk1LnxbMkoVQw8GXvo9VAdRGpLCLhQDdg3mnHzAMedG3fCSw+W3uCUkop3/JZScHVRhALLARCganGmI0iMhxINMbMA6YA74tIMrAXmziUUko5xKdtCsaY+cD80/YN8dg+CnT1ZQxKKaXyTkc0K6WUyqJJQSmlVBZNCkoppbJoUlBKKZVFk4JSSqksAbeegojsAXZexFNEcdo0Gn5C4zo//hiXP8YEGtf5KqhxVTTGlDnXQQGXFC6WiCTmZVKo/KZxnR9/jMsfYwKN63wFe1xafaSUUiqLJgWllFJZgjEpTHI6gFxoXOfHH+Pyx5hA4zpfQR1X0LUpKKWUyl0wlhSUUkrlokAmBRHpKiIbRSRTRHJtrReRm0UkSUSSRWSwx/7KIrLKtX+Wa+pvb8QVKSLfiMgW189SORxzvYis9bgdFZHbXY9NE5HtHo/Vz4+YXMed9HjdeR77nTxX9UVkpeu9Xicid3s85tVzldtnxePxwq6/P9l1Pip5PPasa3+SiLS/mDguIK6nRGST6/z8T0QqejyW43uaT3F1F5E9Hq/fy+OxB13v+xYRefD03/VxXGM8YvpVRPZ7POaT8yUiU0Vkt4hsyOVxEZGxrpjXiUhDj8e8f66MMQXuBlwNRANLgZhcjgkFtgJVgHDgZ6CW67GPgW6u7QlAXy/FFQcMdm0PBl4/x/GR2CnFi7ruTwPu9PK5ylNMwKFc9jt2roAaQHXX9pXAn8Cl3j5XZ/useBzzKDDBtd0NmOXaruU6vjBQ2fU8ofkY1/Uen5++7rjO9p7mU1zdgfgcfjcS2Ob6Wcq1XSq/4jrt+H7YKf99fb5aAQ2BDbk8fguwABCgKbDKl+eqQJYUjDGbjTFJ5zisMZBsjNlmjDkOzAQ6iYgANwCzXce9B9zupdA6uZ4vr897J7DAGJPupdf3RkxZnD5XxphfjTFbXNt/ALuBcw7OuQA5flbOEu9soK3r/HQCZhpjjhljtgPJrufLl7iMMUs8Pj8J2BUQfS0v5ys37YFvjDF7jTH7gG+Amx2K6x7gIy+9dq6MMcuwX/5y0wmYbqwE4FIRuQIfnasCmRTy6Cpgl8f9FNe+0sB+Y8yJ0/Z7Q1ljzJ+u7b+Asuc4vhtnfihHuIqQY0SkcD7GFCEiiSKS4K7Owo/OlYg0xn772+qx21vnKrfPSo7HuM7HP9jzk5ff9WVcnnpiv3G65fSe5mdcXVzvz2wRcS/d6xfny1XNVhlY7LHbV+frXHKL2yfnyqeL7PiSiCwCLs/hoeeNMf/N73jczhaX5x1jjBGRXLt+ub4J1MGuXOf2LPYCGY7tnvYMMDyfYqpojPldRKoAi0VkPfbCd8G8fK7eBx40xmS6dl/QuSqoROR+IAZo7bH7jPfUGLM152fwus+Bj4wxx0SkD7aUdUM+vXZedANmG2NOeuxz8nzlm4BNCsaYGy/yKX4HynvcL+fal4YtnoW5vvG59190XCLyt4hcYYz503Uh232Wp7oLmGOMyfB4bvc352Mi8i7wdH7FZIz53fVzm4gsBRoAn+LwuRKREsCX2C8DCR7PfUHnKhe5fVZyOiZFRMKAktjPUl5+15dxISI3YhNta2PMMff+XN5Tb1zkzhmXMSbN4+472DYk9++2Oe13l3ohpjzF5aEb8JjnDh+er3PJLW6fnKtgrj5aDVQX23smHPshmGdsC84SbH0+wIOAt0oe81zPl5fnPaM+03VxdNfl3w7k2FvB2zGJSCl39YuIRAHNgU1OnyvX+zYHW986+7THvHmucvysnCXeO4HFrvMzD+gmtndSZaA68MNFxHJecYlIA2Ai0NEYs9tjf47vaT7GdYXH3Y7AZtf2QqCdK75SQDtOLS37NC5XbDWxDbcrPfb58nydyzzgAVcvpKbAP64vPb45V95sRfeXG9AZW792DPgbWOjafyUw3+O4W4Bfsdn+eY/9VbD/uMnAJ0BhL8VVGvgfsAVYBES69scA73gcVwn7LSDktN9fDKzHXuA+AC7Jj5iA61yv+7PrZ09/OFfA/UAGsNbjVt8X5yqnzwq2OqqjazvC9fcnu85HFY/ffd71e0lABy9/1s8V1yLX/4D7/Mw713uaT3G9Cmx0vf4SoKbH7z7kOo/JQI/8jMt1fxjw2mm/57Pzhf3y96frs5yCbft5BHjE9bgA410xr8ejR6UvzpWOaFZKKZUlmKuPlFJKnUaTglJKqSyaFJRSSmXRpKCUUiqLJgWllFJZNCkopZTKoklBKaVUFk0KSl0kEWnkmtgtQkSKiV3fobbTcSl1IXTwmlJeICIvY0c1FwFSjDGvOhySUhdEk4JSXuCaS2c1cBS4zpw6u6ZSAUOrj5TyjtLAJUBxbIlBqYCkJQWlvEDsmr0zsQuzXGGMiXU4JKUuSMCup6CUvxCRB4AMY8yHIhIKfC8iNxhjFp/rd5XyN1pSUEoplUXbFJRSSmXRpKCUUiqLJgWllFJZNCkopZTKoklBKaVUFk0KSimlsmhSUEoplUWTglJKqSz/Dzk7DRctdrbQAAAAAElFTkSuQmCC
+" />
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+    
+        </section>
+    </div>
+</div>
+          </div>
+
+          <footer class="show-for-large-up">
+<div class="row">
+    <div class="small-6 medium-3 columns">
+        <ul class="left-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
+        </ul>
+    </div>
+    <div class="small-6 medium-3 medium-push-6 columns">
+        <ul class="right-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
+        </ul>
+    </div>
+    <div class="small-12 medium-6 medium-pull-3 columns text-center">
+        <p class="tag-cloud">
+            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
+            &nbsp;&hellip;
+        </p>
+    </div>
+    <div class="small-12 columns sub-footer">
+        <hr>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-left">
+                &copy; 2019 Shuto 
+                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
+            </p>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-right">
+                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+            </p>
+        </div>
+    </div>
+</div>          </footer>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <footer class="hide-for-large-up">
+<div class="row">
+    <div class="small-6 medium-3 columns">
+        <ul class="left-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
+        </ul>
+    </div>
+    <div class="small-6 medium-3 medium-push-6 columns">
+        <ul class="right-nav">
+            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
+        </ul>
+    </div>
+    <div class="small-12 medium-6 medium-pull-3 columns text-center">
+        <p class="tag-cloud">
+            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
+            &nbsp;&hellip;
+        </p>
+    </div>
+    <div class="small-12 columns sub-footer">
+        <hr>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-left">
+                &copy; 2019 Shuto 
+                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
+            </p>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <p class="small-text-center medium-text-right">
+                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
+                which takes great advantage of <a href="https://www.python.org/">Python</a>.
+            </p>
+        </div>
+    </div>
+</div>        </footer>
+      </div>
+
+
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery.min.js"></script>
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/foundation.min.js"></script>
+      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/app.js"></script>
+      <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+      <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css" media="screen">
+    </body>
+
+</html>

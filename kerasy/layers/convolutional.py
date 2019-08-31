@@ -17,9 +17,9 @@ class Conv2D():
                  kernel_initializer='random_normal', bias_initializer='zeros', data_format='channels_last'):
         """
         @param filters           : (int) the dimensionality of the output space.
-        @param kernel_size       : (int,int)
-        @param strides           : (int,int)
-        @param padding           : (str) "valid" or "same".
+        @param kernel_size       : (int,int) height and width of each kernel. kernel-shape=(*kernel_size, F, OF)
+        @param strides           : (int,int) height and width of stride step.
+        @param padding           : (str) "valid" or "same". Padding method.
         @param activation        : (str) Activation function to use.
         @param kernel_initializer: (str) Initializer for the `kernel` weights matrix.
         @param bias_initializer  : (str) Initializer for the bias vector.
@@ -38,16 +38,15 @@ class Conv2D():
         self.H, self.W, self.F = input_shape
         try:
             if self.padding=="same":
-                self.OH=self.H; self.OW=self.W
+                self.OH = self.H
+                self.OW = self.W
                 self.ph = ((self.sh-1)*self.H+self.kh-self.sh)//2
                 self.pw = ((self.sw-1)*self.W+self.kw-self.sw)//2
             elif self.padding=="valid":
-                self.OH=self.H-self.kh+1; self.OW=self.W-self.kw+1
-                while self.OH%self.sh != 0:
-                    self.OH-=1
-                while self.OW%self.sw != 0:
-                    self.OW-=1
-                self.ph, self.pw = (0,0)
+                self.OH = (self.H-self.kh)//self.sh+1
+                self.OW = (self.W-self.kw)//self.sw+1
+                self.ph = 0
+                self.pw = 0
         except:
             print("Can't understand 'padding=f{self.padding}'. Please chose 'same' or 'valid'.")
 
@@ -56,28 +55,29 @@ class Conv2D():
         self.output_shape=(self.OH, self.OW, self.OF)
 
     def _generator(self, input):
-        """ @param input: (ndarray) must be a 3-D array. (Height, Width, Channel) """
+        """ @param input: (ndarray) must be a 3-D array. shape=(H,W,F) """
         #=== padding ===
-        try:
-            if self.padding =="same":
-                z_in = np.zeros(shape=(self.H+2*self.ph,self.W+2*self.pw))
-                z_in[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
-            elif self.padding == "valid":
-                z_in = input[:self.OH,:self.OW,:]
-        except:
-            print("Can't understand 'padding=f{self.padding}'")
-
-        for i in range(0,self.H-self.kh+1,self.sh):
-            for j in range(0,self.W-self.kw+1,self.sw):
-                clip_image = input[i:(i+self.kh), j:(j+self.kw), :]
+        if self.padding =="same":
+            z_in = np.zeros(shape=(self.H+2*self.ph,self.W+2*self.pw,self.F))
+            z_in[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
+        elif self.padding == "valid":
+            z_in = input[:self.sh*self.OH+self.kh-1, :self.sw*self.OW+self.kw-1, :]
+        else:
+            TypeError(f"Can't understand 'padding=f{self.padding}'")
+            
+        self.z = z_in # Memorize!!
+        
+        #=== generator === 
+        for i in range(self.OH):
+            for j in range(self.OW):
+                clip_image = z_in[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :]
                 yield clip_image,i,j
 
-    def forward(self, z_in):
-        """ @param z_in: (ndarray) 3-D array. """
-        self.z = z_in # Memorize. (input layer. shape=(H,W,F))
+    def forward(self, input):
+        """ @param input: (ndarray) 3-D array. shape=(H,W,F) """
         z_out = np.zeros(shape=(self.OH, self.OW, self.OF))
         for f in range(self.OF):
-            for clip_image,i,j in self._generator(z_in):
+            for clip_image,i,j in self._generator(input):
                 """ 'self.kernel[:,:,:,f]' and 'clip_image' shapes equal in (kh,kw,F) """
                 z_out[i][j][f] = np.sum(clip_image*self.kernel[:,:,:,f])
         a = z_out + self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
@@ -105,14 +105,14 @@ class Conv2D():
         """
         delta = self.h.diff(self.a) * delta_times_w # shape=(OH,OW,OF)
         delta_padd = np.zeros(shape=(self.OH+2*(self.kh-1), self.OW+2*(self.kw-1), self.OF))
-        delta_padd[self.kh-1:-(self.kh-1), self.kw-1:-(self.kw-1), :] = delta
+        delta_padd[(self.kh-1):-(self.kh-1), (self.kw-1):-(self.kw-1), :] = delta
         
-        delta_times_w = np.zeros(shape=(self.H,self.W,self.F)) # output.
+        delta_times_w = np.zeros_like(self.z) # shape=(H+2ph,W+2pw,F)
         
-        for i in range(self.H):
-            for j in range(self.W):
+        for i in range(self.H+2*self.ph):
+            for j in range(self.W+2*self.pw):
                 for f in range(self.F):
-                    delta_times_w[i][j][f] = np.sum(delta_padd[i:i+self.kh,j:j+self.kw,:] * np.flip(self.kernel[:,:,f,:], axis=(0,1)))
+                    delta_times_w[i][j][f] = np.sum(delta_padd[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw),:] * np.flip(self.kernel[:,:,f,:], axis=(0,1)))
 
         if self.trainable:
             self.update(delta)
@@ -122,15 +122,12 @@ class Conv2D():
     def update(self, delta, ALPHA=0.00001):
         """ @param delta: shape=(OH,OW,OF) """
         # Kernels
-        z_padd = np.zeros(shape=(self.OH+self.kh-1, self.OW+self.kw-1, self.F))
-        z_padd[:self.H,:self.W,:] = self.z
-
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)
         for m in range(self.kh):
             for n in range(self.kw):
                 for c in range(self.F):
                     for c_ in range(self.OF):
-                        dEdw[m][n][c][c_] = np.sum(z_padd[m:m+self.OH,n:n+self.OW,c] * delta[:,:,c_])
+                        dEdw[m][n][c][c_] = np.sum(self.z[m:m+self.OH*self.sh:self.sh, n:n+self.OW*self.sw:self.sw, c] * delta[:,:,c_])
         self.kernel -= ALPHA*dEdw
 
         # bias

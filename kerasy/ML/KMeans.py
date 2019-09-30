@@ -11,6 +11,7 @@ class KMeans():
         self.history=[]
 
     def fit(self, data):
+        self.history=[]
         self.N, self.M = data.shape
         mins = np.min(data, axis=0)
         maxs = np.max(data, axis=0)
@@ -22,9 +23,10 @@ class KMeans():
         while True:
             idx = self.Estep(data)
             self.history.append([idx, np.copy(self.mu)])
-            self.Mstep(data, idx)
             if np.all((idx-pidx)==0): break
             pidx = idx
+            self.Mstep(data, idx)
+
 
     def predict(self, data):
         idx = self.Estep(data)

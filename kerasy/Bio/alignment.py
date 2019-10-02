@@ -88,7 +88,7 @@ class NeedlemanWunshGotoh(Alignment):
 
     def _initialize_DPmatrix(self):
         DP = np.zeros(shape=(3*self.size)) # DP matrix.
-        for k in range(3): DP[k*self.size] = -np.inf
+        for k in range(1,3): DP[k*self.size] = -np.inf
         for i in range(1,self.n):
             DP[0*self.size+i*self.m] = -np.inf # M
             DP[1*self.size+i*self.m] = -np.inf # X
@@ -125,9 +125,9 @@ class NeedlemanWunshGotoh(Alignment):
                 for k in range(3):
                     DP[k*self.size+i*self.m+j] = np.max(candidates[k])
                     T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        scores = [DP[k*self.size-1] for k in range(3)]
+        scores = [DP[(k+1)*self.size-1] for k in range(3)]
         score = np.max(scores)
-        pointer = np.argmax(scores)*self.size-1
+        pointer = (np.argmax(scores)+1)*self.size-1
         return score,pointer,T
 
 class SmithWaterman(Alignment):
@@ -208,44 +208,64 @@ class BackwardNeedlemanWunshGotoh(Alignment):
 
     def _initialize_DPmatrix(self):
         DP = np.zeros(shape=(3*self.size)) # DP matrix.
-        for k in range(3): DP[k*self.size] = -np.inf
         for i in range(1,self.n):
-            DP[0*self.size+i*self.m] = -np.inf # M
-            DP[1*self.size+i*self.m] = -np.inf # X
-            DP[2*self.size+i*self.m] = -self.d-(i-1)*self.e # Y
-        for j in range(1,self.m):
-            DP[0*self.size+j] = -np.inf # M
-            DP[1*self.size+j] = -self.d-(j-1)*self.e # X
-            DP[2*self.size+j] = -np.inf # Y
+            DP[0*self.size+i*self.m-1] = -self.d-(self.n-i-1)*self.e # bM
+            DP[1*self.size+i*self.m-1] = -np.inf # bX
+            DP[2*self.size+i*self.m-1] = -(self.n-i)*self.e # bY
+        for j in range(self.m-1):
+            DP[1*self.size-self.m+j] = -self.d-(self.m-j-2)*self.e # bM
+            DP[2*self.size-self.m+j] = -(self.m-j-1)*self.e # bX
+            DP[3*self.size-self.m+j] = -np.inf # bY
         return DP
 
     def _Recursion(self,DP,T,X,Y):
-        for i in range(1,self.n):
-            for j in range(1,self.m):
+        for i in reversed(range(self.n-1)):
+            for j in reversed(range(self.m-1)):
                 candidates = [
                     [
-                        DP[0*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[1*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[2*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
+                        DP[1*self.size+(i+1)*self.m+j]-self.d,
+                        DP[2*self.size+i*self.m+(j+1)]-self.d,
                     ],
                     [
-                        DP[0*self.size+(i-1)*self.m+j]-self.d,
-                        DP[1*self.size+(i-1)*self.m+j]-self.e,
+                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
+                        DP[1*self.size+(i+1)*self.m+j]-self.e,
                     ],
                     [
-                        DP[0*self.size+i*self.m+(j-1)]-self.d,
-                        DP[2*self.size+i*self.m+(j-1)]-self.e,
+                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
+                        DP[2*self.size+i*self.m+(j+1)]-self.e,
                     ],
                 ]
                 pointers = [
-                    [k*self.size+(i-1)*self.m+(j-1) for k in (0,1,2)],
-                    [k*self.size+(i-1)*self.m+j for k in (0,1)],
-                    [k*self.size+i*self.m+(j-1) for k in (0,2)]
+                    [
+                        0*self.size+(i+1)*self.m+(j+1),
+                        1*self.size+(i+1)*self.m+j,
+                        2*self.size+i*self.m+(j+1),
+                    ],
+                    [
+                        0*self.size+(i+1)*self.m+(j+1),
+                        1*self.size+(i+1)*self.m+j,
+                    ],
+                    [
+                        0*self.size+(i+1)*self.m+(j+1),
+                        2*self.size+i*self.m+(j+1),
+                    ],
                 ]
                 for k in range(3):
                     DP[k*self.size+i*self.m+j] = np.max(candidates[k])
                     T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        scores = [DP[k*self.size-1] for k in range(3)]
+        scores = [DP[k*self.size+self.m+1] for k in range(3)]
         score = np.max(scores)
-        pointer = np.argmax(scores)*self.size-1
+        pointer = np.argmax(scores)*self.size+self.m+1
         return score,pointer,T
+
+    def _TraceBack(self,T,pointer):
+        Xidxes=[]; Yidxes=[];
+        while True:
+            Xidxes.append((pointer%self.size)//self.m); Yidxes.append(pointer%self.m)
+            pointer = T[pointer]
+            if pointer==0:
+                break
+        if self.__method__ == "local" and not (Xidxes[-1]==1 and Yidxes[-1]==1):
+            Xidxes=Xidxes[:-1]; Yidxes=Yidxes[:-1]
+        return Xidxes[::-1],Yidxes[::-1]

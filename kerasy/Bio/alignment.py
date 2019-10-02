@@ -45,9 +45,9 @@ class Alignment():
         score,pointer,T = self._Recursion(DP,T,X,Y,memorize=memorize)
         # TraceBack
         Xidxes,Yidxes = self._TraceBack(T,pointer)
-        alignedX = self._arangeSeq(X,Xidxes)
-        alignedY = self._arangeSeq(Y,Yidxes)
-        self._printAlignment(score,alignedX, alignedY, width=width)
+        alignedX,Xidxes = self._arangeSeq(X,Xidxes)
+        alignedY,Yidxes = self._arangeSeq(Y,Yidxes)
+        self._printAlignment(score,alignedX,alignedY,Xidxes,Yidxes,width=width)
 
     def _TraceBack(self,T,pointer):
         Xidxes=[]; Yidxes=[];
@@ -66,12 +66,13 @@ class Alignment():
         if type(idxes) == type([]): idxes=np.array(idxes)
         masks = (np.roll(idxes,-1) == idxes) | (idxes==0)
         alignedSeq = "".join('-' if masks[i] else seq[idxes[i]-1] for i in reversed(range(len(idxes))))
-        return alignedSeq
+        return alignedSeq, idxes-1
 
-    def _printAlignment(self,score,alignedX,alignedY,width):
+    def _printAlignment(self,score,alignedX,alignedY,Xidxes,Yidxes,width):
         print(f"\033[31m\033[07m {self.__name__} \033[0m\nAlignment score: \033[34m{score}\033[0m\n")
         self.params()
         print("="*(width+3))
+        if self.__method__ == "local": print(f"Aligned positions: X[{min(Xidxes)},{max(Xidxes)}] Y[{min(Yidxes)},{max(Yidxes)}]")
         print("\n\n".join([f"X: {alignedX[i: i+width]}\nY: {alignedY[i: i+width]}" for i in range(0, len(alignedX), width)]))
         print("="*(width+3))
 

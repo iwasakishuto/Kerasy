@@ -7,6 +7,8 @@ class Alignment():
         self.n=None
         self.m=None
         self.size=None
+        self.DP=None
+        self.TraceBack=None
         if path is not None:
             self.load_params(path)
         else:
@@ -34,13 +36,13 @@ class Alignment():
         """ Calcurate the match/mismatch score s[xi,yj] """
         return self.match if x==y else self.mismatch
 
-    def align(self,X,Y,width=60):
+    def align(self,X,Y,width=60,memorize=False):
         self.n=len(X)+1; self.m=len(Y)+1; self.size=(len(X)+1)*(len(Y)+1)
         # Initialization
         DP = self._initialize_DPmatrix()
         T  = self._initialize_TraceBackPointer()
         # Recursion (DP)
-        score,pointer,T = self._Recursion(DP,T,X,Y)
+        score,pointer,T = self._Recursion(DP,T,X,Y,memorize=memorize)
         # TraceBack
         Xidxes,Yidxes = self._TraceBack(T,pointer)
         alignedX = self._arangeSeq(X,Xidxes)
@@ -52,8 +54,10 @@ class Alignment():
         while True:
             Xidxes.append((pointer%self.size)//self.m); Yidxes.append(pointer%self.m)
             pointer = T[pointer]
-            if pointer==0:
-                break
+            if self.__direction__ == "forward"  and pointer==0: break
+            if self.__direction__ == "backward" and (pointer+1)%self.size==0: break
+        if self.__direction__ == "backward":
+            Xidxes=Xidxes[::-1];Yidxes=Yidxes[::-1]
         if self.__method__ == "local" and not (Xidxes[-1]==1 and Yidxes[-1]==1):
             Xidxes=Xidxes[:-1]; Yidxes=Yidxes[:-1]
         return Xidxes,Yidxes
@@ -74,6 +78,7 @@ class Alignment():
 class NeedlemanWunshGotoh(Alignment):
     __name__ = "Needleman-Wunsh-Gotoh"
     __method__ = "global"
+    __direction__ = "forward"
 
     def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
         super().__init__(match,mismatch,d,e,path)
@@ -99,7 +104,7 @@ class NeedlemanWunshGotoh(Alignment):
             DP[2*self.size+j] = -np.inf # Y
         return DP
 
-    def _Recursion(self,DP,T,X,Y):
+    def _Recursion(self,DP,T,X,Y,memorize=False):
         for i in range(1,self.n):
             for j in range(1,self.m):
                 candidates = [
@@ -128,12 +133,16 @@ class NeedlemanWunshGotoh(Alignment):
         scores = [DP[(k+1)*self.size-1] for k in range(3)]
         score = np.max(scores)
         pointer = (np.argmax(scores)+1)*self.size-1
+        if memorize:
+            self.DP=DP
+            self.TraceBack = T
         return score,pointer,T
 
 class SmithWaterman(Alignment):
     """ Local Alignment. """
     __name__ = "Smith-Waterman"
     __method__ = "local"
+    __direction__ = "forward"
 
     def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
         super().__init__(match,mismatch,d,e,path)
@@ -160,7 +169,7 @@ class SmithWaterman(Alignment):
             DP[2*self.size+j] = -np.inf # Y
         return DP
 
-    def _Recursion(self,DP,T,X,Y):
+    def _Recursion(self,DP,T,X,Y,memorize=False):
         for i in range(1,self.n):
             for j in range(1,self.m):
                 candidates = [
@@ -189,21 +198,27 @@ class SmithWaterman(Alignment):
                     T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
         score = np.max(DP)
         pointer = np.argmax(DP)
+        if memorize:
+            self.DP=DP
+            self.TraceBack = T
         return score,pointer,T
 
 class BackwardNeedlemanWunshGotoh(Alignment):
     __name__ = "Backward Needleman-Wunsh-Gotoh"
     __method__ = "global"
+    __direction__ = "backward"
 
     def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
         super().__init__(match,mismatch,d,e,path)
 
     def _initialize_TraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
-        for i in range(2,self.n):
-            T[2*self.size+i*self.m] = 2*self.size+(i-1)*self.m # Y
-        for j in range(2,self.m):
-            T[1*self.size+j] = 1*self.size+j-1 # X
+        for i in range(self.n-1):
+            T[0*self.size+(i+1)*self.m-1] = 0*self.size+(i+2)*self.m-1 # bM
+            T[2*self.size+(i+1)*self.m-1] = 2*self.size+(i+2)*self.m-1 # Y
+        for j in range(self.m-1):
+            T[1*self.size-self.m+j] = 1*self.size-self.m+(j+1) # bM
+            T[2*self.size-self.m+j] = 2*self.size-self.m+(j+1) # X
         return T
 
     def _initialize_DPmatrix(self):
@@ -218,7 +233,7 @@ class BackwardNeedlemanWunshGotoh(Alignment):
             DP[3*self.size-self.m+j] = -np.inf # bY
         return DP
 
-    def _Recursion(self,DP,T,X,Y):
+    def _Recursion(self,DP,T,X,Y,memorize=False):
         for i in reversed(range(self.n-1)):
             for j in reversed(range(self.m-1)):
                 candidates = [
@@ -254,18 +269,9 @@ class BackwardNeedlemanWunshGotoh(Alignment):
                 for k in range(3):
                     DP[k*self.size+i*self.m+j] = np.max(candidates[k])
                     T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        scores = [DP[k*self.size+self.m+1] for k in range(3)]
-        score = np.max(scores)
-        pointer = np.argmax(scores)*self.size+self.m+1
+        score = DP[0]
+        pointer = T[0]
+        if memorize:
+            self.DP=DP
+            self.TraceBack = T
         return score,pointer,T
-
-    def _TraceBack(self,T,pointer):
-        Xidxes=[]; Yidxes=[];
-        while True:
-            Xidxes.append((pointer%self.size)//self.m); Yidxes.append(pointer%self.m)
-            pointer = T[pointer]
-            if pointer==0:
-                break
-        if self.__method__ == "local" and not (Xidxes[-1]==1 and Yidxes[-1]==1):
-            Xidxes=Xidxes[:-1]; Yidxes=Yidxes[:-1]
-        return Xidxes[::-1],Yidxes[::-1]

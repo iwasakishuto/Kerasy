@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 import numpy as np
+from fractions import Fraction
 
 class Alignment():
     def __init__(self, match, mismatch, d, e, path):
@@ -16,21 +17,23 @@ class Alignment():
             self.mismatch=mismatch
             self.d=d
             self.e=e
-    def load_params(self, path):
+
+    def set_params(self, path):
         with open(path) as params_file:
             params=json.load(params_file)
-        self.match=params['match']
-        self.mismatch=params['mismatch']
-        self.d=params['d']
-        self.e=params['e']
+        for k in params.keys():
+            params[k]=float(Fraction(params[k])) # Deal with Fraction (string format)
+        self.__dict__.update(params)
+
     def params(self):
-        vals  = ['value',self.match,self.mismatch,self.d,self.e]
-        names = ['parameter','match','mimatch','gap opening penalty','gap extension penalty']
-        digit = max([len(str(val)) for val in vals])
-        width = max([len(name) for name in names])
-        for i,(name,val) in enumerate(zip(names,vals)):
-            print(f"|{name:<{width}}|{val:>{digit}}|")
-            if i==0: print('-'*(width+digit+3))
+        key_title='parameter'; val_title="value"
+        keys = [key for key in self.__dict__.keys() if key not in ["n","m","size","DP","TraceBack"]]
+        vals = [self.__dict__[key] for key in keys]
+        digit = max([len(val_title)] + [len(str(val)) for val in vals])
+        width = max([len(key_title)] + [len(key) for key in keys])
+        print(f"|{key_title:^{width}}|{val_title:^{digit}}|")
+        print('-'*(width+digit+3))
+        for i,(key,val) in enumerate(zip(keys,vals)): print(f"|{key:<{width}}|{val:>{digit}}|")
 
     def s(self,x,y):
         """ Calcurate the match/mismatch score s[xi,yj] """
@@ -276,3 +279,136 @@ class BackwardNeedlemanWunshGotoh(Alignment):
             self.DP=DP
             self.TraceBack = T
         return score,pointer,T
+
+class PairHMM(Alignment):
+    __name__ = "Pair HMM (Viterbi)"
+    __method__ = "global"
+    __direction__ = "forward"
+
+    def __init__(self, path=None):
+        super().__init__(path)
+
+    def s(self,x,y):
+        return self.px_e_y if x==y else self.px_ne_y
+
+    def _memorize_seq_info(self,X,Y):
+        self.n=len(X)+1; self.m=len(Y)+1; self.size=(len(X)+1)*(len(Y)+1)
+
+    def _initialize_TraceBackPointer(self):
+        T = np.zeros(shape=(3*self.size), dtype=int)
+        for i in range(2,self.n): T[1*self.size+i*self.m+0] = 1*self.size+(i-1)*self.m+0
+        for j in range(2,self.m): T[2*self.size+0*self.m+j] = 2*self.size+0*self.m+(j-1)
+        return T
+
+    def _initialize_DPmatrix(self):
+        """ DP matrix for Viterbi or Forward algorithm. """
+        F = np.zeros(shape=(3*self.size))
+        F[0] = 1
+        F[1*self.size+1*self.m+0] = self.delta*self.qx
+        for i in range(2,self.n): F[1*self.size+i*self.m+0] = self.epsilon*self.qx*F[1*self.size+(i-1)*self.m+0]
+        F[2*self.size+0*self.m+1] = self.delta*self.qy
+        for j in range(2,self.m): F[2*self.size+0*self.m+j] = self.epsilon*self.qy*F[2*self.size+0*self.m+(j-1)]
+        return F
+
+    def _initialize_DPmatrix_Backward(self):
+        """ DP matrix for Backward algorithm. """
+        B = np.zeros(shape=(3*self.size))
+        for k in range(3): B[(k+1)*self.size-1] = self.tau
+        for i in reversed(range(1,self.n-1)):
+            B[0*self.size+(i+1)*self.m-1] = self.delta*  self.qx*B[0*self.size+(i+2)*self.m-1]
+            B[1*self.size+(i+1)*self.m-1] = self.epsilon*self.qx*B[0*self.size+(i+2)*self.m-1]
+        for j in reversed(range(1,self.m-1)):
+            B[0*self.size+(self.n-1)*self.m+j] = self.delta*  self.qx*B[0*self.size+(self.n-1)*self.m+(j+1)]
+            B[2*self.size+(self.n-1)*self.m+j] = self.epsilon*self.qy*B[2*self.size+(self.n-1)*self.m+(j+1)]
+        return B
+
+    def _Recursion(self,DP,T,X,Y,memorize=False):
+        """ Viterbi Algorithm """
+        for i in range(1,self.n):
+            for j in range(1,self.m):
+                candidates = [
+                    [
+                        (1-2*self.delta-self.tau)*DP[0*self.size+(i-1)*self.m+(j-1)],
+                        (1-self.epsilon-self.tau)*DP[1*self.size+(i-1)*self.m+(j-1)],
+                        (1-self.epsilon-self.tau)*DP[2*self.size+(i-1)*self.m+(j-1)],
+                    ],
+                    [
+                        self.delta*DP[0*self.size+(i-1)*self.m+j],
+                        self.epsilon*DP[1*self.size+(i-1)*self.m+j],
+                    ],
+                    [
+                        self.delta*DP[0*self.size+i*self.m+(j-1)],
+                        self.epsilon*DP[2*self.size+i*self.m+(j-1)],
+                    ],
+                ]
+                coefficients = [self.s(X[i-1],Y[j-1]), self.qx, self.qy]
+                pointers = [
+                    [k*self.size+(i-1)*self.m+(j-1) for k in (0,1,2)],
+                    [k*self.size+(i-1)*self.m+j for k in (0,1)],
+                    [k*self.size+i*self.m+(j-1) for k in (0,2)]
+                ]
+                for k in range(3):
+                    DP[k*self.size+i*self.m+j] = coefficients[k] * np.max(candidates[k])
+                    T[k*self.size+i*self.m+j] = pointers[k][np.argmax(candidates[k])]
+        scores = [DP[(k+1)*self.size-1] for k in range(3)]
+        score = self.tau*max(scores)
+        pointer = (np.argmax(scores)+1)*self.size-1
+        if memorize:
+            self.DP=DP
+            self.TraceBack = T
+        return score,pointer,T
+
+    def forward(self,X,Y):
+        """
+        Forward Algorithm.
+        F[k,i,j] means the sum of all alignment('x1,..,xi' and 'y1,...,yj') probabilities
+        under the condition that the state is k when xi and yj are considered.
+        """
+        self._memorize_seq_info(X,Y)
+        F = self._initialize_DPmatrix()
+
+        for i in range(1,self.n):
+            for j in range(1,self.m):
+                F[0*self.size+i*self.m+j] = self.s(X[i-1],Y[j-1]) * np.sum([
+                    (1-2*self.delta-self.tau)*F[0*self.size+(i-1)*self.m+(j-1)],
+                    (1-self.epsilon-self.tau)*F[1*self.size+(i-1)*self.m+(j-1)],
+                    (1-self.epsilon-self.tau)*F[2*self.size+(i-1)*self.m+(j-1)],
+                ])
+                F[1*self.size+i*self.m+j] = self.qx * np.sum([
+                    self.delta*F[0*self.size+(i-1)*self.m+j],
+                    self.epsilon*F[1*self.size+(i-1)*self.m+j],
+                ])
+                F[2*self.size+i*self.m+j] = self.qy * np.sum([
+                    self.delta*F[0*self.size+i*self.m+(j-1)],
+                    self.epsilon*F[2*self.size+i*self.m+(j-1)],
+                ])
+        P = self.tau*np.sum([F[(k+1)*self.size-1] for k in range(3)])
+        F = F.reshape(3,self.n,self.m)[0,1:,1:]
+        return F, P
+
+    def backward(self,X,Y):
+        """
+        Backward Algorithm.
+        B[k,i,j] means the sum of all alignment('xi+1,..,xN' and 'yj+1,...,yM') probabilities
+        under the condition that the state is k when xi and yj are considered.
+        """
+        self._memorize_seq_info(X,Y)
+        B = self._initialize_DPmatrix_Backward()
+
+        for i in reversed(range(self.n-1)):
+            for j in reversed(range(self.m-1)):
+                B[0*self.size+i*self.m+j] = np.sum([
+                    (1-2*self.delta-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
+                    self.delta*self.qx*B[1*self.size+(i+1)*self.m+j],
+                    self.delta*self.qy*B[1*self.size+i*self.m+(j+1)],
+                ])
+                B[1*self.size+i*self.m+j] = np.sum([
+                    (1-self.epsilon-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
+                    self.epsilon*self.qx*B[1*self.size+(i+1)*self.m+j],
+                ])
+                B[2*self.size+i*self.m+j] = np.sum([
+                    (1-self.epsilon-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
+                    self.epsilon*self.qy*B[1*self.size+(i+1)*self.m+j],
+                ])
+        B = B.reshape(3,self.n,self.m)[0,1:,1:]
+        return B

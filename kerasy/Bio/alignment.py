@@ -4,19 +4,14 @@ import numpy as np
 from fractions import Fraction
 
 class Alignment():
-    def __init__(self, match, mismatch, d, e, path):
+    def __init__(self, path):
         self.n=None
         self.m=None
         self.size=None
         self.DP=None
         self.TraceBack=None
         if path is not None:
-            self.load_params(path)
-        else:
-            self.match=match
-            self.mismatch=mismatch
-            self.d=d
-            self.e=e
+            self.set_params(path)
 
     def set_params(self, path):
         with open(path) as params_file:
@@ -39,7 +34,7 @@ class Alignment():
         """ Calcurate the match/mismatch score s[xi,yj] """
         return self.match if x==y else self.mismatch
 
-    def align(self,X,Y,width=60,memorize=False):
+    def align(self,X,Y,width=60,memorize=False,return_score=False):
         self.n=len(X)+1; self.m=len(Y)+1; self.size=(len(X)+1)*(len(Y)+1)
         # Initialization
         DP = self._initialize_DPmatrix()
@@ -51,6 +46,7 @@ class Alignment():
         alignedX,Xidxes = self._arangeSeq(X,Xidxes)
         alignedY,Yidxes = self._arangeSeq(Y,Yidxes)
         self._printAlignment(score,alignedX,alignedY,Xidxes,Yidxes,width=width)
+        if return_score: return score
 
     def _TraceBack(self,T,pointer):
         Xidxes=[]; Yidxes=[];
@@ -84,8 +80,8 @@ class NeedlemanWunshGotoh(Alignment):
     __method__ = "global"
     __direction__ = "forward"
 
-    def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
-        super().__init__(match,mismatch,d,e,path)
+    def __init__(self, path=None):
+        super().__init__(path)
 
     def _initialize_TraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
@@ -148,8 +144,8 @@ class SmithWaterman(Alignment):
     __method__ = "local"
     __direction__ = "forward"
 
-    def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
-        super().__init__(match,mismatch,d,e,path)
+    def __init__(self, path=None):
+        super().__init__(path)
 
     def _initialize_TraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
@@ -212,8 +208,8 @@ class BackwardNeedlemanWunshGotoh(Alignment):
     __method__ = "global"
     __direction__ = "backward"
 
-    def __init__(self, match=1, mismatch=-1, d=5, e=1, path=None):
-        super().__init__(match,mismatch,d,e,path)
+    def __init__(self, path=None):
+        super().__init__(path)
 
     def _initialize_TraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.

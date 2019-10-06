@@ -28,20 +28,7 @@ class Nussinov(BaseHandler):
                 cell += f'{"-" if j+as_gamma<i else arr[i][j]:>{digit}} '
             print(cell)
 
-    def _is_bp(self,si,sj):
-        """check if i to j forms a base-pair."""
-        bases = si+sj
-        flag = False
-        if self.Watson_Crick:
-            WC_1 = ("A" in bases) and ("T" in bases) if self.type=="DNA" else ("A" in bases) and ("U" in bases)
-            WC_2 = ("G" in bases) and ("C" in bases)
-            flag = flag or (WC_1 or WC_2)
-        if self.Wobble:
-            Wob  = ("G" in bases) and ("U" in bases)
-            flag = flag or Wob
-        return flag
-
-    def fit(self, sequence, memorize=True, traceback=True):
+    def predict(self, sequence, memorize=True, traceback=True):
         N = len(sequence)
         gamma = np.zeros(shape=(N,N),dtype=int)
         for ini_i in reversed(range(N)):
@@ -109,7 +96,7 @@ class Nussinov(BaseHandler):
 
     def ConstrainedMaximize(self, sequence, gamma=None, omega=None, memorize=False):
         if gamma is None:
-            self.fit(sequence, memorize=True, traceback=False)
+            self.predict(sequence, memorize=True, traceback=False)
             gamma = self.gamma
         if omega is None:
             self.outside(sequence)
@@ -124,3 +111,52 @@ class Nussinov(BaseHandler):
                 Z[i][j] = gamma[i+1][j-1]+1+omega[i][j] if self._is_bp(sequence[i],sequence[j]) and (j-i>3) else 0
         if memorize:  self.Z=Z
         else: self._printAsTerai(Z, sequence)
+
+
+# class Zuker(BaseHandler):
+#     __remove_params__ = ["gamma", "omega","Z"]
+#     __name__ = "Zuker Algorithm"
+#
+#     def __init__(self):
+#         self.type=None
+#         self.Watson_Crick=None
+#         self.Wobble=None
+#         self.hairpin=None
+#         self.stacking=None
+#         self.internal_loop=None
+#         self.buldge_loop
+#         self.gamma=None
+#         self.omega=None
+#         self.Z=None
+#
+#     def _calW(self,i,j): return min(self.W[i+1][j],self.W[i][j-1],self.V[i][j],min([self.W[i][k] + self.W[k+1][j] for k in range(i,j)]))
+#     def _calV(self,i,j,DNA,Wobble): return min(self._F1(i,j),min([self.inf]+[self._F2(i,j,h,l,DNA,Wobble)+self.V[h][l] for h in range(i+1,j) for l in range(h+1,j) if self._is_bp(h,l,DNA=DNA,Wobble=Wobble)<2]),self.M[i+1][j-1] + self.a + self.b) if self._is_bp(i,j,DNA=DNA,Wobble=Wobble)<2 else self.inf
+#     def _calM(self,i,j): return min([self.M1[i][k] + self.M1[k+1][j] for k in range(i,j)])
+#     def _calM1(self,i,j): return min(self.M[i][j], self.V[i][j]+self.b, self.M1[i+1][j]+self.c, self.M1[i][j-1]+self.c)
+#
+#     def _F1(self,i,j):
+#         nt=j-i-1
+#         return self.hairpin[nt] if nt<30 else self.inf
+#     def _F2(self,i,j,h,l,DNA,Wobble):
+#         nt = (h-i-1)+(j-l-1)
+#         if nt>=30: val = self.inf
+#         elif (h==i+1) and (l==j-1): val = self.stacking[self._is_bp(i,j,DNA=DNA,Wobble=Wobble)][self._is_bp(i+1,j-1,DNA=DNA,Wobble=Wobble)]
+#         elif (i+1<h<l<j-1): val = self.internal_loop[nt]
+#         else: val = self.buldge_loop[nt]
+#
+#         return val
+#
+#     def predict(self,sequence,):
+#         """calcurate DP matrix.(recursion)"""
+#         N=len(sequence)
+#         self.V =
+#         for ini_i in reversed(range(self.N)):
+#             diff = self.N-ini_i
+#             for i in reversed(range(ini_i)):
+#                 j = i+diff
+#                 self.V[i][j] = self._calV(i,j,DNA=DNA,Wobble=Wobble)
+#                 self.M[i][j] = self._calM(i,j)
+#                 self.M1[i][j] = self._calM1(i,j)
+#                 self.W[i][j] = self._calW(i,j)
+#
+#

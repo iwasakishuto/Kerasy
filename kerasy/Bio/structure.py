@@ -1,26 +1,32 @@
 # coding: utf-8
 from __future__ import absolute_import
-from ..utils.params import Params
+from ..utils.bio import BaseHandler
 
 import numpy as np
 
-class BaseHandler(Params):
-    __name__ = ""
-
-    def _printAlignment(self, score, seq, pairs, width=60):
-        print(f"\033[31m\033[07m {self.__name__} \033[0m\nScore: \033[34m{score}\033[0m\n")
-        print("="*(width+3))
-        print("\n\n".join([f"seq: {seq[i: i+width]}\n     {pairs[i: i+width]}" for i in range(0, len(seq), width)]))
-        print("="*(width+3))
-
 class Nussinov(BaseHandler):
-    __remove_params__ = ["gamma"]
+    __remove_params__ = ["gamma", "omega"]
     __name__ = "Nussinov Algorithm"
 
     def __init__(self):
         self.type=None
         self.Watson_Crick=None
         self.Wobble=None
+        self.gamma=None
+        self.omega=None
+        self.Z=None
+
+    def _printAsTerai(self, array, sequence, as_gamma=False):
+        arr = array.astype(object)
+        N,M = arr.shape
+        digit = len(str(np.max(arr)))
+
+        print("\ " +  " ".join(sequence))
+        for i in range(N):
+            cell = f"{sequence[i]} "
+            for j in range(N):
+                cell += f'{"-" if j+as_gamma<i else arr[i][j]:>{digit}} '
+            print(cell)
 
     def _is_bp(self,si,sj):
         """check if i to j forms a base-pair."""
@@ -35,7 +41,7 @@ class Nussinov(BaseHandler):
             flag = flag or Wob
         return flag
 
-    def fit(self, sequence, memorize=False):
+    def fit(self, sequence, memorize=True, traceback=True):
         N = len(sequence)
         gamma = np.zeros(shape=(N,N),dtype=int)
         for ini_i in reversed(range(N)):
@@ -49,10 +55,14 @@ class Nussinov(BaseHandler):
                     gamma[i+1][j-1] + delta,
                     max([gamma[i][k] + gamma[k+1][j] for k in range(i,j)]) # Bifurcation
                 )
-        if memorize: self.gamma = gamma
         # TraceBack
-        pairs = self.traceback(gamma, N, sequence)
-        self._printAlignment(gamma[0][-1], sequence, pairs, width=60)
+        if traceback:
+            pairs = self.traceback(gamma, N, sequence)
+            score = gamma[0][-1]
+            self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
+        # Memorize or Return.
+        if memorize: self.gamma=gamma
+        else: self._printAsTerai(gamma, sequence, as_gamma=True)
 
     def traceback(self,gamma,N,sequence):
         """trackback to find which bases form base-pairs."""
@@ -77,3 +87,36 @@ class Nussinov(BaseHandler):
         for i,j in bp:
             pairs[i] = "("; pairs[j] = ")"
         return "".join(pairs)
+
+    def outside(self, sequence, memorize=True):
+        N = len(sequence)
+        omega = np.zeros(shape=(N+1,N+1), dtype=int)
+        for j in reversed(range(N-1)):
+            for i in range(N-j):
+                omega[i+1,j+i]=max(
+                    omega[i][j+i],
+                    omega[i+1][j+i+1],
+                    max([0]+[omega[k+1][j+i] + self.gamma[k][i] for k in range(i)]),
+                    max([0]+[self.gamma[j+i+1][k] + omega[i+1][k] for k in range(j+i+1,N)])
+                )
+        omega = omega[1:,:-1]
+        if memorize: self.omega=omega
+        else: self._printAsTerai(omega, sequence)
+
+    def ConstrainedMaximize(self, sequence, gamma=None, omega=None, memorize=False):
+        if gamma is None:
+            self.fit(sequence, memorize=True, traceback=False)
+            gamma = self.gamma
+        if omega is None:
+            self.outside(sequence)
+            omega = self.omega
+
+        N=len(sequence)
+        Z = np.zeros(shape=(N,N),dtype=int)
+        for ini_i in reversed(range(N)):
+            diff = N-ini_i
+            for i in reversed(range(ini_i)):
+                j = i+diff
+                Z[i][j] = gamma[i+1][j-1]+1+omega[i][j] if self._is_bp(sequence[i],sequence[j]) and (j-i>3) else 0
+        if memorize:  self.Z=Z
+        else: self._printAsTerai(Z, sequence)

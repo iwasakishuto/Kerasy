@@ -96,19 +96,11 @@ class Nussinov(BaseHandler):
             for i in range(N-ini_j):
                 j = ini_j+i
                 delta = 1 if (i>0 and j+1<N) and self._is_bp(sequence[i-1],sequence[j+1]) and (j-i>3) else 0
-                # if i+1==5 and j==6:
-                #     print(
-                #         f"omega[{i}][{j}] = {omega[i][j]}",
-                #         f"\nomega[{i+1}][{j+1}] = {omega[i+1][j+1]}",
-                #         f"\nomega[{i}][{j+1}]+delta = {omega[i][j+1]}+{delta}",
-                #         f'\n{", ".join([f"omega[{k+1}][{j}]+self.gamma[{k}][{i-1}]={omega[k+1][j]+self.gamma[k][i-1]}" for k in range(1,i+1)])}',
-                #         f'\n{[f"self.gamma[{j+1}][{k}]+omega[{i+1}][{k}]={self.gamma[j+1][k]+omega[i+1][k]}" for k in range(j+1,N)]}',
-                #     )
                 omega[i+1,j]=max(
                     omega[i][j],
                     omega[i+1][j+1],
                     omega[i][j+1] + delta,
-                    max([0]+[omega[k+1][j] + self.gamma[k][i-1] for k in range(1,i+1)]),
+                    max([0]+[omega[k+1][j] + self.gamma[k][i-1] for k in range(i)]),
                     max([0]+[self.gamma[j+1][k] + omega[i+1][k] for k in range(j+1,N)])
                 )
         omega = omega[1:,:-1]

@@ -5,7 +5,7 @@ from ..utils.bio import BaseHandler
 import numpy as np
 
 class Nussinov(BaseHandler):
-    __remove_params__ = ["gamma", "omega","Z"]
+    __hidden_params__ = ["gamma", "omega","Z"]
     __name__ = "Nussinov Algorithm"
 
     def __init__(self):

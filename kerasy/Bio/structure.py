@@ -113,50 +113,135 @@ class Nussinov(BaseHandler):
         else: self._printAsTerai(Z, sequence)
 
 
-# class Zuker(BaseHandler):
-#     __remove_params__ = ["gamma", "omega","Z"]
-#     __name__ = "Zuker Algorithm"
-#
-#     def __init__(self):
-#         self.type=None
-#         self.Watson_Crick=None
-#         self.Wobble=None
-#         self.hairpin=None
-#         self.stacking=None
-#         self.internal_loop=None
-#         self.buldge_loop
-#         self.gamma=None
-#         self.omega=None
-#         self.Z=None
-#
-#     def _calW(self,i,j): return min(self.W[i+1][j],self.W[i][j-1],self.V[i][j],min([self.W[i][k] + self.W[k+1][j] for k in range(i,j)]))
-#     def _calV(self,i,j,DNA,Wobble): return min(self._F1(i,j),min([self.inf]+[self._F2(i,j,h,l,DNA,Wobble)+self.V[h][l] for h in range(i+1,j) for l in range(h+1,j) if self._is_bp(h,l,DNA=DNA,Wobble=Wobble)<2]),self.M[i+1][j-1] + self.a + self.b) if self._is_bp(i,j,DNA=DNA,Wobble=Wobble)<2 else self.inf
-#     def _calM(self,i,j): return min([self.M1[i][k] + self.M1[k+1][j] for k in range(i,j)])
-#     def _calM1(self,i,j): return min(self.M[i][j], self.V[i][j]+self.b, self.M1[i+1][j]+self.c, self.M1[i][j-1]+self.c)
-#
-#     def _F1(self,i,j):
-#         nt=j-i-1
-#         return self.hairpin[nt] if nt<30 else self.inf
-#     def _F2(self,i,j,h,l,DNA,Wobble):
-#         nt = (h-i-1)+(j-l-1)
-#         if nt>=30: val = self.inf
-#         elif (h==i+1) and (l==j-1): val = self.stacking[self._is_bp(i,j,DNA=DNA,Wobble=Wobble)][self._is_bp(i+1,j-1,DNA=DNA,Wobble=Wobble)]
-#         elif (i+1<h<l<j-1): val = self.internal_loop[nt]
-#         else: val = self.buldge_loop[nt]
-#
-#         return val
-#
-#     def predict(self,sequence,):
-#         """calcurate DP matrix.(recursion)"""
-#         N=len(sequence)
-#         self.V =
-#         for ini_i in reversed(range(self.N)):
-#             diff = self.N-ini_i
-#             for i in reversed(range(ini_i)):
-#                 j = i+diff
-#                 self.V[i][j] = self._calV(i,j,DNA=DNA,Wobble=Wobble)
-#                 self.M[i][j] = self._calM(i,j)
-#                 self.M1[i][j] = self._calM1(i,j)
-#                 self.W[i][j] = self._calW(i,j)
-#
-#
+class Zuker(BaseHandler):
+    __name__ = "Zuker Algorithm"
+    __initialize_method__ = ['list2np']
+    __np_params__ = ["hairpin", "internal", "buldge", "stacking_score"]
+    __hidden_params__ = ["hairpin", "internal", "buldge", "stacking_cols", "stacking_score"]
+
+    def __init__(self):
+        #=== parameter ===
+        self.a = None
+        self.b = None
+        self.c = None
+        self.hairpin = None
+        self.internal = None
+        self.buldge = None
+        self.stacking_cols = None
+        self.stacking_score = None
+        #=== Base Pair Type ===
+        self.type=None
+        self.Watson_Crick=None
+        self.Wobble=None
+
+    def _calW(self,i,j):
+        return min(
+            self.W[i+1][j],
+            self.W[i][j-1],
+            self.V[i][j],
+            min([self.W[i][k] + self.W[k+1][j] for k in range(i,j)])
+        )
+
+    def _calV(self,i,j):
+        return min(
+            self._F1(i,j),
+            min([self.inf]+[self._F2(i,j,h,l)+self.V[h][l] for h in range(i+1,j) for l in range(h+1,j) if self._is_bp(h,l)]),
+            self.M[i+1][j-1] + self.a + self.b
+        ) if self._is_bp(i,j)<2 else self.inf
+
+    def _calM(self,i,j):
+        return min([self.M1[i][k] + self.M1[k+1][j] for k in range(i,j)])
+
+    def _calM1(self,i,j):
+        return min(
+            self.M[i][j],
+            self.V[i][j]+self.b,
+            self.M1[i+1][j]+self.c,
+            self.M1[i][j-1]+self.c
+        )
+
+    def _F1(self,i,j):
+        nt=j-i-1
+        return self.hairpin[nt] if nt<30 else self.inf
+
+    def _F2(self,i,j,h,l,DNA,Wobble):
+        nt = (h-i-1)+(j-l-1)
+        if nt>=30:
+            val = self.inf
+        elif (h==i+1) and (l==j-1):
+            val = self.stacking[self._is_bp(i,j)][self._is_bp(i+1,j-1)]
+        elif (i+1<h<l<j-1):
+            val = self.internal_loop[nt]
+        else:
+            val = self.buldge_loop[nt]
+
+        return val
+
+    def predict(self,sequence):
+        """ calcurate DP matrix. (Recursion) """
+        N=len(sequence)
+        self.V  = np.full(shape=(N,N), fill_value=np.inf)
+        self.M  = np.full(shape=(N,N), fill_value=np.inf)
+        self.M1 = np.full(shape=(N,N), fill_value=np.inf)
+        self.W  = np.zeros(shape=(N,N))
+        for ini_i in reversed(range(N)):
+            diff = N-ini_i
+            for i in reversed(range(ini_i)):
+                j = i+diff
+                self.V[i][j]  = self._calV(i,j)
+                self.M[i][j]  = self._calM(i,j)
+                self.M1[i][j] = self._calM1(i,j)
+                self.W[i][j]  = self._calW(i,j)
+        #///ADD
+        # TraceBack
+        if traceback:
+            pairs = self.traceback(gamma, N, sequence)
+            score = gamma[0][-1]
+            self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
+        # Memorize or Return.
+        if memorize: self.gamma=gamma
+        else: self._printAsTerai(gamma, sequence, as_gamma=True)
+
+        #====Add/
+
+    def trackback(self,sequence):
+        """trackback to find which bases form base-pairs."""
+        bp = []
+        stack = [(0,N-1)]
+        while(stack):
+            i,j = stack.pop(0)
+            if (i>=j): continue
+            elif self.W[i+1][j] == self.W[i][j]: stack.append((i+1,j))
+            elif self.W[i][j-1] == self.W[i][j]: stack.append((i,j-1))
+            elif self.V[i][j]   == self.W[i][j]:
+                bp.append((i,j))
+                if self.V[i][j] == self._F1(i,j): continue
+                if self.V[i][j] == self.M[i+1][j-1]+self.a+self.b:
+                    for k in range(i+1,j-1):
+                        if self.M1[i][k] + self.DP[k][j] == self.M[i+1][j-1]:
+                            stack.append((k+1,j))
+                            stack.append((i,k))
+                            break
+                else:
+                    flag=0
+                    for h in range(i+1,j):
+                        for l in range(h+1,j):
+                            if self._is_bp(h,l)<2:
+                                if self.V[i][j] == self._F2(i,j,h,l) + self.V[h][l]:
+                                    stack.append((h,l))
+                                    flag=1
+                                    break
+                        if flag: break
+
+            else:
+                for k in range(i,j):
+                    if self.W[i][k] + self.W[k+1][j] == self.W[i][j]:
+                        stack.append((k+1,j))
+                        stack.append((i,k))
+                        break
+        #=== Print ===
+        S = list(" " * N)
+        for i,j in bp:
+            S[i] = "("; S[j] = ")"
+        print(self.arr)
+        print("".join(S))

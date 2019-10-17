@@ -6,27 +6,27 @@ class KMeans():
         self.K=K
         self.N=None
         self.M=None
-        self.mu = None
+        self.mu=None
         self.seed=random_state
-        self.history=[]
 
-    def fit(self, data):
-        self.history=[]
+    def fit(self, data, exact=False, threshold=1e-4):
+        if exact: threshold=1
         self.N, self.M = data.shape
-        mins = np.min(data, axis=0)
-        maxs = np.max(data, axis=0)
-
         #=== Initialization ===
         np.random.seed(self.seed)
+        mins = np.min(data, axis=0)
+        maxs = np.max(data, axis=0)
         self.mu = np.random.uniform(low=mins, high=maxs, size=(self.K, self.M))
-        pidx = np.full(fill_value=self.K, shape=(self.N,))
+
+        idx = self.Estep(data)
+        pll = self._loglikelihood(data, idx)
+        #=== EM algorithm ===
         while True:
             idx = self.Estep(data)
-            self.history.append([idx, np.copy(self.mu)])
-            if np.all((idx-pidx)==0): break
-            pidx = idx
             self.Mstep(data, idx)
-
+            ll = self._loglikelihood(data, idx)
+            if 1-ll/pll <= threshold: break
+            pll = ll
 
     def predict(self, data):
         idx = self.Estep(data)
@@ -42,3 +42,7 @@ class KMeans():
 
     def _nearlest(self, x):
         return np.argmin(np.sum((self.mu-x)**2, axis=1))
+
+    def _loglikelihood(self, data, idx):
+        dst = [np.sum(np.linalg.norm(data[idx==k]-self.mu[k], axis=1)) for k in range(self.K)]
+        return np.sum(dst)/(self.N*self.M)

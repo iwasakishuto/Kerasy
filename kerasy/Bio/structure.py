@@ -115,15 +115,16 @@ class Nussinov(BaseHandler):
 
 class Zuker(BaseHandler):
     __name__ = "Zuker Algorithm"
-    __initialize_method__ = ['list2np']
+    __initialize_method__ = ['list2np', '_sort_stacking_cols']
     __np_params__ = ["hairpin", "internal", "buldge", "stacking_score"]
-    __hidden_params__ = ["hairpin", "internal", "buldge", "stacking_cols", "stacking_score"]
+    __hidden_params__ = ["hairpin", "internal", "buldge", "stacking_cols", "stacking_score", "V", "M", "M1", "W", "sequence"]
 
     def __init__(self):
         #=== parameter ===
         self.a = None
         self.b = None
         self.c = None
+        self.inf = float("inf")
         self.hairpin = None
         self.internal = None
         self.buldge = None
@@ -133,6 +134,15 @@ class Zuker(BaseHandler):
         self.type=None
         self.Watson_Crick=None
         self.Wobble=None
+        # Momory
+        self.sequence = None
+        self.V  = None
+        self.M  = None
+        self.M1 = None
+        self.W  = None
+
+    def _sort_stacking_cols(self):
+        self.stacking_cols = np.array(["".join(sorted(bp)) for bp in self.stacking_cols])
 
     def _calW(self,i,j):
         return min(
@@ -145,9 +155,9 @@ class Zuker(BaseHandler):
     def _calV(self,i,j):
         return min(
             self._F1(i,j),
-            min([self.inf]+[self._F2(i,j,h,l)+self.V[h][l] for h in range(i+1,j) for l in range(h+1,j) if self._is_bp(h,l)]),
+            min([self.inf]+[self._F2(i,j,h,l)+self.V[h][l] for h in range(i+1,j) for l in range(h+1,j) if self._is_bp(self.sequence[h],self.sequence[l])]),
             self.M[i+1][j-1] + self.a + self.b
-        ) if self._is_bp(i,j)<2 else self.inf
+        ) if self._is_bp(self.sequence[i],self.sequence[j]) else self.inf
 
     def _calM(self,i,j):
         return min([self.M1[i][k] + self.M1[k+1][j] for k in range(i,j)])
@@ -164,25 +174,28 @@ class Zuker(BaseHandler):
         nt=j-i-1
         return self.hairpin[nt] if nt<30 else self.inf
 
-    def _F2(self,i,j,h,l,DNA,Wobble):
+    def _F2(self,i,j,h,l):
         nt = (h-i-1)+(j-l-1)
         if nt>=30:
             val = self.inf
         elif (h==i+1) and (l==j-1):
-            val = self.stacking[self._is_bp(i,j)][self._is_bp(i+1,j-1)]
+            ridx=np.argmax(self.stacking_cols=="".join(sorted(self.sequence[i]  +self.sequence[j])))
+            cidx=np.argmax(self.stacking_cols=="".join(sorted(self.sequence[i+1]+self.sequence[j-1])))
+            val = self.stacking_score[ridx][cidx]
         elif (i+1<h<l<j-1):
-            val = self.internal_loop[nt]
+            val = self.internal[nt]
         else:
-            val = self.buldge_loop[nt]
+            val = self.buldge[nt]
 
         return val
 
     def predict(self,sequence):
         """ calcurate DP matrix. (Recursion) """
         N=len(sequence)
-        self.V  = np.full(shape=(N,N), fill_value=np.inf)
-        self.M  = np.full(shape=(N,N), fill_value=np.inf)
-        self.M1 = np.full(shape=(N,N), fill_value=np.inf)
+        self.sequence = sequence
+        self.V  = np.full(shape=(N,N), fill_value=self.inf)
+        self.M  = np.full(shape=(N,N), fill_value=self.inf)
+        self.M1 = np.full(shape=(N,N), fill_value=self.inf)
         self.W  = np.zeros(shape=(N,N))
         for ini_i in reversed(range(N)):
             diff = N-ini_i
@@ -192,20 +205,21 @@ class Zuker(BaseHandler):
                 self.M[i][j]  = self._calM(i,j)
                 self.M1[i][j] = self._calM1(i,j)
                 self.W[i][j]  = self._calW(i,j)
-        #///ADD
-        # TraceBack
-        if traceback:
-            pairs = self.traceback(gamma, N, sequence)
-            score = gamma[0][-1]
-            self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
-        # Memorize or Return.
-        if memorize: self.gamma=gamma
-        else: self._printAsTerai(gamma, sequence, as_gamma=True)
 
+        # TraceBack
+        # if traceback:
+        #     pairs = self.traceback(sequence)
+        #     score = gamma[0][-1]
+        #     self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
+        # # Memorize or Return.
+        # if memorize: self.gamma=gamma
+        # else: self._printAsTerai(gamma, sequence, as_gamma=True)
+        self.traceback()
         #====Add/
 
-    def trackback(self,sequence):
+    def traceback(self):
         """trackback to find which bases form base-pairs."""
+        N=len(self.sequence)
         bp = []
         stack = [(0,N-1)]
         while(stack):
@@ -226,7 +240,7 @@ class Zuker(BaseHandler):
                     flag=0
                     for h in range(i+1,j):
                         for l in range(h+1,j):
-                            if self._is_bp(h,l)<2:
+                            if self._is_bp(self.sequence[h],self.sequence[l]):
                                 if self.V[i][j] == self._F2(i,j,h,l) + self.V[h][l]:
                                     stack.append((h,l))
                                     flag=1
@@ -243,5 +257,5 @@ class Zuker(BaseHandler):
         S = list(" " * N)
         for i,j in bp:
             S[i] = "("; S[j] = ")"
-        print(self.arr)
+        print(self.sequence)
         print("".join(S))

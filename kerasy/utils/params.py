@@ -15,6 +15,7 @@ class npEncoder(json.JSONEncoder):
 class Params():
     __hidden_params__ = []
     __np_params__ = []
+    __inf_params__ = []
     __initialize_method__ = ['list2np']
 
     def load_params(self, json_path):
@@ -32,6 +33,12 @@ class Params():
         for k,v in self.__dict__.items():
             if k in self.__np_params__:
                 self.__dict__[k] = np.array(v)
+
+    def replaceINF(self):
+        for k,v in self.__dict__.items():
+            if k in self.__inf_params__:
+                v = np.array(v)
+                self.__dict__[k] = np.where(v==np.inf, self.inf, v)
 
     def params(self):
         key_title='parameter'; val_title="value"

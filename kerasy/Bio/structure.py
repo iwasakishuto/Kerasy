@@ -70,7 +70,7 @@ class Nussinov(BaseHandler):
                         stack.append((k+1,j))
                         stack.append((i,k))
                         break
-        pairs = list(" " * N)
+        pairs = list("." * N)
         for i,j in bp:
             pairs[i] = "("; pairs[j] = ")"
         return "".join(pairs)
@@ -115,8 +115,9 @@ class Nussinov(BaseHandler):
 
 class Zuker(BaseHandler):
     __name__ = "Zuker Algorithm"
-    __initialize_method__ = ['list2np', '_sort_stacking_cols']
+    __initialize_method__ = ['list2np', '_sort_stacking_cols', 'replaceINF']
     __np_params__ = ["hairpin", "internal", "buldge", "stacking_score"]
+    __inf_params__ = ["hairpin", "internal", "buldge"]
     __hidden_params__ = ["hairpin", "internal", "buldge", "stacking_cols", "stacking_score", "V", "M", "M1", "W", "sequence"]
 
     def __init__(self):
@@ -124,7 +125,7 @@ class Zuker(BaseHandler):
         self.a = None
         self.b = None
         self.c = None
-        self.inf = float("inf")
+        self.inf = None
         self.hairpin = None
         self.internal = None
         self.buldge = None
@@ -136,10 +137,10 @@ class Zuker(BaseHandler):
         self.Wobble=None
         # Momory
         self.sequence = None
-        self.V  = None
-        self.M  = None
-        self.M1 = None
-        self.W  = None
+        self.W  = None # the minimum free energy of subsequence from i to j.
+        self.V  = None # the minimum free energy of subsequence from i to j when i to j forms a base-pair.
+        self.M  = None # the minimum free energy of subsequence closed by two or more base pairs.
+        self.M1 = None # the minimum free energy of subsequence closed by one or more base pairs.
 
     def _sort_stacking_cols(self):
         self.stacking_cols = np.array(["".join(sorted(bp)) for bp in self.stacking_cols])
@@ -196,7 +197,7 @@ class Zuker(BaseHandler):
         self.V  = np.full(shape=(N,N), fill_value=self.inf)
         self.M  = np.full(shape=(N,N), fill_value=self.inf)
         self.M1 = np.full(shape=(N,N), fill_value=self.inf)
-        self.W  = np.zeros(shape=(N,N))
+        self.W  = np.full(shape=(N,N), fill_value=self.inf)
         for ini_i in reversed(range(N)):
             diff = N-ini_i
             for i in reversed(range(ini_i)):
@@ -206,16 +207,9 @@ class Zuker(BaseHandler):
                 self.M1[i][j] = self._calM1(i,j)
                 self.W[i][j]  = self._calW(i,j)
 
-        # TraceBack
-        # if traceback:
-        #     pairs = self.traceback(sequence)
-        #     score = gamma[0][-1]
-        #     self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
-        # # Memorize or Return.
-        # if memorize: self.gamma=gamma
-        # else: self._printAsTerai(gamma, sequence, as_gamma=True)
-        self.traceback()
-        #====Add/
+        score = self.W[0][-1]
+        pairs = self.traceback()
+        self._printAlignment(score, self.sequence, pairs, width=60, xlabel="seq", ylabel="")
 
     def traceback(self):
         """trackback to find which bases form base-pairs."""
@@ -232,7 +226,7 @@ class Zuker(BaseHandler):
                 if self.V[i][j] == self._F1(i,j): continue
                 if self.V[i][j] == self.M[i+1][j-1]+self.a+self.b:
                     for k in range(i+1,j-1):
-                        if self.M1[i][k] + self.DP[k][j] == self.M[i+1][j-1]:
+                        if self.M1[i][k] + self.M1[k+1][j] == self.M[i+1][j-1]:
                             stack.append((k+1,j))
                             stack.append((i,k))
                             break
@@ -253,9 +247,8 @@ class Zuker(BaseHandler):
                         stack.append((k+1,j))
                         stack.append((i,k))
                         break
-        #=== Print ===
-        S = list(" " * N)
+
+        pairs = list("." * N)
         for i,j in bp:
-            S[i] = "("; S[j] = ")"
-        print(self.sequence)
-        print("".join(S))
+            pairs[i] = "("; pairs[j] = ")"
+        return "".join(pairs)

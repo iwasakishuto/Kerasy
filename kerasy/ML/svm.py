@@ -3,8 +3,8 @@ import numpy as np
 from ._kernel import kernel_handler
 
 class BaseSVM():
-    def __init__(self, kernel="gaussian"):
-        self.kernel = kernel_handler(kernel)
+    def __init__(self, kernel="gaussian", **kernelargs):
+        self.kernel = kernel_handler(kernel, **kernelargs)
         self.isZero = None
         self.N = None; self.M = None;
         self.K = None # gram matrix: shape=(N,N)
@@ -23,7 +23,7 @@ class BaseSVM():
     def predict(self, X):
         return np.array([1 if self.y(x)>0 else -1 for x in X]).astype(int)
 
-    def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2):
+    def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2, sparse_memorize=True):
         """
         @param x_train : (ndarray) shape=(N,M)
         @param t_train : (ndarray) shape=(N,)
@@ -45,7 +45,8 @@ class BaseSVM():
         self.SMO(max_iter=max_iter)
 
         # Memorize only support vector data.
-        self.sparseMemorize()
+        if sparse_memorize:
+            self.sparseMemorize()
 
         return self
 
@@ -74,8 +75,8 @@ class BaseSVM():
         self.SVidx = np.arange(self.N)
 
 class SVC(BaseSVM):
-    def __init__(self, kernel="gaussian", C=10):
-        super().__init__(kernel=kernel)
+    def __init__(self, kernel="gaussian", C=10, **kernelargs):
+        super().__init__(kernel=kernel, kernelargs=kernelargs)
         self.C = C
 
     def isSV(self):
@@ -118,8 +119,8 @@ class SVC(BaseSVM):
         return True
 
 class hardSVC(BaseSVM):
-    def __init__(self, kernel="gaussian"):
-        super().__init__(kernel=kernel)
+    def __init__(self, kernel="gaussian", **kernelargs):
+        super().__init__(kernel=kernel, kernelargs=kernelargs)
 
     def isSV(self):
         """whether x_train[i] is a support vector or not."""
@@ -152,3 +153,16 @@ class hardSVC(BaseSVM):
         self.a[i] = ai_next
         self.a[j] = (c-ti*self.a[i])/tj
         return True
+
+# class SVR(BaseSVM):
+#     def __init__(self, kernel="gaussian", **kernelargs):
+#         super().__init__(kernel=kernel, kernelargs=kernelargs)
+#
+#     def calcuBias(self):
+#         return np.mean([self.y_train[n]-np.sum([self.a[m]*self.y_train[m]*self.K[n,m] for m in self.SVidx]) for n in self.SVidx])
+#
+#     def y(self, x):
+#         return sum([self.a[i]*self.y_train[i]*self.kernel(self.x_train[i],x) for i in self.SVidx]) + self.b
+#
+#     def predict(self, X):
+#         return np.array([1 if self.y(x)>0 else -1 for x in X]).astype(int)

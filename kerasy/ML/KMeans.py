@@ -8,8 +8,10 @@ class KMeans():
         self.M=None
         self.mu=None
         self.seed=random_state
+        self.history=[]
 
-    def fit(self, data, exact=False, threshold=1e-4):
+    def fit(self, data, exact=False, threshold=1e-5):
+        self.history=[]
         if exact: threshold=1
         self.N, self.M = data.shape
         #=== Initialization ===
@@ -19,14 +21,15 @@ class KMeans():
         self.mu = np.random.uniform(low=mins, high=maxs, size=(self.K, self.M))
 
         idx = self.Estep(data)
-        pll = self._loglikelihood(data, idx)
+        pJ = self._cost(data, idx)
         #=== EM algorithm ===
         while True:
             idx = self.Estep(data)
+            self.history.append([idx, np.copy(self.mu)])
             self.Mstep(data, idx)
-            ll = self._loglikelihood(data, idx)
-            if 1-ll/pll <= threshold: break
-            pll = ll
+            J = self._cost(data, idx)
+            if 1-J/pJ <= threshold: break
+            pJ = J
 
     def predict(self, data):
         idx = self.Estep(data)
@@ -43,6 +46,6 @@ class KMeans():
     def _nearlest(self, x):
         return np.argmin(np.sum((self.mu-x)**2, axis=1))
 
-    def _loglikelihood(self, data, idx):
+    def _cost(self, data, idx):
         dst = [np.sum(np.linalg.norm(data[idx==k]-self.mu[k], axis=1)) for k in range(self.K)]
         return np.sum(dst)/(self.N*self.M)

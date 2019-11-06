@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Initializers - Kerasy Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="../../theme/css/custom.css" rel="stylesheet">
+  <link href="../../theme/css/jupyter.css" rel="stylesheet">
+  <link href="../../theme/css/theme_extra.css" rel="stylesheet">
+  <link href="../../theme/css/theme.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Initializers";
+    var mkdocs_page_input_path = "deep learning/Initializers.md";
+    var mkdocs_page_url = "/Kerasy/deep learning/Initializers/";
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Kerasy Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../..">Home</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">deep learning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../CNN/">CNN</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Optimizers/">Optimizers</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../NeuralNetwork/">Neural Network</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../ComputationalGraph/">Computational Graph</a>
+  </li>
+        
+          
+
+
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Initializers
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
+        
+      </ul>
+    </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Kerasy Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>deep learning &raquo;</li>
+        
+      
+    
+    <li>Initializers</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/deep learning/Initializers.md"> Edit on iwasakishuto/Kerasy</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div class="row title-bar">
+  <div class="small-12 columns">
+    <h1><a href="https://iwasakishuto.github.io/Kerasy/doc">Kerasy</a></h1>
+    <h2> <small>Imitating to deepen my understanding of deep learning</small></h2>
+    <hr>
+  </div>
+</div>
+
+<div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <h2>Initializers</h2>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-28(Wed)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/deep-learning.html">deep learning</a></span></li>
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="初期化(Initializers)">初期化(Initializers)<a class="anchor-link" href="#初期化(Initializers)">¶</a></h1><p><strong>（編集中）</strong></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [2]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>ニューラルネットワークの重みは、<b>小さな乱数値で初期化される</b>ことがほとんどですが、モデルに合わせて適切な乱数を用いて初期化を行えば<span class="marker-pink">学習のプロセスが高速化する</span>などのメリットがあることが知られています。</p>
+<p>また、特に層が深いネットワークほど初期化の影響を大きく受けることが知られています。<b>（初期分布のズレが掛け算されるため、指数的に影響を及ぼすから）</b></p>
+<p>ここでは、Kerasyで定義されている様々な初期化方法を見ていきます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:center">#</th>
+<th style="text-align:left">手法</th>
+<th style="text-align:left">Kerasy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:left"><a href="#Zeros">Zeros</a></td>
+<td style="text-align:left"><code>kerasy.initializers.Zeros()</code></td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:left"><a href="#Ones">Ones</a></td>
+<td style="text-align:left"><code>kerasy.initializers.Ones()</code></td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:left"><a href="#Constant">Constant</a></td>
+<td style="text-align:left"><code>kerasy.initializers.Constant(value=0)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td style="text-align:left"><a href="#RandomNormal">RandomNormal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:left"><a href="#RandomUniform">RandomUniform</a></td>
+<td style="text-align:left"><code>kerasy.initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td style="text-align:left"><a href="#TruncatedNormal">TruncatedNormal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:left"><a href="#VarianceScaling">VarianceScaling</a></td>
+<td style="text-align:left"><code>kerasy.initializers.VarianceScaling(scale=1.0, mode='fan_in', distribution='normal', seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">8</td>
+<td style="text-align:left"><a href="#Orthogonal">Orthogonal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.Orthogonal(gain=1.0, seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:left"><a href="#Identity">Identity</a></td>
+<td style="text-align:left"><code>kerasy.initializers.Identity(gain=1.0)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">10</td>
+<td style="text-align:left"><a href="#GlorotNormal">GlorotNormal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.glorot_normal(seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:left"><a href="#GlorotUniform">GlorotUniform</a></td>
+<td style="text-align:left"><code>kerasy.initializers.glorot_uniform(seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">12</td>
+<td style="text-align:left"><a href="#HeNormal">HeNormal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.he_normal(seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:left"><a href="#LeCunNormal">LeCunNormal</a></td>
+<td style="text-align:left"><code>kerasy.initializers.lecun_normal(seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">14</td>
+<td style="text-align:left"><a href="#HeUniform">HeUniform</a></td>
+<td style="text-align:left"><code>kerasy.initializers.he_uniform(seed=None)</code></td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:left"><a href="#LeCunUniform">LeCunUniform</a></td>
+<td style="text-align:left"><code>kerasy.initializers.lecun_uniform(seed=None)</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Zeros">Zeros</h3><p>全ての重みを0で初期化する方法です。<span class="marker-pink">ニューラルネットワークの各層間の重みを0で初期化すると誤差が伝わらず、うまく学習ができない</span>ことは容易に想像ができます。</p>
+<p>一方で、バイアス項を0で初期化する手法は良く取られているようです。バイアス項が0でもバイアス項に誤差は伝わるため、学習は進みます。バイアス項を0で初期化することで、<b>ネットワークの学習にバイアスの影響を与えにくくすることができる</b>と考えられます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Ones">Ones</h3><p>全ての重みを1で初期化する方法です。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Constant">Constant</h3><p>全ての重みを定数（=<code>value</code>）で初期化する方法です。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="RandomNormal">RandomNormal</h3><p>正規分布にしたがって重みを初期化します。</p>
+<ul>
+<li><code>mean</code>: 正規分布の平均</li>
+<li><code>stddev</code>: 正規分布の標準偏差</li>
+<li><code>seed</code>: シード値</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="RandomUniform">RandomUniform</h3><p>一様分布にしたがって重みを初期化します。</p>
+<ul>
+<li><code>minval</code>: 乱数を発生する範囲の下限</li>
+<li><code>maxval</code>: 乱数を発生する範囲の上限</li>
+<li><code>seed</code>: シード値</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="TruncatedNormal">TruncatedNormal</h3><p><span class="marker-pink">切断正規分布</span>と呼ばれる分布に従って重みを初期化します。これは正規分布と似ていますが、<b>平均から標準偏差以上離れた値は切り捨てられる</b>という特徴があります。<b>この分布を用いてニューラルネットワークの重みを初期化することが推奨されています。</b></p>
+<ul>
+<li><code>mean</code>: 正規分布の平均</li>
+<li><code>stddev</code>: 正規分布の標準偏差</li>
+<li><code>seed</code>: シード値</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="VarianceScaling">VarianceScaling</h3><p>重みのサイズに合わせてスケーリングを行い、初期化します。</p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">mode</span><span class="o">==</span><span class="s2">"fan_in"</span><span class="p">:</span> <span class="n">n</span><span class="o">=</span><span class="s2">"入力ユニットの数"</span>
+<span class="k">elif</span> <span class="n">mode</span><span class="o">==</span><span class="s2">"fan_out"</span><span class="p">:</span> <span class="n">n</span><span class="o">=</span><span class="s2">"出力ユニットの数"</span>
+<span class="k">elif</span> <span class="n">mode</span><span class="o">==</span><span class="s2">"fan_avg"</span><span class="p">:</span> <span class="n">n</span><span class="o">=</span><span class="s2">"入力ユニットと出力ユニットの数の平均"</span>
+</pre></div>
+<p>また、</p>
+<ul>
+<li><code>distribution="normal"</code>の時：
+平均を0とし、標準偏差を<code>stddev = sqrt(scale / n)</code>とした<b>切断正規分布</b>が用いられます。</li>
+<li><code>distribution="uniform"</code>の時：
+<code>limit = sqrt(3 * scale / n)</code>とし、[-<code>limit</code>, <code>limit</code>]を範囲とする<b>一様分布</b>が用いられます。</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Orthogonal">Orthogonal</h3><p>重みが直交行列となるように初期化を行います。</p>
+<p>なお、実装では、$m$ 行 $n$ 列の行列 $A$ に対して、</p>
+$$A=U \Sigma \overline{V^{T}}$$<ul>
+<li>$U$: $m\times m$ のユニタリ行列</li>
+<li>$\Sigma$: $m\times n$ の実対角行列</li>
+<li>$V$: $n\times n$ のユニタリ行列</li>
+</ul>
+<p>と分解できる<span class="marker-pink">（特異値分解(Singular Value Decomposition)）</span>ことが知られており、実ユニタリ行列が直交行列であることから、この分解を用いて直交行列を生成しています。</p>
+<p>※ <span class="marker-pink">ユニタリ行列</span>は、$U^{*} U=U U^{*}=I$ が成り立つ行列である。（$U^{*}=\overline{U}^{\mathrm{T}}$）</p>
+<ul>
+<li><code>gain</code>: 直交行列のスケール</li>
+<li><code>seed</code>: シード値</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Identity">Identity</h3><p>重みが単位行列となるように初期化を行います。</p>
+<p>なお、これは、重みが2次正方行列の場合のみ使うことができます。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GlorotNormal">GlorotNormal</h3><p><span class="marker-pink">Glorot の正規分布</span>による初期化を行います。</p>
+<p>これは、</p>
+<ul>
+<li>平均: $0$</li>
+<li>標準偏差: <code>stddev = sqrt(2 / ("入力ユニット数" + "出力ユニット数"))</code></li>
+</ul>
+<p>とする<b>正規分布</b>と等しいです。</p>
+<p>Glorot の正規分布のアイデアは、<span class="marker-pink">活性化関数が原点対称であり、原点付近で線形であるという条件下で</span>順伝播・逆伝播共に<b>各層の出力が同じ分散を持っていることを目指す</b>というもので、それぞれの条件の中間を取ることでこれを実現しています。よって、分散が <code>sqrt(2 / ("入力ユニット数" + "出力ユニット数"))</code> となる<b>正規分布</b>で初期化を行っています。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GlorotUniform">GlorotUniform</h3><p><span class="marker-pink">Glorot の一様分布</span>による初期化を行います。</p>
+<p>これは、<code>limit=sqrt(6 / ("入力ユニット数" + "出力ユニット数"))</code>とし、[-<code>limit</code>, <code>limit</code>]を範囲とする<b>一様分布</b>と等しいです。</p>
+<p>Glorot の一様分布は、分散が <code>sqrt(2 / ("入力ユニット数" + "出力ユニット数"))</code> となるような一様分布であり、$[-a,a]$ の範囲の一様分布の分散が $a^2/3$ であることから、上記の範囲の<b>一様分布</b>で初期化を行っています。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="HeNormal">HeNormal</h3><p><span class="marker-pink">He の正規分布</span>による初期化を行います。</p>
+<p>これは、</p>
+<ul>
+<li>平均: $0$</li>
+<li>標準偏差: <code>stddev = sqrt(2 / "入力ユニット数")</code> </li>
+</ul>
+<p>とする<b>切断正規分布</b>と等しいです。</p>
+<p><b>Glorot の正規分布</b>が活性化関数に制約を置いており、<b>relu関数</b>を用いた場合や、<b>全結合以外のConvolution 層などのネットワーク</b>が対象外であったため、それらに対処するために考えられたのが<b>He の正規分布</b>です。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="LeCunNormal">LeCunNormal</h3><p><span class="marker-pink">LeCunの正規分布</span>による初期化を行います。</p>
+<p>これは、</p>
+<ul>
+<li>平均: $0$</li>
+<li>標準偏差: <code>stddev = sqrt(1 / "入力ユニット数")</code></li>
+</ul>
+<p>とする<b>切断正規分布</b>と等しいです。</p>
+<p>この分布は、HeNormalを $1/\sqrt{2}$ でスケールしたものと等価です。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="HeUniform">HeUniform</h3><p><span class="marker-pink">He の一様分布</span>による初期化を行います。</p>
+<p>これは、<code>limit=sqrt(6 / "入力ユニット数")</code>とし、[-<code>limit</code>, <code>limit</code>]を範囲とする<b>一様分布</b>と等しいです。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="LeCunUniform">LeCunUniform</h3><p><span class="marker-pink">LeCun の一様分布</span>による初期化を行います。</p>
+<p>これは、<code>limit=sqrt(3 / "入力ユニット数")</code>とし、[-<code>limit</code>, <code>limit</code>]を範囲とする<b>一様分布</b>と等しいです。</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In [ ]:</div>
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+        </section>
+    </div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../ComputationalGraph/" class="btn btn-neutral" title="Computational Graph"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../ComputationalGraph/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../theme/js/extra.js" defer></script>
+      <script src="../../theme/js/jquery-2.1.1.min.js" defer></script>
+      <script src="../../theme/js/modernizr-2.8.3.js" defer></script>
+      <script src="../../theme/js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

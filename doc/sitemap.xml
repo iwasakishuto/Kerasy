@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/deep learning/CNN/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/deep learning/Optimizers/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/deep learning/NeuralNetwork/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/deep learning/ComputationalGraph/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/deep learning/Initializers/</loc>
+     <lastmod>2019-11-06</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+</urlset>

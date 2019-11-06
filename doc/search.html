@@ -1,208 +1,188 @@
-<!doctype html>
-<html class="no-js" lang="en">
-    <head>
-        <link rel="shortcut icon" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="./img/favicon.ico">
+  <title>Kerasy Documentation</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
 
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="author" content="Shuto" />
-        <title>Search · Kerasy
-</title>
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link href="./theme/css/custom.css" rel="stylesheet">
+  <link href="./theme/css/jupyter.css" rel="stylesheet">
+  <link href="./theme/css/theme_extra.css" rel="stylesheet">
+  <link href="./theme/css/theme.css" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet">
+  
+  <script src="./js/jquery-2.1.1.min.js" defer></script>
+  <script src="./js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
 
-        <meta name="description" content="Imitating to deepen my understanding of deep learning" />
-        <meta name="keywords" content="Blog "/>
+<body class="wy-body-for-nav" role="document">
 
-        <!--[if !IE 7]>
-        <style type="text/css">
-            #main-content {display:table;height:100%}
-        </style>
-        <![endif]-->
-        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/backdrop.css" />
-        <link rel="stylesheet" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/pygments.css" />
-        <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr.js"></script>
+  <div class="wy-grid-for-nav">
 
-        <!-- Added by Shuto Iwasaki. -->
-        <link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
-        <!-- Custom CSS -->
-        <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
-        <!-- Syntax highlight -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-        <script>hljs.initHighlightingOnLoad();</script>
-        <!-- LaTex -->
-        <!-- Github env -->
-        <!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
-        <script type="text/x-mathjax-config">
-        	MathJax.Hub.Config({
-        		tex2jax: {
-        			inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-        			displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-        		}
-        	});
-        </script>
-        <script src="https://iwasakishuto.github.io/js/jquery.color.js"></script>
-    </head>
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="./." class="icon icon-home"> Kerasy Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
 
 
-    <body>
-      <div class="master-row">
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="./.">Home</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">deep learning</p>
+  </li>
 
-        <div class="image-pane main-content" style="background: url('https://iwasakishuto.github.io/Kerasy/doc/theme/img/background.png'); background-size:cover; background-position: right;">
-          <div class="row">
-            <div class="small-12 medium-4 large-12 columns">
-              <h5 class='text-center'>About</h5>
-              <div class="about-me">
-                <div class="hide-for-medium-only small-3 columns no-buffer">
-                  <a class="th" href="https://iwasakishuto.github.io/images/profile/square.png">
-                    <img src="https://iwasakishuto.github.io/images/profile/square.png">
-                  </a>
-                </div>
-                <div class="small-9 medium-12 large-9 columns text-justify">
-                  Bioinformatics/Deep learning/Augmented Human/The University of Tokyo
-                </div>
-                <div class="small-12 columns">
-                  <ul class="inline-center social-list">
-                    <li><a href="https://twitter.com/cabernet_rock"><i class="fa fa-twitter"></i>&nbsp; twitter</a></li>
-                    <li><a href="https://github.com/iwasakishuto"><i class="fa fa-github"></i>&nbsp; github</a></li>
-                    <li><a href="https://www.facebook.com/iwasakishuto"><i class="fa fa-facebook"></i>&nbsp; facebook</a></li>
-                  </ul>
-                </div>
-              </div>
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="./deep learning/CNN/">CNN</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="./deep learning/Optimizers/">Optimizers</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="./deep learning/NeuralNetwork/">Neural Network</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="./deep learning/ComputationalGraph/">Computational Graph</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="./deep learning/Initializers/">Initializers</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="./.">Kerasy Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="./.">Docs</a> &raquo;</li>
+    
+    
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+
+  <h1 id="search">Search Results</h1>
+
+  <form id="content_search" action="search.html">
+    <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+    <input name="q" id="mkdocs-search-query" type="text" class="search_input search-query ui-autocomplete-input" placeholder="Search the Docs" autocomplete="off" autofocus title="Type search term here">
+  </form>
+
+  <div id="mkdocs-search-results" class="search-results">
+    Searching...
+  </div>
+
+
             </div>
-
-            <div class="small-12 medium-4  large-12 columns link-list">
-              <h5 class='text-center'>Links</h5>
-              <ul class="inline-center">
-                <li><a href="https://iwasakishuto.github.io">Home</a></li>
-                <li><a href="https://iwasakishuto.github.io/blog/articles/index.html">Blog</a></li>
-                <li><a href="https://iwasakishuto.github.io/University/index.html">University</a></li>
-                <li><a href="https://iwasakishuto.github.io/Kerasy/doc/index.html">Kerasy</a></li>
-                <li><a href="https://iwasakishuto.github.io/Front-End/index.html">Front-End</a></li>
-              </ul>
-            </div>
-
-<!--
-            <div class="small-12 medium-3 large-12 columns">
-            </div>
--->
           </div>
-        </div>
+          <footer>
+  
 
-        <div class="content-pane main-content">
-          <nav class="top-bar" data-topbar role="navigation">
-            <ul class="title-area">
-              <li class="name"><!-- Leave this empty --></li>
-              <li class="toggle-topbar menu-icon"><a href="#"><span></span></a></li>
-            </ul>
-            <section class="top-bar-section">
-              <ul class="left">
-              </ul>
-              <ul class="right">
-                <li><a href="https://iwasakishuto.github.io/Kerasy/doc/category/kerasy.html">Kerasy</a></li>
-              </ul>
-            </section>
-          </nav>
+  <hr/>
 
-          <div class="row title-bar">
-            <div class="small-12 columns">
-              <h1><a href="https://iwasakishuto.github.io/Kerasy/doc">Kerasy</a></h1>
-              <h2> <small>Imitating to deepen my understanding of deep learning</small></h2>
-              <hr>
-            </div>
-          </div>
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
 
-          <div id="contents">
-<article>
-    <div class="span8 offset2">
-        <div id="tipue_search_content"><div id="tipue_search_loading"></div></div>
-    </div>
-</article>
-          </div>
-
-          <footer class="show-for-large-up">
-<div class="row">
-    <div class="small-6 medium-3 columns">
-        <ul class="left-nav">
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
-        </ul>
-    </div>
-    <div class="small-6 medium-3 medium-push-6 columns">
-        <ul class="right-nav">
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
-        </ul>
-    </div>
-    <div class="small-12 medium-6 medium-pull-3 columns text-center">
-        <p class="tag-cloud">
-            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
-            &nbsp;&hellip;
-        </p>
-    </div>
-    <div class="small-12 columns sub-footer">
-        <hr>
-        <div class="small-12 medium-6 columns">
-            <p class="small-text-center medium-text-left">
-                &copy; 2019 Shuto 
-                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
-            </p>
-        </div>
-        <div class="small-12 medium-6 columns">
-            <p class="small-text-center medium-text-right">
-                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="https://www.python.org/">Python</a>.
-            </p>
-        </div>
-    </div>
-</div>          </footer>
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
         </div>
       </div>
 
+    </section>
 
-      <div class="row">
-        <footer class="hide-for-large-up">
-<div class="row">
-    <div class="small-6 medium-3 columns">
-        <ul class="left-nav">
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc">Home &nbsp;<i class="fa fa-home fa-fw"></i></a></li>
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/categories.html">Categories &nbsp;<i class="fa fa-folder-open fa-fw"></i></a></li>
-        </ul>
-    </div>
-    <div class="small-6 medium-3 medium-push-6 columns">
-        <ul class="right-nav">
-            <li><a href="https://iwasakishuto.github.io/Kerasy/doc/archives.html"><i class="fa fa-archive fa-fw"></i>&nbsp; Archives</a></li>
-        </ul>
-    </div>
-    <div class="small-12 medium-6 medium-pull-3 columns text-center">
-        <p class="tag-cloud">
-            <a href="https://iwasakishuto.github.io/Kerasy/doc/tags.html"><i class="fa fa-tags"></i>&nbsp;Tags:</a>&nbsp;&nbsp;
-            &nbsp;&hellip;
-        </p>
-    </div>
-    <div class="small-12 columns sub-footer">
-        <hr>
-        <div class="small-12 medium-6 columns">
-            <p class="small-text-center medium-text-left">
-                &copy; 2019 Shuto 
-                <!-- <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="cc.png" /></a>-->
-            </p>
-        </div>
-        <div class="small-12 medium-6 columns">
-            <p class="small-text-center medium-text-right">
-                Proudly powered by <a href="http://blog.getpelican.com/">Pelican</a>,
-                which takes great advantage of <a href="https://www.python.org/">Python</a>.
-            </p>
-        </div>
-    </div>
-</div>        </footer>
-      </div>
+  </div>
 
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="./js/theme.js" defer></script>
+      <script src="./theme/js/extra.js" defer></script>
+      <script src="./theme/js/jquery-2.1.1.min.js" defer></script>
+      <script src="./theme/js/modernizr-2.8.3.js" defer></script>
+      <script src="./theme/js/theme.js" defer></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
+      <script src="./search/main.js" defer></script>
 
-      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery.min.js"></script>
-      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/foundation.min.js"></script>
-      <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/app.js"></script>
-      <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
-      <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css" media="screen">
-    </body>
-
+</body>
 </html>

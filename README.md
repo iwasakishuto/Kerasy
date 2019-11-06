@@ -41,12 +41,12 @@ $ make html # pelican-src(.md, .ipynb) → pelican-works (.html)
 ```
 2. Move html files (made by pelican) to `MkDocs-src` as a `.md` style.
 3. Make a `mkdocs.yml` file
+    - Paset from `yml-templates.yml`
+    - Get information from the Hierarchical structure of `pelican-src`.
 ```
 # @Kerasy
 $ python pelican2mkdocs
 ```
-    - Paset from `yml-templates.yml`
-    - Get information from the Hierarchical structure of `pelican-src`.
 4. Generate the articles by `mkdocs build`.
 ```
 # @Kerasy/MkDocs

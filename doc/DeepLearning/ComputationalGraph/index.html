@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
+
+
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Computational Graph - Kerasy Documentation</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
@@ -20,26 +20,26 @@
   <link href="../../theme/css/theme_extra.css" rel="stylesheet">
   <link href="../../theme/css/theme.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet">
-  
+
   <script>
     // Current page data
     var mkdocs_page_name = "Computational Graph";
     var mkdocs_page_input_path = "DeepLearning/ComputationalGraph.md";
     var mkdocs_page_url = "/Kerasy/DeepLearning/ComputationalGraph/";
   </script>
-  
+
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
   <script src="../../js/modernizr-2.8.3.min.js" defer></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
+  <script>hljs.initHighlightingOnLoad();</script>
+
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
 
-    
+
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
       <div class="wy-side-nav-search">
         <a href="../.." class="icon icon-home"> Kerasy Documentation</a>
@@ -52,72 +52,72 @@
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
 	<ul class="tocbase current">
-    
-    
-      
+
+
+
 
 
   <li class="navtree toctree-l1 inactive">
     <a class="" href="../..">Home</a>
   </li>
-    
-      
+
+
   <li class="navtree toctree-l1 label">
     <p class="caption">DeepLearning</p>
   </li>
 
 
-  
 
-  
+
+
     <li class="navtree toctree-l1 group">
       <ul class="navtree subnav-l1 current">
-          
+
 
 
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../CNN/">CNN</a>
   </li>
-        
-          
+
+
 
 
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../Optimizers/">Optimizers</a>
   </li>
-        
-          
+
+
 
 
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../NeuralNetwork/">Neural Network</a>
   </li>
-        
-          
 
 
-  
-    
+
+
+
+
     <li class="navtree toctree-l2 page current">
       <a class="current" href="./">
         Computational Graph
           <span class="toctree-expand"></span>
       </a>
     </li>
-    
 
-  
-        
-          
+
+
+
+
 
 
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../Initializers/">Initializers</a>
   </li>
-        
+
       </ul>
     </li>
-    
+
   </ul>
       </div>
       &nbsp;
@@ -125,37 +125,37 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
-      
+
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
         <a href="../..">Kerasy Documentation</a>
       </nav>
 
-      
+
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
+
+
+
           <li>DeepLearning &raquo;</li>
-        
-      
-    
+
+
+
     <li>Computational Graph</li>
     <li class="wy-breadcrumbs-aside">
-      
+
         <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/DeepLearning/ComputationalGraph.md"> Edit on iwasakishuto/Kerasy</a>
-      
+
     </li>
   </ul>
   <hr/>
 </div>
           <div role="main">
             <div class="section">
-              
+
                 <div class="row title-bar">
   <div class="small-12 columns">
     <h1><a href="https://iwasakishuto.github.io/Kerasy/doc">Kerasy</a></h1>
@@ -203,7 +203,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img alt="計算グラフの逆伝播" src="theme/img/ComputationalGraph/BackPropagation.png" /></p>
+<p><img alt="計算グラフの逆伝播" src="../../theme/img/ComputationalGraph/BackPropagation.png" /></p>
 </div>
 </div>
 </div>
@@ -234,7 +234,7 @@ $$
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="計算グラフ">計算グラフ<a class="anchor-link" href="#計算グラフ">¶</a></h3><p>上で数式的に考えた連鎖律の計算を計算グラフで表すと、以下のようになる。</p>
-<p><img alt="連鎖律" src="theme/img/ComputationalGraph/ChainRule.png" /></p>
+<p><img alt="連鎖律" src="../../theme/img/ComputationalGraph/ChainRule.png" /></p>
 <p>これによって、局所的な微分計算の積によって合成関数の微分が行われていることが視覚的に理解できる。</p>
 </div>
 </div>
@@ -265,7 +265,7 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>したがって、加算ノードの逆伝播は以下のように表される。</p>
-<p><img alt="加算ノード" src="theme/img/ComputationalGraph/add.png" /></p>
+<p><img alt="加算ノード" src="../../theme/img/ComputationalGraph/add.png" /></p>
 <p>つまり、加算ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値をそのまま次のノードへと流すだけ」</span>になる。</p>
 </div>
 </div>
@@ -282,7 +282,7 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>したがって、乗算ノードの逆伝播は以下のように表される。</p>
-<p><img alt="乗算ノード" src="theme/img/ComputationalGraph/multiple.png" /></p>
+<p><img alt="乗算ノード" src="../../theme/img/ComputationalGraph/multiple.png" /></p>
 <p>つまり、乗算ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に、順伝播の際の入力信号を『ひっくり返した値』を乗算して下流のノードへと流す」</span>ことになる。</p>
 </div>
 </div>
@@ -294,7 +294,7 @@ $$<p>したがって、乗算ノードの逆伝播は以下のように表され
 $$
 \frac{\partial y}{\partial x} = -\frac{1}{x^2} = -y^2
 $$<p>したがって、逆数ノードの逆伝播は以下のように表される。</p>
-<p><img alt="逆数ノード" src="theme/img/ComputationalGraph/inverse.png" /></p>
+<p><img alt="逆数ノード" src="../../theme/img/ComputationalGraph/inverse.png" /></p>
 <p>つまり、逆数ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に『順伝播の出力の二乗にマイナスを付けた値』を乗算して下流のノードへと流す」</span>ことになる。</p>
 </div>
 </div>
@@ -306,7 +306,7 @@ $$<p>したがって、逆数ノードの逆伝播は以下のように表され
 $$
 \frac{\partial y}{\partial x} = \exp\left(x\right) = y
 $$<p>したがって、expノードの逆伝播は以下のように表される。</p>
-<p><img alt="expノード" src="theme/img/ComputationalGraph/exp.png" /></p>
+<p><img alt="expノード" src="../../theme/img/ComputationalGraph/exp.png" /></p>
 <p>つまり、逆数ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に『順伝播の出力』を乗算して下流のノードへと流す」</span>ことになる。</p>
 </div>
 </div>
@@ -316,7 +316,7 @@ $$<p>したがって、expノードの逆伝播は以下のように表される
 <div class="text_cell_render border-box-sizing rendered_html">
 <div class="frame">
 　ここまでのノードを用いることで、<span class="marker-pink">Softmax</span>や<span class="marker-pink">Cross Entropy Error</span>の逆伝播も計算することができる。
-    <img alt="Softmax-with-Loss" src="theme/img/ComputationalGraph/Softmax-with-Loss.png" />
+    <img alt="Softmax-with-Loss" src="../../theme/img/ComputationalGraph/Softmax-with-Loss.png" />
 </div>
 </div>
 </div>
@@ -333,10 +333,10 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>したがって、dotノードの逆伝播は以下のように表される。</p>
-<p><img alt="dotノード" src="theme/img/ComputationalGraph/affine.png" /></p>
+<p><img alt="dotノード" src="../../theme/img/ComputationalGraph/affine.png" /></p>
 <p>天下り式にこの逆伝播を理解しても良いが、行列を対象とした逆伝播を求める場合は、行列の要素ごとに書き下すことで、これまでのスカラ値を対象とした計算グラフと同様に考えることができる。</p>
 <p>実際に書き下すと、以下の計算グラフに分解できる。</p>
-<p><img alt="dotノード（要素ごとに分解）" src="theme/img/ComputationalGraph/affine_element.png" /></p>
+<p><img alt="dotノード（要素ごとに分解）" src="../../theme/img/ComputationalGraph/affine_element.png" /></p>
 </div>
 </div>
 </div>
@@ -396,7 +396,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>                
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span>
 
         <span class="k">return</span> <span class="n">out</span>
@@ -520,7 +520,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="参考">参考<a class="anchor-link" href="#参考">¶</a></h2><p><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585"><img src="theme/img/ComputationalGraph/Deep_Learning_from_Scratch.png" /></a></p>
+<h2 id="参考">参考<a class="anchor-link" href="#参考">¶</a></h2><p><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585"><img src="../../theme/img/ComputationalGraph/Deep_Learning_from_Scratch.png" /></a></p>
 </div>
 </div>
 </div>
@@ -529,7 +529,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="prompt input_prompt">In [ ]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span>
 </pre></div>
 </div>
 </div>
@@ -568,31 +568,31 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
     </div>
 </div>
 </div>
-              
+
             </div>
           </div>
           <footer>
-  
+
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+
         <a href="../Initializers/" class="btn btn-neutral float-right" title="Initializers">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
+
+
         <a href="../NeuralNetwork/" class="btn btn-neutral" title="Neural Network"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+
     </div>
-  
+
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
+
   </div>
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+
         </div>
       </div>
 
@@ -602,13 +602,13 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 
   <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
+
+
         <span><a href="../NeuralNetwork/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
+
+
         <span style="margin-left: 15px"><a href="../Initializers/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
+
     </span>
 </div>
     <script>var base_url = '../..';</script>

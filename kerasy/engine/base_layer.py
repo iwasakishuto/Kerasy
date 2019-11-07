@@ -56,18 +56,3 @@ class Layers():
             getattr(self, param) += optimizer.get_updates(self._losses[param], self._updates[param], self.name)
             self._updates[param].append(getattr(self, param))
             self._losses[param] = []
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        d

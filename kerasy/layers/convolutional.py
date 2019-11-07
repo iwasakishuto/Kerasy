@@ -55,7 +55,8 @@ class Conv2D(Layer):
             self.OW = (self.W-self.kw)//self.sw+1
             self.ph = 0
             self.pw = 0
-        return (self.OH, self.OW, self.OF)
+        self.output_shape = (self.OH, self.OW, self.OF)
+        return self.output_shape
 
     def build(self, input_shape):
         """ @params input_shape: (H,W,F) of input image. """
@@ -105,7 +106,7 @@ class Conv2D(Layer):
                 a[i,j,c] = np.sum(clip_image*self.kernel[:,:,:,c])
         a     += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
         self.a = a # Memorize. (output layer. shape=(OH,OW,OF))
-        Xout = self.h(a)
+        Xout = self.h.forward(a)
         return Xout
 
     def backprop(self, dEdXout, lr=1e-3):

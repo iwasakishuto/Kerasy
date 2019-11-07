@@ -15,11 +15,12 @@ class Input(Layer):
 
 class Flatten(Layer):
     def __init__(self):
-        self.input=None
+        super().__init__(**kwargs)
 
-    def build(self, input_shape):
+    def compute_output_shape(self, input_shape):
         self.input_shape = input_shape
         self.output_shape = (np.prod(list(input_shape)),)
+        return self.output_shape
 
     def forward(self, input):
         return input.flatten()
@@ -39,42 +40,53 @@ class Dense(Layer):
         self.kernel_initializer = Initializer(kernel_initializer)
         self.bias_initializer   = Initializer(bias_initializer)
         self.h = ActivationFunc(activation)
-        self.w = None
-        self.z = None
-        self.a = None
-        self.trainable = True
+        self.use_bias = True
+        super().__init__(**kwargs)
+
+    def compute_output_shape(self, input_shape):
+        return self.units
 
     def build(self, input_shape):
         self.input_shape = input_shape
-        self.w = np.c_[
-            self.kernel_initializer(shape=(self.output_shape[0],self.input_shape[0])),
-            self.bias_initializer(shape=(self.output_shape[0],1))
-        ]
+        output_shape = self.compute_output_shap(input_shape)
+        self.kernel  = self.add_weight(shape=(self.output_shape + input_shape),
+                                       name="kernel",
+                                       Initializer=self.kernel_initializer,
+                                       regularizer=self.kernel_regularizer,
+                                       constraint =self.kernel_constraint)
+        if self.use_bias:
+            self.bias = self.add_weight(shape=(self.output_shape[0],1),
+                                        name="bias",
+                                        initializer=self.bias_initializer,
+                                        regularizer=self.bias_regularizer,
+                                        constraint =self.bias_constraint)
+        else:
+            self.bias = None
+        return output_shape
 
     def forward(self, input):
         """ @param input: shape=(Din,) """
-        z_in = np.append(input,1)       # shape=(Din+1,)
-        a = self.w.dot(z_in)            # (Dout,Din+1) @ (Din+1,) = (Dout,)
-        z_out = self.h.forward(input=a) # shape=(Dout,)
-        self.z = z_in
+        Xin  = np.append(input,1) if self.use_bias else input # shape=(Din+1,)
+        a    = self.w.dot(Xin)         # (Dout,Din+1) @ (Din+1,) = (Dout,)
+        Xout = self.h.forward(input=a) # shape=(Dout,)
         self.a = a
-        return z_out
+        sekf.Xin = Xin
+        return Xout
 
-    def backprop(self, dEdz_out):
-        """ @param dEdz_out: shape=(Dout,) """
-        dz_outda = self.h.diff(self.a)
-        if len(dz_outda.shape) == 1:
-            dEda = dz_outda*dEdz_out      # δ, shape=(Dout,)
-        elif len(dz_outda.shape) == 2:
-            dEda = np.sum(dz_outda*dEdz_out, axis=1) # δ, shape=(Dout,)
+    def backprop(self, dEdXout):
+        """ @param dEdXout: shape=(Dout,) """
+        dXoutda = self.h.diff(self.a) # shape=(Dout,)
+        dEda = dXoutda*dEdXout        # shape=(Dout,)
+        dEdXin = self.w.T.dot(dEda)   # (Din+1,Dout) @ (Dout,) = (Din+1,)
+
+        self.memorize_delta(dEda)
+        dEdXin = dEdXin[:-1] if self.use_bias else dEdXin
+        return dEdXin # shape=(Din,) delta of bias is not propagated.
+
+    def memorize_delta(self, dEda):
+        dEdw = np.outer(delta, self.Xin)
+        if self.use_bias:
+            self._losses['kernel'] += dEdw[:-1]
+            self._losses['bias'] += dEdw[-1]
         else:
-            raise ValueError("Couldn't understand the shape of dz_out/da. It's shape must be 1D or 2D.")
-        dEdz_in = self.w.T.dot(dEda)        # (Din+1,Dout) @ (Dout,) = (Din+1,)
-        if self.trainable:
-            self.update(dEda)
-        return dEdz_in[:-1]                 # shape=(Din,) term of bias is not propagated.
-
-    def update(self, delta, ALPHA=0.01):
-        """ @param delta: shape=(Dout,) """
-        dw = np.outer(delta, self.z) # (Dout,) × (Din+1,) = (Dout,Din+1)
-        self.w -= ALPHA*dw # update.
+            self._losses['kernel'] += dEdw

@@ -84,3 +84,10 @@ class SGD(Optimizer):
         else:
             new_param = Last + velocity
         return new_param
+
+OptimizerHandler = {
+    'sgd': SGD,
+}
+
+def Optimizer(optimizer_name):
+    return OptimizerHandler[optimizer_name]

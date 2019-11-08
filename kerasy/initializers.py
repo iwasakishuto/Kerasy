@@ -10,11 +10,11 @@ def Ones(shape, dtype=None):
 def Constant(shape, value=0, dtype=None):
     return np.full(shape=shape, fill_value=value, dtype=dtype)
 
-def RandomNormal(shape, mean=0, stddev=0.05, seed=None):
+def RandomNormal(shape, mean=0, stddev=0.05, dtype=None, seed=None):
     rng = np.random.RandomState(seed) if seed is not None else np.random
-    return rng.normal(size=shape, loc=mean, scale=stddev)
+    return rng.normal(size=shape, loc=mean, scale=stddev, dtype=dtype)
 
-def RandomUniform(shape, minval=-0.05, maxval=0.05, seed=None):
+def RandomUniform(shape, minval=-0.05, maxval=0.05, dtype=None, seed=None):
     rng = np.random.RandomState(seed) if seed is not None else np.random
     return rng.uniform(size=shape, low=minval, high=maxval)
 
@@ -28,7 +28,7 @@ def TruncatedNormal(shape, mean=0.0, stddev=0.05, seed=None):
     return X.rvs(size=shape,random_state=seed)
 
 def VarianceScaling(shape, scale=1.0, mode='fan_in', distribution='normal', seed=None):
-    n = "入力ユニットの数" if mode=="fan_in" else "出力ユニットの数" if mode=="fan_out" else "入力ユニットと出力ユニットの数の平均" 
+    n = "入力ユニットの数" if mode=="fan_in" else "出力ユニットの数" if mode=="fan_out" else "入力ユニットと出力ユニットの数の平均"
 
     if distribution=='normal':
         stddev = np.sqrt(scale / n)
@@ -66,7 +66,7 @@ def GlorotNormal(shape, seed=None):
         distribution='normal',
         seed=seed
     )
-    
+
 def GlorotUniform(shape, seed=None):
     return VarianceScaling(
         shape=shape,
@@ -75,7 +75,7 @@ def GlorotUniform(shape, seed=None):
         distribution='uniform',
         seed=seed
     )
-    
+
 def HeNormal(shape, seed=None):
     return VarianceScaling(
         shape=shape,
@@ -102,7 +102,7 @@ def HeUniform(shape, seed=None):
         distribution='uniform',
         seed=seed
     )
-    
+
 def LeCunUniform(shape, seed=None):
     return VarianceScaling(
         shape=shape,
@@ -111,7 +111,7 @@ def LeCunUniform(shape, seed=None):
         distribution='uniform',
         seed=seed
     )
-    
+
 InitializeHandler = {
     'zeros': Zeros,
     'ones': Ones,

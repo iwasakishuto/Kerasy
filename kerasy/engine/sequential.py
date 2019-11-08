@@ -5,8 +5,10 @@ from __future__ import absolute_import
 import numpy as np
 
 from ..losses import LossFunc
+from ..optimizers import Optimizer
 from ..layers.core import Input
-from .training_utils import make_batches
+from ..utils.training_utils import make_batches
+from .base_layer import Layer
 
 class Sequential():
     def __init__(self):
@@ -14,7 +16,7 @@ class Sequential():
 
     def add(self, layer):
         """Adds a layer instance."""
-        if not isinstance(layer, Layers):
+        if not isinstance(layer, Layer):
             raise TypeError(f"The added layer must be an instance of class Layer. Found: {str(layer)}")
         self.layers.append(layer)
 
@@ -24,11 +26,11 @@ class Sequential():
         @param loss        : (String name of loss function) or (Loss instance).
         @param metrics     : (List) Metrics to be evaluated by the model during training and testing.
         """
-        self.optimizer = optimizer if isinstance(optimizer, str) else optimizer
+        self.optimizer = Optimizer(optimizer) if isinstance(optimizer, str) else optimizer
         self.loss = LossFunc(loss) if isinstance(loss, str) else loss
         self.metrics = metrics
         input_layer = self.layers[0]
-        if not isinstance(input_layer, Input): raise ValueError(f"The initial layer should be Input instance, but f{str(input_layer)}")
+        if not isinstance(input_layer, Input): raise ValueError(f"The initial layer should be Input instance, but {str(input_layer)}")
         output_shape = input_layer.input_shape
         for layer in self.layers:
             output_shape = layer.build(output_shape)
@@ -51,7 +53,7 @@ class Sequential():
             else: raise ValueError(f"When passing validation_data, it must contain 2 (x_val, y_val) or 3 (x_val, y_val, val_sample_weights) items. However, it contains {len(validation)} items.")
 
         num_train_samples = len(x)
-        index_array = np.arange(num_samples)
+        index_array = np.arange(num_train_samples)
         for epoch in range(initial_epoch, epochs):
             if shuffle: np.random.shuffle(index_array)
             batches = make_batches(num_train_samples, batch_size)

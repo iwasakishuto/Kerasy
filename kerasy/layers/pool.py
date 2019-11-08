@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from .. import backend as K
+import numpy as np
+
 from ..engine.base_layer import Layer
 
 class MaxPooling2D(Layer):
@@ -25,13 +26,14 @@ class MaxPooling2D(Layer):
         self.pool_size = pool_size
         super().__init__(**kwargs)
 
-    def compute_output_shap(self, input_shape):
+    def compute_output_shape(self, input_shape):
         self.H, self.W, self.F = input_shape
         ph,pw = self.pool_size
         self.OH = self.H//ph
         self.OW = self.W//pw
         self.OF = self.F
         self.output_shape = (self.OH, self.OW, self.OF)
+        return self.output_shape
 
     def _generator(self, Xin):
         """ Generator for training. """

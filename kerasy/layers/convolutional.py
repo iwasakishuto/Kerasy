@@ -6,18 +6,11 @@ import numpy as np
 from ..activations import ActivationFunc
 from ..initializers import Initializer
 from ..losses import LossFunc
-from ..layers.core import Input, Dense
-from .. import backend as K
 from ..engine.base_layer import Layer
-
-class Input(Layer):
-    def __init__(self, input_shape, **kwargs):
-        self.input_shape=input_shape
-        super().__init__(**kwargs)
 
 class Conv2D(Layer):
     def __init__(self, filters, kernel_size=(3,3), strides=(1,1), padding='valid', activation='relu',
-                 kernel_initializer='random_normal', bias_initializer='zeros', data_format='channels_last'):
+                 kernel_initializer='random_normal', bias_initializer='zeros', data_format='channels_last', **kwargs):
         """
         @param filters           : (int) the dimensionality of the output space.
         @param kernel_size       : (int,int) height and width of each kernel. kernel-shape=(*kernel_size, F, OF)
@@ -60,18 +53,20 @@ class Conv2D(Layer):
 
     def build(self, input_shape):
         """ @params input_shape: (H,W,F) of input image. """
-        output_shape = self.compute_output_shap(input_shape)
+        output_shape = self.compute_output_shape(input_shape)
         self.kernel  = self.add_weight(shape=(self.kh, self.kw, self.F, self.OF),
                                        name="kernel",
-                                       Initializer=self.kernel_initializer,
+                                       initializer=self.kernel_initializer,
                                        regularizer=self.kernel_regularizer,
-                                       constraint =self.kernel_constraint)
+                                       constraint =self.kernel_constraint,
+                                       trainable  =self.trainable)
         if self.use_bias:
             self.bias = self.add_weight(shape=(self.OF,),
                                         name="bias",
                                         initializer=self.bias_initializer,
                                         regularizer=self.bias_regularizer,
-                                        constraint =self.bias_constraint)
+                                        constraint =self.bias_constraint,
+                                        trainable  =self.trainable)
         else:
             self.bias = None
         return output_shape

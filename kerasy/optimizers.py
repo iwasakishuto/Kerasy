@@ -68,6 +68,7 @@ class SGD(Optimizer):
         @past_params: (ndarray) shape=(z,x,y)
         @name       : (str) layer name + param name.
         """
+        print(f"{name}: grads.shape={grads.shape}")
         grads = self.get_gradients(grads) # Cliped.
         # Increase processing speed by storing in local variables.
         if self.initial_decay > 0:
@@ -78,11 +79,15 @@ class SGD(Optimizer):
         else:
             preLast, Last = past_params[-2:]
             dParam = Last-preLast
+        print(f"\n=== {name} ===")
+        print(f"dParam: {np.sqrt(np.mean(np.square(dParam)))}")
+        print(f"grads:  {np.sqrt(np.mean(np.square(grads)))}")
         velocity = self.momentum*dParam - self.learning_rate*grads
         if self.nesterov:
             new_param = Last + self.momentum*velocity - self.lr*grads
         else:
             new_param = Last + velocity
+        print(f"new-last: {np.sqrt(np.mean(np.square(new_param-Last)))}")
         return new_param
 
 OptimizerHandler = {

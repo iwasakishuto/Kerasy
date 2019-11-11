@@ -26,7 +26,7 @@ class Sequential():
         @param loss        : (String name of loss function) or (Loss instance).
         @param metrics     : (List) Metrics to be evaluated by the model during training and testing.
         """
-        self.optimizer = Optimizer(optimizer) if isinstance(optimizer, str) else optimizer
+        self.optimizer = Optimizer(optimizer)() if isinstance(optimizer, str) else optimizer
         self.loss = LossFunc(loss) if isinstance(loss, str) else loss
         self.metrics = metrics
         input_layer = self.layers[0]
@@ -59,10 +59,10 @@ class Sequential():
             batches = make_batches(num_train_samples, batch_size)
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
-                for x_, y_ in zip(x[batch_ids], y[batch_ids]):
+                for bs, (x_, y_) in enumerate(zip(x[batch_ids], y[batch_ids])):
                     out = self.forward(x_)
                     self.backprop(y_, out)
-                self.updates()
+                self.updates(bs+1)
             print(f'[{epoch+1}/{epochs}]')
 
     def forward(self, input):
@@ -81,3 +81,7 @@ class Sequential():
             return self.forward(x_train)
         else:
             return np.array([self.forward(x) for x in x_train])
+
+    def updates(self, batch_size):
+        for layer in reversed(self.layers):
+            layer.update(self.optimizer, batch_size)

@@ -87,7 +87,7 @@ class Conv2D(Layer):
     def _generator(self, Xin):
         #=== generator ===
         for i in range(self.OH//self.sh):
-            for j in range(self.OW,self.sw):
+            for j in range(self.OW//self.sw):
                 clipedXin = Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :]
                 yield clipedXin,i,j
 
@@ -120,7 +120,6 @@ class Conv2D(Layer):
             for i in range((self.H+2*self.ph)//self.sh):
                 for j in range((self.W+2*self.pw)//self.sw):
                     dEdXin[i,j,c] = np.sum(delta_padd[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw),:] * np.flip(self.kernel[:,:,c,:], axis=(0,1)))
-
         self.memorize_delta(dEda)
         return dEdXin
 
@@ -133,4 +132,4 @@ class Conv2D(Layer):
                         # dEdw_{m,n,c,c'} = ΣiΣj(dEda * dadw) = ΣiΣj(dEda_{i,j,c'}*Xin_{i+m,j+n,c})
                         dEdw[m,n,c,c_] = np.sum(dEda[:,:,c_] * self.Xin[m:m+self.OH:self.sh, n:n+self.OW:self.sw, c])
         self._losses['kernel'] += dEdw
-        self._losses['bias'] += np.sum(delta, axis=(0,1))
+        self._losses['bias'] += np.sum(dEdw, axis=(0,1))

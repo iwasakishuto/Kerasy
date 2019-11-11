@@ -14,7 +14,10 @@ class Input(Layer):
         super().__init__(**kwargs)
 
     def forward(self, input):
-            return input
+        return input
+
+    def backprop(self, delta):
+        return delta
 
 class Flatten(Layer):
     def __init__(self, **kwargs):
@@ -83,17 +86,16 @@ class Dense(Layer):
     def backprop(self, dEdXout):
         """ @param dEdXout: shape=(Dout,) """
         dXoutda = self.h.diff(self.a) # shape=(Dout,)
-        dEda = dXoutda*dEdXout        # shape=(Dout,)
+        dEda = dEdXout.dot(dXoutda) if len(dXoutda.shape)==2 else dEdXout * dXoutda # shape=(Dout,)
         dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
-
         self.memorize_delta(dEda)
         dEdXin = dEdXin[:-1] if self.use_bias else dEdXin
         return dEdXin # shape=(Din,) delta of bias is not propagated.
 
     def memorize_delta(self, dEda):
-        dEdw = np.outer(dEda, self.Xin)
+        dEdw = np.outer(dEda, self.Xin) # (Dout, Din+1)
         if self.use_bias:
-            self._losses['kernel'] += dEdw[:-1]
-            self._losses['bias'] += dEdw[-1]
+            self._losses['kernel'] += dEdw[:,:-1] # shape=(Dout, Din)
+            self._losses['bias'] += dEdw[:,-1:] # shape=(Dout, 1)
         else:
             self._losses['kernel'] += dEdw

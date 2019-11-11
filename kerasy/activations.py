@@ -8,19 +8,19 @@ class Linear():
     def diff(delta):
         return delta
 
-class Softmax():        
+class Softmax():
     def forward(input):
         """ @param input shape=(class,) """
         exps = np.exp(input - np.max(input)) # For avoiding overflowing.
         return exps/np.sum(exps)
-    
+
     def diff(delta):
         """
         @param  : shape=(class,)
         @return : shape=(class,class)
         =================================
         ∂z_i    / z_i(1-z_i)  --- if i==k
-        ---- = |  
+        ---- = |
         ∂a_k    \ -z_iz_k     --- if i!=k
         """
         exps = np.exp(delta - np.max(delta)) # For avoiding overflowing.

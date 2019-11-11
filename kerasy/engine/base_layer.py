@@ -14,7 +14,7 @@ class Layer():
         self._losses = {}  # (name, delta)
         self._updates = {}
         prefix = self.__class__.__name__.lower()
-        name = prefix + '_' + str(get_uid(prefix))
+        self.name = prefix + '_' + str(get_uid(prefix))
         self.trainable = kwargs.get('trainable', True)
 
     def compute_output_shape(self, input_shape):
@@ -42,19 +42,20 @@ class Layer():
             self._trainable_weights.append(name)
         else:
             self._non_trainable_weights.append(name)
-        self._updates[name] = [weight]
-        self._losses[name] = [np.zeros_like(weight)]
+        self._updates[name] = np.expand_dims(weight, axis=0) # shape=(z,x,y)
+        self._losses[name] = np.zeros_like(weight) # shape=(x,y)
         return weight
 
-    def update(self, optimizer):
-        if self.trainable:
+    def update(self, optimizer, batch_size):
+        if self.trainable and len(self._non_trainable_weights)>0:
             self._trainable_weights += self._non_trainable_weights
             self._non_trainable_weights = []
-        else:
+        elif self.trainable == False and len(self._trainable_weights)>0:
             self._non_trainable_weights += self._trainable_weights
             self._trainable_weights = []
 
-        for param in self._trainable_weights:
-            self.__dict__[param] += optimizer.get_updates(self._losses[param], self._updates[param], self.name)
-            self._updates[param].append(getattr(self, param))
-            self._losses[param] = [np.zeros_like(weight)]
+        for name in self._trainable_weights:
+            new_weight = optimizer.get_updates(self._losses[name]/batch_size, self._updates[name], self.name)
+            self.__dict__[name] = new_weight
+            self._updates[name] = np.r_[self._updates[name], np.expand_dims(new_weight, axis=0)]
+            self._losses[name]  = np.zeros_like(new_weight)

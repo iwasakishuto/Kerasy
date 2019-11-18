@@ -25,6 +25,7 @@ class MaxPooling2D(Layer):
         self.input = None
         self.pool_size = pool_size
         super().__init__(**kwargs)
+        self.trainable = False
 
     def compute_output_shape(self, input_shape):
         self.H, self.W, self.F = input_shape

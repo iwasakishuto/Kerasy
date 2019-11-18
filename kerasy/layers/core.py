@@ -88,7 +88,8 @@ class Dense(Layer):
         dXoutda = self.h.diff(self.a) # shape=(Dout,)
         dEda = dEdXout.dot(dXoutda) if len(dXoutda.shape)==2 else dEdXout * dXoutda # shape=(Dout,)
         dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
-        self.memorize_delta(dEda)
+        if self.trainable:
+            self.memorize_delta(dEda)
         dEdXin = dEdXin[:-1] if self.use_bias else dEdXin
         return dEdXin # shape=(Din,) delta of bias is not propagated.
 

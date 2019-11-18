@@ -104,6 +104,9 @@ class Conv2D(Layer):
         Xout = self.h.forward(a)
         return Xout
 
+    def _backprop_mask(self,i,j,m,n):
+        return ((i%self.sh+m < self.kh) and (j%self.sw+n < self.kw)) and ((self.OH > (i-m)//self.sh >= 0) and (self.OW > (j-n)//self.sw >= 0))
+
     def backprop(self, dEdXout, lr=1e-3):
         """
         @param  delta_times_w: shape=(OH,OW,OF)
@@ -111,17 +114,13 @@ class Conv2D(Layer):
         @return delta_times_w: shape=(H,W,F)
         """
         dEda = dEdXout*self.h.diff(self.a) # Xout=h(a) → dE/da = dE/dXout*h'(a)
-        # Look at "https://iwasakishuto.github.io/Kerasy/doc/theme/img/CNN/convolution/backprop.gif"
-        delta_padd = np.zeros(shape=(self.OH+2*(self.kh-self.sh), self.OW+2*(self.kw-self.sw), self.OF))
-        delta_padd[(self.kh-self.sh):-(self.kh-self.sh), (self.kw-self.sw):-(self.kw-self.sw), :] = dEda
-
-        dEdXin = np.zeros_like(self.Xin) # shape=(H+2ph,W+2pw,F)
+        dEdXin = np.zeros_like(self.Xin)   # shape=(H+2ph,W+2pw,F)
         for c in range(self.F):
-            for i in range((self.H+2*self.ph)//self.sh):
-                for j in range((self.W+2*self.pw)//self.sw):
-                    dEdXin[i,j,c] = np.sum(delta_padd[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw),:] * np.flip(self.kernel[:,:,c,:], axis=(0,1)))
+            for i in range(self.H+2*self.ph):
+                for j in range(self.W+2*self.pw):
+                    dEdXin[i,j,c] = np.sum([ dEda[(i-m)//self.sh,(j-n)//self.sw,:] * self.kernel[i%self.sh+m,j%self.sw+n,c,:] for m in range(0,self.kh,self.sh) for n in range(0,self.kw,self.sw) if self._backprop_mask(i,j,m,n)])
         if self.trainable: self.memorize_delta(dEda)
-        return dEdXin
+        return dEdXin[self.ph:-self.ph,self.pw:-self.pw,:]
 
     def memorize_delta(self, dEda):
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)

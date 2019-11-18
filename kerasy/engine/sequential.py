@@ -22,9 +22,9 @@ class Sequential():
 
     def compile(self, optimizer, loss=None, metrics=None):
         """ Creates the layer weights.
-        @param optimizer   : (String name of optimizer) or (Optimizer instance).
-        @param loss        : (String name of loss function) or (Loss instance).
-        @param metrics     : (List) Metrics to be evaluated by the model during training and testing.
+        @param optimizer: (String name of optimizer) or (Optimizer instance).
+        @param loss     : (String name of loss function) or (Loss instance).
+        @param metrics  : (List) Metrics to be evaluated by the model during training and testing.
         """
         self.optimizer = Optimizer(optimizer)() if isinstance(optimizer, str) else optimizer
         self.loss = LossFunc(loss) if isinstance(loss, str) else loss

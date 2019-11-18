@@ -120,7 +120,7 @@ class Conv2D(Layer):
                 for j in range(self.W+2*self.pw):
                     dEdXin[i,j,c] = np.sum([ dEda[(i-m)//self.sh,(j-n)//self.sw,:] * self.kernel[i%self.sh+m,j%self.sw+n,c,:] for m in range(0,self.kh,self.sh) for n in range(0,self.kw,self.sw) if self._backprop_mask(i,j,m,n)])
         if self.trainable: self.memorize_delta(dEda)
-        return dEdXin[self.ph:-self.ph,self.pw:-self.pw,:]
+        return dEdXin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:]
 
     def memorize_delta(self, dEda):
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)

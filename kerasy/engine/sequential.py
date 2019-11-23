@@ -57,13 +57,15 @@ class Sequential():
         for epoch in range(initial_epoch, epochs):
             if shuffle: np.random.shuffle(index_array)
             batches = make_batches(num_train_samples, batch_size)
+            n_batches = len(batches)
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
                 for bs, (x_, y_) in enumerate(zip(x[batch_ids], y[batch_ids])):
                     out = self.forward(x_)
                     self.backprop(y_, out)
                 self.updates(bs+1)
-            print(f'[{epoch+1}/{epochs}]')
+                flush_progress_bar(f"{epoch+1:0{max_digit}}/{epochs}", (batch_index+1)/n_batches, info="")
+
 
     def forward(self, input):
         out=input

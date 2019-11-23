@@ -7,6 +7,7 @@ from ..activations import ActivationFunc
 from ..initializers import Initializer
 from ..losses import LossFunc
 from ..engine.base_layer import Layer
+from ..utils import flush_progress_bar
 
 class Input(Layer):
     def __init__(self, input_shape, **kwargs):

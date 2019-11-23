@@ -71,3 +71,10 @@ class Progbar():
         @param values : (list)
         """
         pass
+
+def flush_progress_bar(epoch, max_epoch, initial_t, metrics=""):
+    number = int(rate/0.05)+1
+    bar = ('>' * number).ljust(20, '-')
+    sys.stdout.write(f"\r{barname} : [{bar}] {rate*100:.2f}% {info}")
+    if rate==1:
+        print(f"\r{barname} : [{bar}] {rate*100:.2f}% {info}")

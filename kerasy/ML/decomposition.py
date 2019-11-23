@@ -72,14 +72,12 @@ class tSNE():
     """
 
     def __init__(self,
-                 max_iter=10,
                  initial_momentum = 0.5,
                  final_momoentum = 0.8,
                  eta = 500,
                  min_gain = 0.1,
                  tol = 1e-5,
                  prec_max_iter = 50):
-        self.max_iter = max_iter
         self.initial_momentum = initial_momentum
         self.final_momoentum = final_momoentum
         self.eta = eta
@@ -147,7 +145,7 @@ class tSNE():
         print(f"Mean value of sigma: {np.mean(np.sqrt(1/2*beta)):.3f}")
         return P
 
-    def fit_transform(self, X, n_components=2, initial_dims=50, perplexity=30.0, random_state=None):
+    def fit_transform(self, X, n_components=2, initial_dims=50, perplexity=30.0, max_iter=10, random_state=None):
         # If the number of initial features are too large, using PCA to reduce the dimentions.
         n_samples, n_ori_features = X.shape
         if n_ori_features > initial_dims:
@@ -170,8 +168,10 @@ class tSNE():
         P = P * 4.
         P = np.maximum(P, 1e-12)
 
-        max_digit = len(str(self.max_iter))
-        for it in range(self.max_iter):
+        max_digit = len(str(max_iter))
+        print()
+        for it in range(max_iter):
+            print(f"{it+1}/{max_iter}")
             for inner_it in range(100):
                 # equation (4)
                 propto_qij = 1. / (1. + pairwise_euclid_distances(Y, squared=True))
@@ -198,7 +198,7 @@ class tSNE():
                 iY = momentum * iY - self.eta * (gains * dY)
                 Y += iY
                 Y  = Y - np.tile(np.mean(Y, axis=0), (n_samples, 1))
-                flush_progress_bar(f"{it+1:0{max_digit}}/{self.max_iter}", (inner_it+1)/100, info=f"KL(P||Q) = {np.sum(P * np.log(P / Q)):.3f}")
+                flush_progress_bar(inner_it, 100, metrics=f"KL(P||Q) = {np.sum(P * np.log(P / Q)):.3f}")
             # Stop lying about P-values
             if it == 0: P = P / 4.
             # Compute current value of cost function

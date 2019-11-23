@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from six.moves.urllib.request import urlretrieve
 from collections import defaultdict
 
@@ -47,34 +48,23 @@ def get_file(fname, origin, cache_subdir='datasets', file_hash=None):
             raise
     return fpath
 
-
 def get_uid(prefix=""):
     _UID_PREFIXES[prefix] += 1
     return _UID_PREFIXES[prefix]
 
-class Progbar():
-    """Displays a progress bar.
-    @param target  : (int) Total number of steps expected. None if unknown.
-    @param width   : (int) Progress bar width on screen.
-    @param verbose : (int) Verbosity mode, 0 (silent), 1 (verbose), 2 (semi-verbose)
-    @param interval: (float) Minimum visual progress update interval (in seconds).
-    """
-    def __init__(self, target, width=30, verbose=1, interval=5e-2):
-        self.target = target
-        self.width = width
-        self.verbose = verbose
-        self.interval = interval
+initial_time = time.time()
+def flush_progress_bar(it, max_iter, metrics="", barname=""):
+    global initial_time
+    if it == 0: initial_time = time.time()
+    if len(barname) > 0: barname = " " + barname
+    it+=1
+    digit = len(str(max_iter))
+    rate  = it/max_iter
+    n_bar = int(rate/0.05)
+    bar   = ('#' * n_bar).ljust(20, '-')
 
-    def update(self, current, values=None):
-        """Update the progress bar.
-        @param current: (int) Index of current step.
-        @param values : (list)
-        """
-        pass
-
-def flush_progress_bar(epoch, max_epoch, initial_t, metrics=""):
-    number = int(rate/0.05)+1
-    bar = ('>' * number).ljust(20, '-')
-    sys.stdout.write(f"\r{barname} : [{bar}] {rate*100:.2f}% {info}")
-    if rate==1:
-        print(f"\r{barname} : [{bar}] {rate*100:.2f}% {info}")
+    percent = f"{rate*100:.2f}"
+    content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-initial_time:.3f}s  {metrics}"
+    sys.stdout.write(content)
+    if it==max_iter:
+        print(content)

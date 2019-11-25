@@ -20,4 +20,24 @@
      <lastmod>2019-11-26</lastmod>
      <changefreq>daily</changefreq>
     </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/TrainOnlyDense/</loc>
+     <lastmod>2019-11-26</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/ComputationalGraph/</loc>
+     <lastmod>2019-11-26</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/Initializers/</loc>
+     <lastmod>2019-11-26</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/decomposition/</loc>
+     <lastmod>2019-11-26</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
 </urlset>

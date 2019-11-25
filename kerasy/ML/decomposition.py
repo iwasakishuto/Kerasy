@@ -4,6 +4,8 @@ import numpy as np
 from ..utils import flush_progress_bar
 from ..utils import pairwise_euclid_distances
 
+from ._kernel import kernel_handler
+
 class PCA():
     def __init__(self, n_components=None):
         self.n_components = n_components
@@ -15,9 +17,9 @@ class PCA():
         if self.n_components is None:
             self.n_components = min(X.shape)
         N,D = X.shape
-        # X_mean = np.mean(X, axis=0) # X_ave.shape=(D,)
-        # X_centralized = X-X_mean    # X_centralized.shape=(N,D)
-        S = np.cov(X.T)               # S[i][j] = np.mean(X_centralized[:,i]*X_centralized[:,j])
+        X_mean = np.mean(X, axis=0).reshape(1,D) # X_ave.shape=(D,)
+        X_centralized = X-X_mean      # X_centralized.shape=(N,D)
+        S = np.cov(X_centralized.T)   # S[i][j] = np.mean(X_centralized[:,i]*X_centralized[:,j])
         eigenvals, eigenvecs = np.linalg.eig(S)
         # NOTE: v[:,i] is the eigenvector corresponding to the eigenvalue w[i].
 
@@ -28,11 +30,11 @@ class PCA():
         self.components_ = eigenvecs[:,:self.n_components].T # shape=(n_components,D)
         self.explained_variance_ = eigenvals[:self.n_components]
         self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]
-        # self.mean = X_mean
+        self.mean = X_mean
 
     def transform(self,X):
-        # X_centralized = X-self.mean
-        X_transformed = np.dot(X, self.components_.T) # (N,D)@(M,D).T = (N,M)
+        X_centralized = X-self.mean
+        X_transformed = np.dot(X_centralized, self.components_.T) # (N,D)@(M,D).T = (N,M)
         return X_transformed
 
 class LDA():
@@ -203,3 +205,31 @@ class tSNE():
             if it == 0: P = P / 4.
             # Compute current value of cost function
         return Y
+
+class KernelPCA():
+    def __init__(self, n_components=None, kernel="gaussian", **kernelargs):
+        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.n_components = n_components
+
+    def fit_transform(self, X):
+        """
+        @param X: shape=(N,M)
+        """
+        if self.n_components is None:
+            self.n_components = min(X.shape)
+        N, M = X.shape
+        K = np.array([[self.kernel(xi, xj) for xj in X] for xi in X])
+        I = 1/N * np.ones(shape=(N,N))
+        K_tilde = K - I.dot(K) - K.dot(I) + np.dot(I,np.dot(K,I)) # shape=(N,N)
+        eigenvals, eigenvecs = np.linalg.eig(K_tilde) # K@a_i = lambda_i*N*a_i
+        total_var = eigenvals.sum()
+        explained_variance_ratio_ = eigenvals / total_var
+
+        # Memorization.
+        self.components_ = eigenvecs[:,:self.n_components].T # shape=(n_components,N)
+        self.explained_variance_ = eigenvals[:self.n_components]
+        self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]
+        self.N,self.M = N,M
+        self.X = X
+        X_transformed = np.dot(K_tilde, self.components_.T) # (N,N)@(N,n_components) = (N,n_components)
+        return X_transformed

@@ -607,7 +607,19 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <!-- Custom CSS -->
 <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad();</script></p>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- LaTex -->
+<!-- Github env -->
+<!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['<script type="math/tex">','</script>'], ["\(","\)"] ],
+            displayMath: [ ['<script type="math/tex; mode=display">','</script>'], ["\[","\]"] ]
+        }
+    });
+</script></p>
               
             </div>
           </div>

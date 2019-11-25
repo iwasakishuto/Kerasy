@@ -199,7 +199,7 @@
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-30(Fri)</span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-11-26(Tue)</span></li>
             <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/machinelearning.html">MachineLearning</a></span></li>
         </ul>
     </div>
@@ -210,8 +210,11 @@
   <p>The purpose of <b>decomposition (dimensionality reduction, feature extraction)</b> is to find the <font color="red"><b>"best"</b></font> <b>principal subspace</b> where data are expressed with much less dimensions, but keep the information as much as possible.</p>
 </div>
 
-<p>!!! Tip
-    Example Notebook:   <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/decompositions.ipynb">Kerasy.examples.decompositions.ipynb</a></p>
+<div class="admonition tip">
+  <p class="admonition-title">Notebook</p>
+  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/decompositions.ipynb">Kerasy.examples.decompositions.ipynb</a></p>
+</div>
+
 <h2>PCA</h2>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 </pre></div>
@@ -235,8 +238,11 @@ L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}
 \end{aligned}$$</div>
 <p>The variance will be a maximum when we set <span class="math">\(\mathbf{u}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_1\)</span>. This eigenvector is known as the first principal component.</p>
 <p>We can define additional principal components in the same way.</p>
-<p>!!! summary
-    If we consider an <span class="math">\(M\)</span>-dimensional projection space, the optimal linear projection is defined by the <span class="math">\(M\)</span> eigenvectors <span class="math">\(\mathbf{u}_1\ldots,\mathbf{u}_M\)</span> of the data covariance matrix <span class="math">\(\mathbf{S}\)</span> corresponding to the <span class="math">\(M\)</span> largest eigenvalues <span class="math">\(\lambda_1, \ldots,\lambda_M\)</span>.</p>
+<div class="admonition summary">
+  <p class="admonition-title">Summary</p>
+  If we consider an M-dimensional projection space, the optimal linear projection is defined by the M eigenvectors u1,...,uM of the data covariance matrix S corresponding to the M largest eigenvalues λ1,...,λM.
+</div>
+
 <h2>Kernel PCA</h2>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">KernelPCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kernelargs</span><span class="p">)</span>
 </pre></div>
@@ -271,8 +277,11 @@ Having solved the eigenvector problem, the projection of a point <span class="ma
 <p>and the corresponding elements of the Gram matrix are given by</p>
 <div class="math">$$\tilde{\mathbf{K}} = \mathbf{K} - \mathbf{1_NK} - \mathbf{K1_N} +\mathbf{1_NK1_N}$$</div>
 <p>where <span class="math">\(\mathbf{1}_N\)</span> denotes the <span class="math">\(N\times N\)</span> matrix in which every element takes the value <span class="math">\(1/N\)</span>.</p>
-<p>!!! Warning
-    I don't know how to deal with new data point <span class="math">\(\mathbf{x}_{n+1}\)</span></p>
+<div class="admonition warning">
+  <p class="admonition-title">Warning</p>
+  <p>I don't know how to deal with new data point xn.</p>
+</div>
+
 <h2>SNE</h2>
 <p><font color="red"><b>Stochastic Neighbor Embedding (SNE)</b></font> starts by <b>converting the high-dimensional Euclidean distances between datapoints into conditional probabilities</b>. The similarity of datapoint <span class="math">\(\mathbf{x}_j\)</span> to datapoint <span class="math">\(\mathbf{x}_i\)</span> is conditional probability <span class="math">\(p_{j|i}\)</span>, that <span class="math">\(\mathbf{x}_i\)</span> would pick <span class="math">\(\mathbf{x}_j\)</span> as its neighbor <b>if neighbors were picked in propotion to their probability density under <font color="red">Gaussian centered at <span class="math">\(\mathbf{x}_i\)</span></font></b>.</p>
 <p>Mathmatically, the conditional probability <span class="math">\(p_{j|i}\)</span> is given by</p>
@@ -391,7 +400,19 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
 <!-- Custom CSS -->
 <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad();</script></p>
+<script>hljs.initHighlightingOnLoad();</script>
+<!-- LaTex -->
+<!-- Github env -->
+<!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['<script type="math/tex">','</script>'], ["\(","\)"] ],
+            displayMath: [ ['<script type="math/tex; mode=display">','</script>'], ["\[","\]"] ]
+        }
+    });
+</script></p>
               
             </div>
           </div>

@@ -1,6 +1,7 @@
 # coding: utf-8
 import numpy as np
 import matplotlib.pyplot as plt
+from ..utils import flush_progress_bar
 
 class Pannel():
     n=None;m=None;digit=None
@@ -62,7 +63,7 @@ class Pannel():
         return g
 
     def transibles(self):
-        arr=self.str2arr(self.str)
+        arr = self.str2arr(self.str)
         idx = np.argmax(arr==-1)
         x,y = (idx//Pannel.m, idx%Pannel.m)
 
@@ -101,12 +102,16 @@ def OptimalTransit(n,m,initial_str,last_str,heuristic_method="Manhattan_distance
 
     open_list = [initial_state]
     closed_list = {}
+    it = 0; max_it = 100
     while(open_list):
         state = open_list.pop(np.argmin(open_list))
         closed_list[state.str] = state
         if state.str==last_str: break
         open_list += [s for s in state.transibles() if s.str not in closed_list]
-
+        it+=1
+        flush_progress_bar(it, max_it, metrics=f"{state.h} transition from initial states.", barname="")
+        if it==max_it: it=0
+        
     if last_str not in closed_list:
         print("Can't reach to the last state.")
     else:

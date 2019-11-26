@@ -23,6 +23,19 @@ class BaseSVM():
     def predict(self, X):
         return np.array([1 if self.y(x)>0 else -1 for x in X]).astype(int)
 
+    @staticmethod
+    def formatting_y(y_train):
+        y_train = np.copy(y_train)
+        valid_train = np.array([-1,1])
+        unique_cls = np.unique(train)
+        if len(unique_cls) > 2:
+            raise ValueError("If you want to classify more than 2 class, please use MultipleSVM` instead.")
+        if not np.all(valid_train, unique_cls)):
+            for i,t in unique_cls:
+                y_train[y_train==t] = valid_train[i]
+                print(f"Convert {t} to {valid_train[i]} to suit for the SVM train data format.")
+        return y_train
+
     def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2, sparse_memorize=True):
         """
         @param x_train : (ndarray) shape=(N,M)
@@ -31,6 +44,7 @@ class BaseSVM():
         @param max_iter: (int)
         @param zero_eps: (float) if |x|<zero_eps, x is considered equal to 0.
         """
+        y_train = self.formatting_y(y_train)
         self.isZero = lambda x:abs(x)<zero_eps
         self.N, self.M = x_train.shape
         self.K = np.array([[self.kernel(x_train[i], x_train[j]) for j in range(self.N)] for i in range(self.N)])
@@ -153,6 +167,32 @@ class hardSVC(BaseSVM):
         self.a[i] = ai_next
         self.a[j] = (c-ti*self.a[i])/tj
         return True
+
+class MultipleSVM():
+    def __init__(self, kernel="gaussian", C=10, **kernelargs):
+        self.weekSVMs = []
+        self.kernel = kernel
+        self.C = C
+        self.kernelargs = kernelargs
+
+    def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2, sparse_memorize=True):
+        """
+        @param x_train : (ndarray) shape=(N,M)
+        @param t_train : (ndarray) shape=(N,)
+        @param max_iter: (int)
+        @param zero_eps: (float) if |x|<zero_eps, x is considered equal to 0.
+        """
+        self.weekSVMs = []
+        for cls in np.unique(y_train):
+            print(f"{cls} vs others")
+            y_train_for_week = np.ones_like(y_train, dtype=int)
+            y_train_for_week[np.where(y_train != cls)] = -1
+            weekSVM = SVC(kernel=self.kernel, **self.kernelargs)
+            weekSVM.fit(x_train, y_train_for_week, max_iter=max_iter, zero_eps=zero_eps, sparse_memorize=sparse_memorize)
+            self.weekSVMs.append(weekSVM)
+
+    def predict(self, X):
+        return np.asarray([np.argmax([weekSVM.y(x) for weekSVM in self.weekSVM]) for x in X], dtype=int)
 
 # class SVR(BaseSVM):
 #     def __init__(self, kernel="gaussian", **kernelargs):

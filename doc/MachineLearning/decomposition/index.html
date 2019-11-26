@@ -240,7 +240,7 @@ L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}
 <p>We can define additional principal components in the same way.</p>
 <div class="admonition summary">
   <p class="admonition-title">Summary</p>
-  If we consider an M-dimensional projection space, the optimal linear projection is defined by the M eigenvectors u1,...,uM of the data covariance matrix S corresponding to the M largest eigenvalues λ1,...,λM.
+  <p>If we consider an M-dimensional projection space, the optimal linear projection is defined by the M eigenvectors u1,...,uM of the data covariance matrix S corresponding to the M largest eigenvalues λ1,...,λM.</p>
 </div>
 
 <h2>Kernel PCA</h2>
@@ -279,7 +279,7 @@ Having solved the eigenvector problem, the projection of a point <span class="ma
 <p>where <span class="math">\(\mathbf{1}_N\)</span> denotes the <span class="math">\(N\times N\)</span> matrix in which every element takes the value <span class="math">\(1/N\)</span>.</p>
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
-  <p>I don't know how to deal with new data point xn.</p>
+  <p>I don't understand clearly how to deal with new data point xn.</p>
 </div>
 
 <h2>SNE</h2>
@@ -392,27 +392,34 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
 
 <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+<!-- LaTex -->
+
+<!-- Github env -->
+
+<!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
+
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+    });
+</script>
+
 <p><link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
 <!-- Use fontawesome Icon -->
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 <!-- Syntax highlight -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
 <!-- Custom CSS -->
-<link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-<!-- LaTex -->
-<!-- Github env -->
-<!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['<script type="math/tex">','</script>'], ["\(","\)"] ],
-            displayMath: [ ['<script type="math/tex; mode=display">','</script>'], ["\[","\]"] ]
-        }
-    });
-</script></p>
+<link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen"></p>
               
             </div>
           </div>

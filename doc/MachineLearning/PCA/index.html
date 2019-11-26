@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>decomposition - Kerasy Documentation</title>
+  <title>PCA - Kerasy Documentation</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
   <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
 
@@ -23,9 +23,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "decomposition";
-    var mkdocs_page_input_path = "MachineLearning/decomposition.md";
-    var mkdocs_page_url = "/Kerasy/MachineLearning/decomposition/";
+    var mkdocs_page_name = "PCA";
+    var mkdocs_page_input_path = "MachineLearning/PCA.md";
+    var mkdocs_page_url = "/Kerasy/MachineLearning/PCA/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -135,7 +135,7 @@
     
     <li class="navtree toctree-l2 page current">
       <a class="current" href="./">
-        decomposition
+        PCA
           <span class="toctree-expand"></span>
       </a>
     </li>
@@ -172,10 +172,10 @@
         
       
     
-    <li>decomposition</li>
+    <li>PCA</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/MachineLearning/decomposition.md"> Edit on iwasakishuto/Kerasy</a>
+        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/MachineLearning/PCA.md"> Edit on iwasakishuto/Kerasy</a>
       
     </li>
   </ul>
@@ -195,7 +195,7 @@
 <div id="contents">
 <div class="row">
     <div class="small-12 columns article">
-        <h2>decomposition</h2>
+        <h2>PCA</h2>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
@@ -266,11 +266,9 @@ $$</div>
 \frac{1}{N}\sum_{n=1}^Nk(\mathbf{x}_l,\mathbf{x}_n)\sum_{m=1}^Na_{i,m}k(\mathbf{x}_n,\mathbf{x}_m) &amp;= \lambda_i\sum_{n=1}^Na_{in}k(\mathbf{x}_l,\mathbf{x}_n)\quad(\because\text{multiplied $\phi(\mathbf{x}_l)^T$})\\
 \mathbf{K}^2\mathbf{a}_i &amp;= \lambda_iN\mathbf{Ka}_i\quad (\because\text{written in matrix notation})\\
 \end{aligned}$$</div>
-<p>We can find solutions for <span class="math">\(\mathbf{a}_i\)</span> by solving the following eigenvalue problem. The variance in feature space will be a maximum when we set <span class="math">\(\mathbf{a}_1\)</span>​ eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_i\)</span>.</p>
+<p>We can find solutions for <span class="math">\(\mathbf{a}_i\)</span> by solving the following eigenvalue problem. The variance in feature space will be a maximum when we set <span class="math">\(\mathbf{a}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_i\)</span>.</p>
 <div class="math">$$\mathbf{Ka}_i = \lambda_iN\mathbf{a}_i$$</div>
-<p>
-​
-Having solved the eigenvector problem, the projection of a point <span class="math">\(\mathbf{x}\)</span> onto eigenvector <span class="math">\(i\)</span> is given by</p>
+<p>Having solved the eigenvector problem, the projection of a point <span class="math">\(\mathbf{x}\)</span> onto eigenvector <span class="math">\(i\)</span> is given by</p>
 <div class="math">$$y_i(\mathbf{x}) = \phi(\mathbf{x})^T\mathbf{v}_i = \sum_{n=1}^Na_{in}\phi(\mathbf{x})^T\phi(\mathbf{x}_n) = \sum_{n=1}^Na_{in}k(\mathbf{x},\mathbf{x}_n)$$</div>
 <p>If <font color="red"><b>projected data set doesn't have zero mean</b></font>, the projected data points after centralizing are given by</p>
 <div class="math">$$\tilde{\phi(\mathbf{x}_n)} = \phi(\mathbf{x}_n)-\frac{1}{N}\sum_{l=1}^N\phi(\mathbf{x}_l)$$</div>
@@ -316,8 +314,8 @@ Having solved the eigenvector problem, the projection of a point <span class="ma
 to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for all datapoints <span class="math">\(\mathbf{x}_i\)</span></p>
 <p>The gradient is given by</p>
 <div class="math">$$\frac{\partial C}{\partial \mathbf{y}_i} = 4\sum_j\left(p_{ij} - q_{ij}\right) \left(\mathbf{y}_i - \mathbf{y}_j\right)\left(1 + \|\mathbf{y}_i - \mathbf{y}_j\|^2\right)^{-1}$$</div>
-<div class="frame">
-  <h4>Reference</h4>
+<div class="admonition summary">
+  <p class="admonition-title">Reference</p>
   <ul>
     <li><a href="https://lvdmaaten.github.io/publications/papers/JMLR_2008.pdf">Visualizing Data using t-SNE</a></li>
     <li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/#!prml-book">Pattern Recognition and Machine Learning by Christopher Bishop</a></li>

@@ -1,6 +1,7 @@
 #coding: utf-8
 import numpy as np
 from ._kernel import kernel_handler
+from ..utils import flush_progress_bar
 
 class BaseSVM():
     def __init__(self, kernel="gaussian", **kernelargs):
@@ -23,20 +24,23 @@ class BaseSVM():
     def predict(self, X):
         return np.array([1 if self.y(x)>0 else -1 for x in X]).astype(int)
 
+    def accuracy(self, x_train, y_train):
+        return np.mean(self.predict(x_train) == self.formatting_y(y_train, verbose=0))
+
     @staticmethod
-    def formatting_y(y_train):
+    def formatting_y(y_train, verbose=1):
         y_train = np.copy(y_train)
         valid_train = np.array([-1,1])
-        unique_cls = np.unique(train)
+        unique_cls = np.unique(y_train)
         if len(unique_cls) > 2:
             raise ValueError("If you want to classify more than 2 class, please use MultipleSVM` instead.")
-        if not np.all(valid_train, unique_cls)):
-            for i,t in unique_cls:
+        if not np.all(np.in1d(valid_train, unique_cls)):
+            for i,t in enumerate(unique_cls):
                 y_train[y_train==t] = valid_train[i]
-                print(f"Convert {t} to {valid_train[i]} to suit for the SVM train data format.")
+                if verbose>0: print(f"Convert {t} to {valid_train[i]:>2} to suit for the SVM train data format.")
         return y_train
 
-    def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2, sparse_memorize=True):
+    def fit(self, x_train, y_train, max_iter=500, zero_eps=1e-2, sparse_memorize=True):
         """
         @param x_train : (ndarray) shape=(N,M)
         @param t_train : (ndarray) shape=(N,)
@@ -65,7 +69,8 @@ class BaseSVM():
         return self
 
     def SMO(self, max_iter):
-        idxes = np.arange(self.N)
+        N = self.N
+        idxes = np.arange(N)
         for it in range(max_iter):
             changed = False
             np.random.shuffle(idxes)
@@ -80,6 +85,8 @@ class BaseSVM():
                 self.b = self.calcuBias()
                 self.SVidx = self.isSV()
             if not changed: break
+            flush_progress_bar(it, max_iter, metrics=f"Rate of Support Vector = {100*len(self.SVidx)/N:.1f}%")
+        print()
 
     def sparseMemorize(self):
         self.N = np.count_nonzero(self.SVidx)
@@ -114,16 +121,26 @@ class SVC(BaseSVM):
         if i == j: return False
         ti = self.y_train[i]; yi = self.y(self.x_train[i])
         tj = self.y_train[j]; yj = self.y(self.x_train[j])
-        delta_i  = (1-ti*tj+ti*(yj-yi))/(self.K[i,i]-2*self.K[i,j]+self.K[j,j])
-        ai_next = self.a[i] + delta_i
         c = ti*self.a[i] + tj*self.a[j]
-
         # clipping
         if ti == tj:
             l = max(0, c/ti-self.C); h = max(self.C, c/ti)
         else:
             l = max(0, c/ti); h = min(self.C, self.C+c/ti)
-        ai_next = l if ai_next<l else h if ai_next>h else ai_next
+
+        denominator = self.K[i,i]-2*self.K[i,j]+self.K[j,j]
+        numerator = 1-ti*tj+ti*(yj-yi)
+
+        #=== Dealing with Overflow. ===
+        if denominator==0:
+            ai_next = h if np.sign(numerator)==1 else l
+        else:
+            delta_i  = numerator/denominator
+            if np.inf==abs(delta_i):
+                ai_next = h if np.sign(delta_i)==1 else l
+            else:
+                ai_next = self.a[i] + delta_i
+                ai_next = l if ai_next<l else h if ai_next>h else ai_next
 
         if self.isZero(ai_next - self.a[i]): return False
 
@@ -153,13 +170,26 @@ class hardSVC(BaseSVM):
         if i == j: return False
         ti = self.y_train[i]; yi = self.y(self.x_train[i])
         tj = self.y_train[j]; yj = self.y(self.x_train[j])
-        delta_i  = (1-ti*tj+ti*(yj-yi))/(self.K[i,i]-2*self.K[i,j]+self.K[j,j])
-        ai_next = self.a[i] + delta_i
         c = ti*self.a[i] + tj*self.a[j]
-
         # clipping
-        if ti == tj: ai_next = 0 if ai_next<0 else c/ti if ai_next>c/ti else ai_next
-        else: ai_next = max(c/ti, 0) if ai_next<max(c/ti, 0) else ai_next
+        if ti == tj:
+            l = 0; h = c/ti
+        else:
+            l = max(0, c/ti); h = 10*c/ti
+
+        denominator = self.K[i,i]-2*self.K[i,j]+self.K[j,j]
+        numerator = 1-ti*tj+ti*(yj-yi)
+
+        #=== Dealing with Overflow. ===
+        if denominator==0:
+            ai_next = h if np.sign(numerator)==1 else l
+        else:
+            delta_i  = numerator/denominator
+            if np.inf==abs(delta_i):
+                ai_next = h if np.sign(delta_i)==1 else l
+            else:
+                ai_next = self.a[i] + delta_i
+                ai_next = l if ai_next<l else h if ai_next>h else ai_next
 
         if self.isZero(ai_next - self.a[i]): return False
 
@@ -175,7 +205,7 @@ class MultipleSVM():
         self.C = C
         self.kernelargs = kernelargs
 
-    def fit(self, x_train, y_train, max_iter=1000, zero_eps=1e-2, sparse_memorize=True):
+    def fit(self, x_train, y_train, max_iter=500, zero_eps=1e-2, sparse_memorize=True):
         """
         @param x_train : (ndarray) shape=(N,M)
         @param t_train : (ndarray) shape=(N,)
@@ -184,7 +214,7 @@ class MultipleSVM():
         """
         self.weekSVMs = []
         for cls in np.unique(y_train):
-            print(f"{cls} vs others")
+            print(f"[{cls} vs others]")
             y_train_for_week = np.ones_like(y_train, dtype=int)
             y_train_for_week[np.where(y_train != cls)] = -1
             weekSVM = SVC(kernel=self.kernel, **self.kernelargs)
@@ -192,7 +222,10 @@ class MultipleSVM():
             self.weekSVMs.append(weekSVM)
 
     def predict(self, X):
-        return np.asarray([np.argmax([weekSVM.y(x) for weekSVM in self.weekSVM]) for x in X], dtype=int)
+        return np.asarray([np.argmax([weekSVM.y(x) for weekSVM in self.weekSVMs]) for x in X], dtype=int)
+
+    def accuracy(self, x_train, y_train):
+        return np.mean(self.predict(x_train) == y_train)
 
 # class SVR(BaseSVM):
 #     def __init__(self, kernel="gaussian", **kernelargs):
@@ -206,3 +239,26 @@ class MultipleSVM():
 #
 #     def predict(self, X):
 #         return np.array([1 if self.y(x)>0 else -1 for x in X]).astype(int)
+
+
+class RVM():
+    """Relevance Vector Machine
+    """
+    def __init__(self, initial_alpha, initial_beta):
+        self.initial_alpha = initial_alpha
+        self.initial_beta  = initial_beta
+
+    def fit(self, x_train, y_train, max_iter=500, zero_eps=1e-2, sparse_memorize=True, add_bias=False):
+        """
+        @param x_train : (ndarray) shape=(N,M)
+        @param t_train : (ndarray) shape=(N,)
+        @param max_iter: (int)
+        @param zero_eps: (float) if |x|<zero_eps, x is considered equal to 0.
+        """
+        N,M = x_train.shape
+        if add_bias:
+            x_train = np.c_[np.copy(x_train), np.ones(shape=N)].shape
+            M+=1
+        self.phi = x_train
+        self.alpha = np.full(shape=M, fill_value=self.initial_alpha)
+        self.beta

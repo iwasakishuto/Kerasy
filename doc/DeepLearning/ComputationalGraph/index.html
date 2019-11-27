@@ -1,42 +1,63 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Computational Graph - Kerasy Documentation</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-  <link href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' type='text/css'>
+<html class="no-js" lang="en" >
+  <head>
+    <link rel="shortcut icon" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" />
 
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
-  <link href="../../theme/css/custom.css" rel="stylesheet">
-  <link href="../../theme/css/jupyter.css" rel="stylesheet">
-  <link href="../../theme/css/theme_extra.css" rel="stylesheet">
-  <link href="../../theme/css/theme.css" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
-  <link href="https://iwasakishuto.github.io/css/custom.css" rel="stylesheet">
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Computational Graph";
-    var mkdocs_page_input_path = "DeepLearning/ComputationalGraph.md";
-    var mkdocs_page_url = "/Kerasy/DeepLearning/ComputationalGraph/";
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
-  
-</head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Shuto" />
+    <meta name="twitter:card" content="summary">
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
 
+    <title>ComputationalGraph - Kerasy Documentation</title>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme_extra.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme.css">
+
+    <script>
+      // Current page data
+      var mkdocs_page_name = "ComputationalGraph";
+      var mkdocs_page_input_path = "DeepLearning/ComputationalGraph.md";
+      var mkdocs_page_url = "/Kerasy/DeepLearning/ComputationalGraph/";
+    </script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/theme.js" defer></script>
+
+    <!-- Common CSS in my portofolio  -->
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
+    <!-- Use fontawesome Icon -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <!-- Syntax highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+    <!-- Custom CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+      });
+    </script>
+    <!-- Mermaid -->
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" charset="UTF-8"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad:true
+      });
+    </script>
+    <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+  </head>
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
@@ -142,7 +163,14 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../../MachineLearning/PCA/">PCA</a>
+    <a class="" href="../../MachineLearning/Principal Component Analysis/">Principal Component Analysis</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Support Vector Machine/">Support Vector Machine</a>
   </li>
         
       </ul>
@@ -177,7 +205,7 @@
     <li>Computational Graph</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/DeepLearning/ComputationalGraph.md"> Edit on iwasakishuto/Kerasy</a>
+        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/DeepLearning/ComputationalGraph.md"> Edit on github<i class="fab fa-github"></i></a>
       
     </li>
   </ul>
@@ -186,15 +214,7 @@
           <div role="main">
             <div class="section">
               
-                <!-- <div class="row title-bar">
-  <div class="small-12 columns" style="">
-    <div class="topRibbon">
-      <h3><a href="https://iwasakishuto.github.io/Kerasy/doc" style="color: white;">Kerasy</a></h3>
-    </div>
-  </div>
-</div> -->
-
-<div id="contents">
+                <div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
@@ -600,25 +620,6 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
     </div>
 </div>
 </div>
-
-<script>hljs.initHighlightingOnLoad();</script>
-
-<!-- LaTex -->
-
-<!-- Github env -->
-
-<!--<script type="text/javascript" async src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>-->
-
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-            displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
-        }
-    });
-</script>
               
             </div>
           </div>
@@ -664,14 +665,6 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 </div>
     <script>var base_url = '../..';</script>
     <script src="../../js/theme.js" defer></script>
-      <script src="../../theme/js/extra.js" defer></script>
-      <script src="../../theme/js/jquery-2.1.1.min.js" defer></script>
-      <script src="../../theme/js/modernizr-2.8.3.js" defer></script>
-      <script src="../../theme/js/theme.js" defer></script>
-      <script src="https://iwasakishuto.github.io/css/jupyter.css" defer></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML" defer></script>
-      <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js" defer></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js" defer></script>
       <script src="../../search/main.js" defer></script>
 
 </body>

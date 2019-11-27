@@ -22,7 +22,7 @@ def linear_kernel(x, x_prime,*,c=0):
 def polynomial_kernle(x, x_prime,*,alpha=1, c=0, d=3):
     return (alpha*x.T.dot(x_prime) + c)**d
 
-def gaussian_kernel(x, x_prime,*,sigma=0.1):
+def gaussian_kernel(x, x_prime,*,sigma=1):
     return np.exp(-sum((x-x_prime)**2)/(2*sigma**2))
 
 def exponential_kernel(x, x_prime,*,sigma=0.1):

@@ -52,10 +52,25 @@ def get_uid(prefix=""):
     _UID_PREFIXES[prefix] += 1
     return _UID_PREFIXES[prefix]
 
-initial_time = time.time()
+class pycolor:
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    PURPLE = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    RETURN = '\033[07m' #反転
+    ACCENT = '\033[01m' #強調
+    FLASH = '\033[05m'  #点滅
+    RED_FLASH = '\033[05;41m' #赤背景+点滅
+    END = '\033[0m'
+
+INITIAL_TIME = 0
 def flush_progress_bar(it, max_iter, metrics="", barname=""):
-    global initial_time
-    if it == 0: initial_time = time.time()
+    global INITIAL_TIME
+    if it == 0: INITIAL_TIME = time.time()
     if len(barname) > 0: barname = " " + barname
     it+=1
     digit = len(str(max_iter))
@@ -64,7 +79,5 @@ def flush_progress_bar(it, max_iter, metrics="", barname=""):
     bar   = ('#' * n_bar).ljust(20, '-')
 
     percent = f"{rate*100:.2f}"
-    content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-initial_time:.3f}s  {metrics}"
+    content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
     sys.stdout.write(content)
-    if it==max_iter:
-        print(content)

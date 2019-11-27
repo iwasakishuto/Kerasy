@@ -4904,3 +4904,8 @@ span[id*='MathJax-Span'] {
 .math {
   text-align: center
 }
+div.admonition {
+    background-color: #FDF5E6;
+    padding: 10px 12px 1px 13px;
+    margin: 0 0 10px 0;
+}

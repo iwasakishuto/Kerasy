@@ -69,3 +69,19 @@ class PolynomialBaseTransformer():
         """
         x_tranformed = np.asarray([x ** i for i in range(self.M+1)]).transpose()
         return x_tranformed
+
+class NoneBaseTransformer():
+    def transform(self, x):
+        return x
+
+BasisTransformerHandler = {
+    'gaussian': GaussianBaseTransformer,
+    'sigmoid': SigmoidBaseTransformer,
+    'polynomial': PolynomialBaseTransformer,
+    'none': NoneBaseTransformer,
+}
+
+def basis_transformer(basis_name, **basisargs):
+    if basis_name not in BasisTransformerHandler:
+        raise KeyError(f"Please select basis transformer from {list(BasisTransformerHandler.keys())}")
+    return BasisTransformerHandler[basis_name](**basisargs)

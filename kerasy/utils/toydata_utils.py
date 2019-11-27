@@ -10,9 +10,10 @@ def generateX(size, xmin=-1, xmax=1, seed=None):
     x = np.where(x>xmax, xmax, x)
     return x
 
-def generateSin(size, xmin=-1, xmax=1, seed=None):
-    x = generateX(size=size, xmin=xmin, xmax=xmax, seed=seed)
-    y = np.sin(2*np.pi*x)
+def generateSin(size, xmin=-1, xmax=1, noise_scale=0.1, seed=None):
+    x     = generateX(size=size, xmin=xmin, xmax=xmax, seed=seed)
+    noise = np.random.RandomState(seed).normal(loc=0,scale=noise_scale,size=size)
+    y     = np.sin(2*np.pi*x) + noise
     return (x,y)
 
 def generateGausian(size, x=None, loc=0, scale=0.1, seed=None):

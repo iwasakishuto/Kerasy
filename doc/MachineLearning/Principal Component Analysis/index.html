@@ -172,6 +172,13 @@
 
 
   <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Tree/">Support Vector Machine</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
     <a class="" href="../Support Vector Machine/">Support Vector Machine</a>
   </li>
         
@@ -246,14 +253,15 @@
 </pre></div>
 
 
-<p>Consider a dataset <span class="math">\(\{\mathbf{x}_n\}\)</span>. If we consider a <span class="math">\(D\)</span>-dimensional vector <span class="math">\(\mathbf{u}_1\)</span>, each data point <span class="math">\(\mathbf{x}_n\in\mathbb{R}^{D}\)</span> is projected onto a scalar value <span class="math">\(\mathbf{u}_1^T\mathbf{x}_n\)</span>. In that (one-dimensional) space,
-- Mean:
-</p>
+<p>Consider a dataset <span class="math">\(\{\mathbf{x}_n\}\)</span>. If we consider a <span class="math">\(D\)</span>-dimensional vector <span class="math">\(\mathbf{u}_1\)</span>, each data point <span class="math">\(\mathbf{x}_n\in\mathbb{R}^{D}\)</span> is projected onto a scalar value <span class="math">\(\mathbf{u}_1^T\mathbf{x}_n\)</span>. In that (one-dimensional) space,</p>
+<ul>
+<li>Mean:
 <div class="math">$$\tilde{\mathbf{x}} = \frac{1}{N}\sum_{n=1}^N\mathbf{x}_n$$</div>
-<p>
-- Variance:
-</p>
+</li>
+<li>Variance:
 <div class="math">$$\frac{1}{N}\sum_{n=1}^N\left\{\mathbf{u}_1^T\mathbf{x}_n - \mathbf{u}_1^T\tilde{\mathbf{x}}\right\}^2 = \mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}= \frac{1}{N}\sum_{n=1}^N\left(\mathbf{x}-\tilde{\mathbf{x}}\right)\left(\mathbf{x}-\tilde{\mathbf{x}}\right)^T$$</div>
+</li>
+</ul>
 <p>We now maximize the projected variance <span class="math">\(\mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}\)</span> with respect to <span class="math">\(\mathbf{u}_1\)</span>, because we can think <font color="red"><b>"Larger variance" ↔︎ "Features are more expressed"</b></font>.</p>
 <p>To avoid <span class="math">\(\|\mathbf{u}_1\|\rightarrow\infty\)</span>, we introduce the normalization condition <span class="math">\(\mathbf{u}_1^T\mathbf{u}_1=1\)</span> using Lagrange multiplier <span class="math">\(\lambda_1\)</span>.</p>
 <p>Then, the object function is given by</p>
@@ -420,7 +428,7 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../Support Vector Machine/" class="btn btn-neutral float-right" title="Support Vector Machine">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../Tree/" class="btn btn-neutral float-right" title="Support Vector Machine">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../../DeepLearning/Initializers/" class="btn btn-neutral" title="Initializers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -452,7 +460,7 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
         <span><a href="../../DeepLearning/Initializers/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../Support Vector Machine/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../Tree/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

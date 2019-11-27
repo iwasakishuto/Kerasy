@@ -46,9 +46,10 @@ class LinearRegressionRidge(LinearRegression):
         N, M = train_x.shape
         self.w = np.linalg.solve(self.lambda_*np.identity(M) + train_x.T.dot(train_x), train_x.T.dot(train_y))
 
-class LinearRegressionLASSO(LinearRegressionRidge):
+class LinearRegressionLASSO(LinearRegression):
     def __init__(self, lambda_, basis="none", **basisargs):
-        super().__init__(lambda_=lambda_, basis=basis, **basisargs)
+        self.lambda_ = lambda_
+        super().__init__(basis=basis, **basisargs)
 
     @staticmethod
     def prox(w,alpha,rho,lambda_):
@@ -76,45 +77,50 @@ class LinearRegressionLASSO(LinearRegressionRidge):
             flush_progress_bar(it, max_iter)
         self.w = w
 
-class BayesianLinearRegression():
-    def __init__(self, alpha=1, beta=25):
+class BayesianLinearRegression(LinearRegression):
+    def __init__(self, alpha=1, beta=25, basis="none", **basisargs):
         self.alpha=alpha
         self.beta=beta
         self.SN=None
         self.mN=None
+        super().__init__(basis=basis, **basisargs)
 
     def fit(self, train_x, train_y):
+        train_x = self.basis_transform(train_x)
         N,M = train_x.shape
         self.SN = np.linalg.inv(self.alpha*np.eye(M) + self.beta*train_x.T.dot(train_x))
         self.mN = self.beta*self.SN.dot(train_x.T.dot(train_y))
 
     def predict(self, X):
+        X = self.basis_transform(X)
         mu = np.array([self.mN.T.dot(x) for x in X])
         std = np.sqrt(np.array([1/self.beta + x.T.dot(self.SN).dot(x) for x in X]))
-        return (mu,std)
+        return (mu, std)
 
 class EvidenceApproxBayesianRegression(BayesianLinearRegression):
-    def __init__(self, iter_max=100, alpha=1, beta=1):
-        super().__init__(alpha=alpha, beta=beta)
-        self.iter_max = iter_max
+    def __init__(self, alpha=1, beta=1, basis="none", **basisargs):
+        super().__init__(alpha=alpha, beta=beta, basis=basis, **basisargs)
         self.gamma = None
 
-    def fit(self, train_x, train_y):
-        N,M = train_x.shape
-        Phi = train_x.T.dot(train_x)
+    def fit(self, train_x, train_y, max_iter=100):
+        train_x_ = self.basis_transform(train_x)
+        N,M = train_x_.shape
+        Phi = train_x_.T.dot(train_x_)
         eigvals = np.linalg.eigvals(Phi)
-        for it in range(self.iter_max):
+        for it in range(max_iter):
             params = [self.alpha, self.beta]
             super().fit(train_x, train_y)
             lambda_ = self.beta * eigvals
             self.gamma = np.sum(lambda_ / (self.alpha + lambda_))
             self.alpha = self.gamma / self.mN.dot(self.mN)
-            self.beta  = (N-self.gamma) / np.sum( (train_y-train_x.dot(self.mN))**2 )
+            self.beta  = (N-self.gamma) / np.sum( (train_y-train_x_.dot(self.mN))**2 )
             if np.allclose(params, [self.alpha, self.beta]): break
+            flush_progress_bar(it, max_iter)
         super().fit(train_x, train_y)
 
     def evidence(self, train_x, train_y):
         """ loglikelihood of marginalization ln p(y|α,β) PRML(3.86) """
+        train_x = self.basis_transform(train_x)
         N,M = train_x.shape
         A = self.alpha*np.eye(M) + self.beta*train_x.T.dot(train_x)
         EmN = self.beta/2 * np.sum( (train_y - train_x.dot(self.mN))**2 ) + self.alpha/2 * self.mN.dot(self.mN)

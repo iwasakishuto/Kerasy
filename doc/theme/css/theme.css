@@ -4121,7 +4121,8 @@ div[class^='highlight'] pre {
 }
 
 .wy-menu-vertical header, .wy-menu-vertical p.caption {
-  color: #c9c9c9;
+  background-color: #d5e8e7;
+  font-weight: bold;
   height: 32px;
   line-height: 32px;
   padding: 0 1.618em;
@@ -4131,8 +4132,17 @@ div[class^='highlight'] pre {
   font-size: 80%;
 }
 
+p.caption::before {
+    font-family: FontAwesome;
+    content: "\f103";
+    font-weight: bold;
+    margin-right: 3px;
+    font-size: 1.2em;
+    color: black;
+}
+
 .wy-menu-vertical li.toctree-l2.current>a {
-  background: #c9c9c9;
+  background: #fff8cd;
   padding: 0.4045em 2.427em
 }
 
@@ -4281,7 +4291,7 @@ div[class^='highlight'] pre {
 
 .wy-nav-top {
   display: none;
-  background: #2980B9;
+  background: #83274e;
   color: #fff;
   padding: 0.4045em 0.809em;
   position: relative;

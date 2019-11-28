@@ -5,7 +5,7 @@ import scipy.stats as stats
 from ..utils import flush_progress_bar
 
 class EMmodel():
-    def __init__(self, K=3, random_state=None):
+    def __init__(self, K, random_state=None):
         self.K=K
         self.seed=random_state
         self.history=[]
@@ -17,17 +17,34 @@ class EMmodel():
         N,D  = X.shape
         Xmin = np.min(X, axis=0); Xmax = np.max(X, axis=0) #shape=(D,)
         self.mu = np.random.RandomState(self.seed).uniform(low=Xmin, high=Xmax, size=(self.K, D))
-    def fit(self):
+
+    def fit(self, X, max_iter=100, memorize=False):
         raise NotImplementedError()
-    def predict(self):
+        #=== Initialization. ===
+        self.train_initialize(X) # Initialize the mean value `self.mu` within data space.
+        # If you need, you also initialize some parameters.
+        #=== EM algorithm. ===
+        for it in range(max_iter):
+            responsibilities = self.Estep(X)
+            if memorize: self.memorize_param(responsibilities)
+            self.Mstep(X, responsibilities)
+            ll = self.loglikelihood(X)
+            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}")
+            if it>0 and "Any Break Condition": break
+        if memorize: self.memorize_param(responsibilities)
+        print()
+
+    def predict(self, X):
         raise NotImplementedError()
-    def Estep(self):
+        responsibilities = self.Estep(X)
+        return responsibilities
+    def Estep(self, X):
         raise NotImplementedError()
-    def Mstep(self):
+    def Mstep(self, X, responsibilities):
         raise NotImplementedError()
 
 class KMeans(EMmodel):
-    def __init__(self, K=3, random_state=None):
+    def __init__(self, K, random_state=None):
         super().__init__(K=K, random_state=random_state)
         self.mu=None
 
@@ -71,7 +88,7 @@ class KMeans(EMmodel):
             self.mu[k] = np.mean(X[idx==k], axis=0)
 
 class MixedGaussian(EMmodel):
-    def __init__(self, K=3, random_state=None):
+    def __init__(self, K, random_state=None):
         super().__init__(K=K, random_state=random_state)
         self.mu=None
         self.S=None

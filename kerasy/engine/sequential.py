@@ -39,7 +39,7 @@ class Sequential():
     def fit(self,
             x=None, y=None, batch_size=32, epochs=1, verbose=1, shuffle=True,
             validation_spilit=0, validation_data=None, validation_steps=None,
-            class_weight=None, sample_weight=None, initial_epoch=0, **kwargs):
+            class_weight=None, sample_weight=None, **kwargs):
         if kwargs: raise TypeError(f'Unrecognized keyword arguments: {str(kwargs)}')
         if (x is None) or (y is None): raise ValueError('Please specify the trainig data. (x,y)')
         # Prepare validation data.
@@ -55,19 +55,20 @@ class Sequential():
 
         num_train_samples = len(x)
         index_array = np.arange(num_train_samples)
-        for epoch in range(initial_epoch, epochs):
-            print(f"Epoch {epoch+1}/{epochs}")
+        digit=len(str(epochs))
+        for epoch in range(epochs):
             if shuffle: np.random.shuffle(index_array)
             batches = make_batches(num_train_samples, batch_size)
             n_train = 0
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
                 for bs, (x_, y_) in enumerate(zip(x[batch_ids], y[batch_ids])):
-                    n_train+=1
                     out = self.forward(x_)
                     self.backprop(y_, out)
-                    flush_progress_bar(n_train, num_train_samples)
+                    flush_progress_bar(n_train, num_train_samples, barname=f"Epoch {epoch+1:>0{digit}}/{epochs} |")
+                    n_train+=1
                 self.updates(bs+1)
+            print()
 
     def forward(self, input):
         out=input

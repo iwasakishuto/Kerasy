@@ -101,3 +101,20 @@ class Dense(Layer):
             self._losses['bias'] += dEdw[:,-1:] # shape=(Dout, 1)
         else:
             self._losses['kernel'] += dEdw
+
+class Dropout(Layer):
+    def __init__(self, keep_prob, **kwargs):
+        self.keep_prob = min(1., max(0., keep_prob))
+        super().__init__(**kwargs)
+
+    def compute_output_shape(self, input_shape):
+        self.input_shape = input_shape
+        self.output_shape = input_shape
+        return input_shape
+
+    def forward(self, input):
+        self.mask = np.random.uniform(low=0., high=1., size=input.shape)<=self.keep_prob
+        return input * self.mask
+
+    def backprop(self, delta):
+        return delta * self.mask

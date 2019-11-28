@@ -79,5 +79,5 @@ def flush_progress_bar(it, max_iter, metrics="", barname=""):
     bar   = ('#' * n_bar).ljust(20, '-')
 
     percent = f"{rate*100:.2f}"
-    content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
+    content = f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
     sys.stdout.write(content)

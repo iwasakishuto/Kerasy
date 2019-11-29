@@ -21,4 +21,6 @@ LossHandler = {
 }
 
 def LossFunc(loss_func_name):
+    if loss_func_name not in LossHandler:
+        raise KeyError(f"Please select loss function from {list(LossHandler.keys())}")
     return LossHandler[loss_func_name]

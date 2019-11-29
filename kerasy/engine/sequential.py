@@ -7,9 +7,10 @@ import numpy as np
 from ..losses import LossFunc
 from ..optimizers import Optimizer
 from ..layers.core import Input
-from ..utils.training_utils import make_batches
 from .base_layer import Layer
+from ..utils import make_batches
 from ..utils import flush_progress_bar
+from ..utils import print_summary
 
 class Sequential():
     def __init__(self):
@@ -90,3 +91,6 @@ class Sequential():
     def updates(self, batch_size):
         for layer in reversed(self.layers):
             layer.update(self.optimizer, batch_size)
+
+    def summary(self):
+        print_summary(self)

@@ -5,6 +5,7 @@ from . import metric_utils
 from . import np_utils
 from . import prepro_utils
 from . import toydata_utils
+from . import vis_utils
 
 # Globally-importable utils.
 from .generic_utils import flush_progress_bar
@@ -22,3 +23,5 @@ from .toydata_utils import generateSin
 from .toydata_utils import generateGausian
 from .toydata_utils import generateMultivariateNormal
 from .toydata_utils import generateWholeCakes
+
+from .vis_utils import galleryplot

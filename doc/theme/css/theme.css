@@ -964,6 +964,26 @@ big, small {
   content: ""
 }
 
+.summary .admonition-title:before {
+  /* Summary (pencil) */
+  content: "\f040";
+}
+
+.tip .admonition-title:before {
+  /* Notebook (book) */
+  content: "\f02d";
+}
+
+.reference .admonition-title:before {
+  /* Reference (file-pdf-o) */
+  content: "\f1c1";
+}
+
+.warning .admonition-title:before {
+  /* Warning (bell) */
+  content: "\f0f3";
+}
+
 .fa-gift:before {
   content: ""
 }
@@ -3698,9 +3718,9 @@ div[class^='highlight'] td.code {
 div[class^='highlight'] pre {
   white-space: pre;
   margin: 0;
-  padding: 12px 12px;
-  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
-  font-size: 12px;
+  padding: 10px 6px;
+  font-family: Monaco, Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+  font-size: 14px;
   line-height: 1.5;
   display: block;
   overflow: auto;

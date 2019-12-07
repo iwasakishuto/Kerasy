@@ -1,358 +1,372 @@
 # coding: utf-8
 import json
 import numpy as np
+from scipy.special import logsumexp
 from fractions import Fraction
 
-class Alignment():
-    def __init__(self, path):
-        self.n=None
-        self.m=None
-        self.size=None
-        self.DP=None
-        self.TraceBack=None
-        if path is not None:
-            self.set_params(path)
+from ..utils import Params
+from ..utils import printAlignment
+from ..utils import handleKeyError
+from ..utils import flush_progress_bar
 
-    def set_params(self, path):
-        with open(path) as params_file:
-            params=json.load(params_file)
-        for k in params.keys():
-            params[k]=float(Fraction(params[k])) # Deal with Fraction (string format)
-        self.__dict__.update(params)
+class BaseAlignmentModel(Params):
+    """Basement for Alignment models.
+    ~~~~~~~ Variables.
+    - nx             : the length of the sequence X) + 1. (For the margin of the DPmatrixmatrix.)
+    - ny             : the length of the sequence Y) + 1. (For the margin of the DPmatrixmatrix.)
+    - size           : nx × ny
+    - DPmatrix       : the Matrix for Dynamic Programming. 1-dimentional array.
+    - TraceBackMatrix: the Matrix for Trace Back. 1-dimentional array.
+    ~~~~~~~ Methods
+    - s          : Calcurate the match/mismatch score between base_x, and base_y
+    - align      : Performe Alignment Program.
+    - align_score: Performe Alignemnt Program. It is only for calcurating the score.
+    - TraceBack  : Performe Trace Back for understanding which bases formed the base-pairs.
+    - InitializeDPmatrix        : (Not Implemented) Initialize Dinamyc Programming Matrix.
+    - InitializeTraceBackPointer: (Not Implemented) Initialize TraceBack Pointer Matrix.
+    - DynamicProgramming        : (Not Implemented) Recursion of Dynamic Programming.
+    """
+    def __init__(self, **kwargs):
+        self.nx=None # (the length of the sequence X) + 1. (For the margin of the DPmatrixmatrix.)
+        self.ny=None # (the length of the sequence Y) + 1. (For the margin of the DPmatrixmatrix.)
+        self.size=None # nx × ny
+        self.DPmatrix=None # the Matrix for Dynamic Programming. 1-dimentional array.
+        self.TraceBackMatrix=None
+        self.__dict__.update(**kwargs)
+        if len(kwargs)>0:
+            self.format_params()
 
-    def params(self):
-        key_title='parameter'; val_title="value"
-        keys = [key for key in self.__dict__.keys() if key not in ["n","m","size","DP","TraceBack"]]
-        vals = [self.__dict__[key] for key in keys]
-        digit = max([len(val_title)] + [len(str(val)) for val in vals])
-        width = max([len(key_title)] + [len(key) for key in keys])
-        print(f"|{key_title:^{width}}|{val_title:^{digit}}|")
-        print('-'*(width+digit+3))
-        for i,(key,val) in enumerate(zip(keys,vals)): print(f"|{key:<{width}}|{val:>{digit}}|")
-
-    def s(self,x,y):
+    def s(self,base_x,base_y):
         """ Calcurate the match/mismatch score s[xi,yj] """
-        return self.match if x==y else self.mismatch
+        return self.match if base_x==base_y else self.mismatch
 
-    def align(self,X,Y,width=60,memorize=False,return_score=False):
-        self.n=len(X)+1; self.m=len(Y)+1; self.size=(len(X)+1)*(len(Y)+1)
+    def align(self,X,Y, width=60, only_score=False, display=True):
+        self.nx=len(X)+1
+        self.ny=len(Y)+1
+        self.size=(len(X)+1)*(len(Y)+1)
         # Initialization
-        DP = self._initialize_DPmatrix()
-        T  = self._initialize_TraceBackPointer()
-        # Recursion (DP)
-        score,pointer,T = self._Recursion(DP,T,X,Y,memorize=memorize)
-        # TraceBack
-        Xidxes,Yidxes = self._TraceBack(T,pointer)
-        alignedX,Xidxes = self._arangeSeq(X,Xidxes)
-        alignedY,Yidxes = self._arangeSeq(Y,Yidxes)
-        self._printAlignment(score,alignedX,alignedY,Xidxes,Yidxes,width=width)
-        if return_score: return score
+        self.InitializeDPmatrix()
+        self.InitializeTraceBackPointer()
+        score,pointer = self.DynamicProgramming(X,Y)
+        if only_score:
+            return score
+        Xidxes,Yidxes = self.TraceBack(pointer)
+        if display:
+            printAlignment(sequences=[X,Y], indexes=[Xidxes,Yidxes], score=score, width=width, model=self.__class__.__name__)
+        else:
+            return (score,Xidxes,Yidxes)
 
-    def _TraceBack(self,T,pointer):
+    def align_score(self,X,Y):
+        """ Calcurate only score. """
+        score = self.align(X,Y,only_score=True)
+        return score
+
+    def InitializeDPmatrix(self):
+        """ Initialize Dinamyc Programming Matrix. """
+        raise NotImplementedError()
+
+    def InitializeTraceBackPointer(self):
+        """ Initialize TraceBack Pointer Matrix. """
+        raise NotImplementedError()
+
+    def DynamicProgramming(self):
+        """ Recursion of Dynamic Programming. """
+        raise NotImplementedError()
+
+    def TraceBack(self, pointer):
+        handleKeyError(lst=["forward", "backward"], message="It indicates the direction of the Dynamic Programming.", direction=self.direction)
+        handleKeyError(lst=["global", "local"], message="It indicates the range in which alignment is performed", method=self.method)
         Xidxes=[]; Yidxes=[];
         while True:
-            Xidxes.append((pointer%self.size)//self.m); Yidxes.append(pointer%self.m)
-            pointer = T[pointer]
-            if self.__direction__ == "forward"  and pointer==0: break
-            if self.__direction__ == "backward" and (pointer+1)%self.size==0: break
-        if self.__direction__ == "backward":
-            Xidxes=Xidxes[::-1];Yidxes=Yidxes[::-1]
-        if self.__method__ == "local" and not (Xidxes[-1]==1 and Yidxes[-1]==1):
-            Xidxes=Xidxes[:-1]; Yidxes=Yidxes[:-1]
+            Xidxes.append((pointer%self.size)//self.ny); Yidxes.append(pointer%self.ny)
+            pointer = self.TraceBackMatrix[pointer]
+            if self.direction == "forward"  and pointer==0: break
+            if self.direction == "backward" and (pointer+1)==self.size: break
+        if self.direction == "forward":
+            # Because the traceback direction is backward.
+            Xidxes = Xidxes[::-1];Yidxes=Yidxes[::-1]
+        # Remove the initial header.
+        if self.method == "local" and not (Xidxes[0]==0 and Yidxes[0]==0):
+            Xidxes=Xidxes[1:]; Yidxes=Yidxes[1:]
+        Xidxes = np.asarray(Xidxes, dtype=int)-1; Yidxes = np.asarray(Yidxes, dtype=int)-1
         return Xidxes,Yidxes
 
-    def _arangeSeq(self, seq, idxes):
-        if type(idxes) == type([]): idxes=np.array(idxes)
-        masks = (np.roll(idxes,-1) == idxes) | (idxes==0)
-        alignedSeq = "".join('-' if masks[i] else seq[idxes[i]-1] for i in reversed(range(len(idxes))))
-        return alignedSeq, idxes-1
+class NeedlemanWunshGotoh(BaseAlignmentModel):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.direction = "forward"
+        self.method = "global"
 
-    def _printAlignment(self,score,alignedX,alignedY,Xidxes,Yidxes,width):
-        print(f"\033[31m\033[07m {self.__name__} \033[0m\nAlignment score: \033[34m{score}\033[0m\n")
-        self.params()
-        print("="*(width+3))
-        if self.__method__ == "local": print(f"Aligned positions: X[{min(Xidxes)},{max(Xidxes)}] Y[{min(Yidxes)},{max(Yidxes)}]")
-        print("\n\n".join([f"X: {alignedX[i: i+width]}\nY: {alignedY[i: i+width]}" for i in range(0, len(alignedX), width)]))
-        print("="*(width+3))
-
-class NeedlemanWunshGotoh(Alignment):
-    __name__ = "Needleman-Wunsh-Gotoh"
-    __method__ = "global"
-    __direction__ = "forward"
-
-    def __init__(self, path=None):
-        super().__init__(path)
-
-    def _initialize_TraceBackPointer(self):
+    def InitializeTraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
-        for i in range(2,self.n):
-            T[2*self.size+i*self.m] = 2*self.size+(i-1)*self.m # Y
-        for j in range(2,self.m):
+        for i in range(2, self.nx):
+            T[2*self.size+i*self.ny] = 2*self.size+(i-1)*self.ny # Y
+        for j in range(2, self.ny):
             T[1*self.size+j] = 1*self.size+j-1 # X
-        return T
+        self.TraceBackMatrix = T
 
-    def _initialize_DPmatrix(self):
-        DP = np.zeros(shape=(3*self.size)) # DP matrix.
-        for k in range(1,3): DP[k*self.size] = -np.inf
-        for i in range(1,self.n):
-            DP[0*self.size+i*self.m] = -np.inf # M
-            DP[1*self.size+i*self.m] = -np.inf # X
-            DP[2*self.size+i*self.m] = -self.d-(i-1)*self.e # Y
-        for j in range(1,self.m):
-            DP[0*self.size+j] = -np.inf # M
-            DP[1*self.size+j] = -self.d-(j-1)*self.e # X
-            DP[2*self.size+j] = -np.inf # Y
-        return DP
+    def InitializeDPmatrix(self):
+        DPmatrix = np.zeros(shape=(3*self.size)) # DPmatrix matrix.
+        for k in range(1,3): DPmatrix[k*self.size] = -np.inf
+        for i in range(1,self.nx):
+            DPmatrix[0*self.size+i*self.ny] = -np.inf # M
+            DPmatrix[1*self.size+i*self.ny] = -np.inf # X
+            DPmatrix[2*self.size+i*self.ny] = -self.d-(i-1)*self.e # Y
+        for j in range(1,self.ny):
+            DPmatrix[0*self.size+j] = -np.inf # M
+            DPmatrix[1*self.size+j] = -self.d-(j-1)*self.e # X
+            DPmatrix[2*self.size+j] = -np.inf # Y
+        self.DPmatrix = DPmatrix
 
-    def _Recursion(self,DP,T,X,Y,memorize=False):
-        for i in range(1,self.n):
-            for j in range(1,self.m):
+    def DynamicProgramming(self,X,Y):
+        for i in range(1,self.nx):
+            for j in range(1,self.ny):
                 candidates = [
                     [
-                        DP[0*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[1*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[2*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[2*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
                     ],
                     [
-                        DP[0*self.size+(i-1)*self.m+j]-self.d,
-                        DP[1*self.size+(i-1)*self.m+j]-self.e,
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.d,
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.e,
                     ],
                     [
-                        DP[0*self.size+i*self.m+(j-1)]-self.d,
-                        DP[2*self.size+i*self.m+(j-1)]-self.e,
+                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.d,
+                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.e,
                     ],
                 ]
                 pointers = [
-                    [k*self.size+(i-1)*self.m+(j-1) for k in (0,1,2)],
-                    [k*self.size+(i-1)*self.m+j for k in (0,1)],
-                    [k*self.size+i*self.m+(j-1) for k in (0,2)]
+                    [k*self.size+(i-1)*self.ny+(j-1) for k in (0,1,2)],
+                    [k*self.size+(i-1)*self.ny+j for k in (0,1)],
+                    [k*self.size+i*self.ny+(j-1) for k in (0,2)]
                 ]
                 for k in range(3):
-                    DP[k*self.size+i*self.m+j] = np.max(candidates[k])
-                    T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        scores = [DP[(k+1)*self.size-1] for k in range(3)]
+                    self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
+                    self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+        scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
         score = np.max(scores)
         pointer = (np.argmax(scores)+1)*self.size-1
-        if memorize:
-            self.DP=DP
-            self.TraceBack = T
-        return score,pointer,T
+        return score,pointer
 
-class SmithWaterman(Alignment):
-    """ Local Alignment. """
-    __name__ = "Smith-Waterman"
-    __method__ = "local"
-    __direction__ = "forward"
+class SmithWaterman(BaseAlignmentModel):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.direction = "forward"
+        self.method = "local"
 
-    def __init__(self, path=None):
-        super().__init__(path)
-
-    def _initialize_TraceBackPointer(self):
+    def InitializeTraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
         # Below is Not necessary because it is initialized with 0
-        for i in range(2,self.n):
-            T[2*self.size+i*self.m] = 0 # Y
-        for j in range(2,self.m):
+        for i in range(2,self.nx):
+            T[2*self.size+i*self.ny] = 0 # Y
+        for j in range(2,self.ny):
             T[1*self.size+j] = 0 # X
-        return T
+        self.TraceBackMatrix = T
 
-    def _initialize_DPmatrix(self):
-        DP = np.zeros(shape=(3*self.size)) # DP matrix.
-        for k in range(3): DP[k*self.size] = -np.inf
-        for i in range(1,self.n):
-            DP[0*self.size+i*self.m] = -np.inf # M
-            DP[1*self.size+i*self.m] = -np.inf # X
-            DP[2*self.size+i*self.m] = 0 # Y
-        for j in range(1,self.m):
-            DP[0*self.size+j] = -np.inf # M
-            DP[1*self.size+j] = 0 # X
-            DP[2*self.size+j] = -np.inf # Y
-        return DP
+    def InitializeDPmatrix(self):
+        DPmatrix = np.zeros(shape=(3*self.size)) # DPmatrix matrix.
+        for k in range(3): DPmatrix[k*self.size] = -np.inf
+        for i in range(1,self.nx):
+            DPmatrix[0*self.size+i*self.ny] = -np.inf # M
+            DPmatrix[1*self.size+i*self.ny] = -np.inf # X
+            DPmatrix[2*self.size+i*self.ny] = 0 # Y
+        for j in range(1,self.ny):
+            DPmatrix[0*self.size+j] = -np.inf # M
+            DPmatrix[1*self.size+j] = 0 # X
+            DPmatrix[2*self.size+j] = -np.inf # Y
+        self.DPmatrix = DPmatrix
 
-    def _Recursion(self,DP,T,X,Y,memorize=False):
-        for i in range(1,self.n):
-            for j in range(1,self.m):
+    def DynamicProgramming(self,X,Y):
+        for i in range(1,self.nx):
+            for j in range(1,self.ny):
                 candidates = [
                     [
                         0,
-                        DP[0*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[1*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
-                        DP[2*self.size+(i-1)*self.m+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
+                        self.DPmatrix[2*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
                     ],
                     [
-                        DP[0*self.size+(i-1)*self.m+j]-self.d,
-                        DP[1*self.size+(i-1)*self.m+j]-self.e,
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.d,
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.e,
                     ],
                     [
-                        DP[0*self.size+i*self.m+(j-1)]-self.d,
-                        DP[2*self.size+i*self.m+(j-1)]-self.e,
+                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.d,
+                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.e,
                     ],
                 ]
                 pointers = [
-                    [0]+[k*self.size+(i-1)*self.m+(j-1) for k in (0,1,2)],
-                    [k*self.size+(i-1)*self.m+j for k in (0,1)],
-                    [k*self.size+i*self.m+(j-1) for k in (0,2)]
+                    [0]+[k*self.size+(i-1)*self.ny+(j-1) for k in (0,1,2)],
+                    [k*self.size+(i-1)*self.ny+j for k in (0,1)],
+                    [k*self.size+i*self.ny+(j-1) for k in (0,2)]
                 ]
                 for k in range(3):
-                    DP[k*self.size+i*self.m+j] = np.max(candidates[k])
-                    T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        score = np.max(DP)
-        pointer = np.argmax(DP)
-        if memorize:
-            self.DP=DP
-            self.TraceBack = T
-        return score,pointer,T
+                    self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
+                    self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+        score = np.max(self.DPmatrix)
+        pointer = np.argmax(self.DPmatrix)
+        return score,pointer
 
-class BackwardNeedlemanWunshGotoh(Alignment):
-    __name__ = "Backward Needleman-Wunsh-Gotoh"
-    __method__ = "global"
-    __direction__ = "backward"
+class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.direction = "backward"
+        self.method = "global"
 
-    def __init__(self, path=None):
-        super().__init__(path)
-
-    def _initialize_TraceBackPointer(self):
+    def InitializeTraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int) # TraceBack.
-        for i in range(self.n-1):
-            T[0*self.size+(i+1)*self.m-1] = 0*self.size+(i+2)*self.m-1 # bM
-            T[2*self.size+(i+1)*self.m-1] = 2*self.size+(i+2)*self.m-1 # Y
-        for j in range(self.m-1):
-            T[1*self.size-self.m+j] = 1*self.size-self.m+(j+1) # bM
-            T[2*self.size-self.m+j] = 2*self.size-self.m+(j+1) # X
-        return T
+        for i in range(self.nx-1):
+            T[0*self.size+(i+1)*self.ny-1] = 0*self.size+(i+2)*self.ny-1 # bM
+            T[2*self.size+(i+1)*self.ny-1] = 2*self.size+(i+2)*self.ny-1 # Y
+        for j in range(self.ny-1):
+            T[1*self.size-self.ny+j] = 1*self.size-self.ny+(j+1) # bM
+            T[2*self.size-self.ny+j] = 2*self.size-self.ny+(j+1) # X
+        self.TraceBackMatrix = T
 
-    def _initialize_DPmatrix(self):
-        DP = np.zeros(shape=(3*self.size)) # DP matrix.
-        for i in range(1,self.n):
-            DP[0*self.size+i*self.m-1] = -self.d-(self.n-i-1)*self.e # bM
-            DP[1*self.size+i*self.m-1] = -np.inf # bX
-            DP[2*self.size+i*self.m-1] = -(self.n-i)*self.e # bY
-        for j in range(self.m-1):
-            DP[1*self.size-self.m+j] = -self.d-(self.m-j-2)*self.e # bM
-            DP[2*self.size-self.m+j] = -(self.m-j-1)*self.e # bX
-            DP[3*self.size-self.m+j] = -np.inf # bY
-        return DP
+    def InitializeDPmatrix(self):
+        DPmatrix = np.zeros(shape=(3*self.size)) # DPmatrix matrix.
+        for i in range(1,self.nx):
+            DPmatrix[0*self.size+i*self.ny-1] = -self.d-(self.nx-i-1)*self.e # bM
+            DPmatrix[1*self.size+i*self.ny-1] = -np.inf # bX
+            DPmatrix[2*self.size+i*self.ny-1] = -(self.nx-i)*self.e # bY
+        for j in range(self.ny-1):
+            DPmatrix[1*self.size-self.ny+j] = -self.d-(self.ny-j-2)*self.e # bM
+            DPmatrix[2*self.size-self.ny+j] = -(self.ny-j-1)*self.e # bX
+            DPmatrix[3*self.size-self.ny+j] = -np.inf # bY
+        self.DPmatrix = DPmatrix
 
-    def _Recursion(self,DP,T,X,Y,memorize=False):
-        for i in reversed(range(self.n-1)):
-            for j in reversed(range(self.m-1)):
+    def DynamicProgramming(self,X,Y):
+        for i in reversed(range(self.nx-1)):
+            for j in reversed(range(self.ny-1)):
                 candidates = [
                     [
-                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
-                        DP[1*self.size+(i+1)*self.m+j]-self.d,
-                        DP[2*self.size+i*self.m+(j+1)]-self.d,
+                        self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
+                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.d,
+                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.d,
                     ],
                     [
-                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
-                        DP[1*self.size+(i+1)*self.m+j]-self.e,
+                        self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
+                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.e,
                     ],
                     [
-                        DP[0*self.size+(i+1)*self.m+(j+1)]+self.s(X[i],Y[j]),
-                        DP[2*self.size+i*self.m+(j+1)]-self.e,
+                        self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
+                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.e,
                     ],
                 ]
                 pointers = [
                     [
-                        0*self.size+(i+1)*self.m+(j+1),
-                        1*self.size+(i+1)*self.m+j,
-                        2*self.size+i*self.m+(j+1),
+                        0*self.size+(i+1)*self.ny+(j+1),
+                        1*self.size+(i+1)*self.ny+j,
+                        2*self.size+i*self.ny+(j+1),
                     ],
                     [
-                        0*self.size+(i+1)*self.m+(j+1),
-                        1*self.size+(i+1)*self.m+j,
+                        0*self.size+(i+1)*self.ny+(j+1),
+                        1*self.size+(i+1)*self.ny+j,
                     ],
                     [
-                        0*self.size+(i+1)*self.m+(j+1),
-                        2*self.size+i*self.m+(j+1),
+                        0*self.size+(i+1)*self.ny+(j+1),
+                        2*self.size+i*self.ny+(j+1),
                     ],
                 ]
                 for k in range(3):
-                    DP[k*self.size+i*self.m+j] = np.max(candidates[k])
-                    T[k*self.size+i*self.m+j]  = pointers[k][np.argmax(candidates[k])]
-        score = DP[0]
-        pointer = T[0]
-        if memorize:
-            self.DP=DP
-            self.TraceBack = T
-        return score,pointer,T
+                    self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
+                    self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+        score = self.DPmatrix[0]
+        pointer = self.TraceBackMatrix[0]
+        return score,pointer
 
-class PairHMM(Alignment):
-    __name__ = "Pair HMM (Viterbi)"
-    __method__ = "global"
-    __direction__ = "forward"
-
-    def __init__(self, path=None):
-        super().__init__(path)
+class PairHMM(BaseAlignmentModel):
+    """
+    # NOTE:
+    This model using logarithm so that the rounding does not occur due to the dynamic range.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.direction = "forward"
+        self.method = "global"
 
     def s(self,x,y):
         return self.px_e_y if x==y else self.px_ne_y
 
-    def _memorize_seq_info(self,X,Y):
-        self.n=len(X)+1; self.m=len(Y)+1; self.size=(len(X)+1)*(len(Y)+1)
-
-    def _initialize_TraceBackPointer(self):
+    def InitializeTraceBackPointer(self):
         T = np.zeros(shape=(3*self.size), dtype=int)
-        for i in range(2,self.n): T[1*self.size+i*self.m+0] = 1*self.size+(i-1)*self.m+0
-        for j in range(2,self.m): T[2*self.size+0*self.m+j] = 2*self.size+0*self.m+(j-1)
-        return T
+        for i in range(2,self.nx): T[1*self.size+i*self.ny+0] = 1*self.size+(i-1)*self.ny+0
+        for j in range(2,self.ny): T[2*self.size+0*self.ny+j] = 2*self.size+0*self.ny+(j-1)
+        self.TraceBackMatrix = T
 
-    def _initialize_DPmatrix(self):
-        """ DP matrix for Viterbi or Forward algorithm. """
+    def InitializeDPmatrix(self):
+        self.DPmatrix = self.InitializeDPmatrixForward()
+
+    def InitializeDPmatrixForward(self):
+        """ DPmatrix matrix for Viterbi or Forward algorithm. """
         F = np.zeros(shape=(3*self.size))
-        F[0] = 1
-        F[1*self.size+1*self.m+0] = self.delta*self.qx
-        for i in range(2,self.n): F[1*self.size+i*self.m+0] = self.epsilon*self.qx*F[1*self.size+(i-1)*self.m+0]
-        F[2*self.size+0*self.m+1] = self.delta*self.qy
-        for j in range(2,self.m): F[2*self.size+0*self.m+j] = self.epsilon*self.qy*F[2*self.size+0*self.m+(j-1)]
+
+        for i in range(self.nx): F[i*self.ny+0] = -np.inf
+        for j in range(self.ny): F[j] = -np.inf
+        F[0] = 0
+
+        F[1*self.size+1*self.ny+0] = np.log(self.delta*self.qx)
+        for j in range(self.ny):
+            F[1*self.size+0*self.ny+j] = -np.inf
+        for i in range(2,self.nx):
+            F[1*self.size+i*self.ny+0] = np.log(self.epsilon*self.qx) + F[1*self.size+(i-1)*self.ny+0]
+
+        F[2*self.size+0*self.ny+1] = np.log(self.delta*self.qy)
+        for i in range(self.nx):
+            F[2*self.size+i*self.ny+0] = -np.inf
+        for j in range(2,self.ny):
+            F[2*self.size+0*self.ny+j] = np.log(self.epsilon*self.qy) + F[2*self.size+0*self.ny+(j-1)]
         return F
 
-    def _initialize_DPmatrix_Backward(self):
-        """ DP matrix for Backward algorithm. """
+    def InitializeDPmatrixBackward(self):
+        """ DPmatrix matrix for Backward algorithm. """
         B = np.zeros(shape=(3*self.size))
-        for k in range(3): B[(k+1)*self.size-1] = self.tau
-        for i in reversed(range(1,self.n-1)):
-            B[0*self.size+(i+1)*self.m-1] = self.delta*  self.qx*B[0*self.size+(i+2)*self.m-1]
-            B[1*self.size+(i+1)*self.m-1] = self.epsilon*self.qx*B[0*self.size+(i+2)*self.m-1]
-        for j in reversed(range(1,self.m-1)):
-            B[0*self.size+(self.n-1)*self.m+j] = self.delta*  self.qx*B[0*self.size+(self.n-1)*self.m+(j+1)]
-            B[2*self.size+(self.n-1)*self.m+j] = self.epsilon*self.qy*B[2*self.size+(self.n-1)*self.m+(j+1)]
+        for k in range(3): B[(k+1)*self.size-1] = np.log(self.tau)
+        for i in reversed(range(1,self.nx-1)):
+            B[0*self.size+(i+1)*self.ny-1] = np.log(self.delta*self.qx)   + B[0*self.size+(i+2)*self.ny-1]
+            B[1*self.size+(i+1)*self.ny-1] = np.log(self.epsilon*self.qx) + B[0*self.size+(i+2)*self.ny-1]
+        for j in reversed(range(1,self.ny-1)):
+            B[0*self.size+(self.nx-1)*self.ny+j] = np.log(self.delta*self.qx)   + B[0*self.size+(self.nx-1)*self.ny+(j+1)]
+            B[2*self.size+(self.nx-1)*self.ny+j] = np.log(self.epsilon*self.qy) + B[2*self.size+(self.nx-1)*self.ny+(j+1)]
         return B
 
-    def _Recursion(self,DP,T,X,Y,memorize=False):
+    def DynamicProgramming(self,X,Y):
         """ Viterbi Algorithm """
-        for i in range(1,self.n):
-            for j in range(1,self.m):
+        for i in range(1,self.nx):
+            for j in range(1,self.ny):
                 candidates = [
                     [
-                        (1-2*self.delta-self.tau)*DP[0*self.size+(i-1)*self.m+(j-1)],
-                        (1-self.epsilon-self.tau)*DP[1*self.size+(i-1)*self.m+(j-1)],
-                        (1-self.epsilon-self.tau)*DP[2*self.size+(i-1)*self.m+(j-1)],
+                        np.log(1-2*self.delta-self.tau) + self.DPmatrix[0*self.size+(i-1)*self.ny+(j-1)],
+                        np.log(1-self.epsilon-self.tau) + self.DPmatrix[1*self.size+(i-1)*self.ny+(j-1)],
+                        np.log(1-self.epsilon-self.tau) + self.DPmatrix[2*self.size+(i-1)*self.ny+(j-1)],
                     ],
                     [
-                        self.delta*DP[0*self.size+(i-1)*self.m+j],
-                        self.epsilon*DP[1*self.size+(i-1)*self.m+j],
+                        np.log(self.delta)   + self.DPmatrix[0*self.size+(i-1)*self.ny+j],
+                        np.log(self.epsilon) + self.DPmatrix[1*self.size+(i-1)*self.ny+j],
                     ],
                     [
-                        self.delta*DP[0*self.size+i*self.m+(j-1)],
-                        self.epsilon*DP[2*self.size+i*self.m+(j-1)],
+                        np.log(self.delta)   + self.DPmatrix[0*self.size+i*self.ny+(j-1)],
+                        np.log(self.epsilon) + self.DPmatrix[2*self.size+i*self.ny+(j-1)],
                     ],
                 ]
                 coefficients = [self.s(X[i-1],Y[j-1]), self.qx, self.qy]
                 pointers = [
-                    [k*self.size+(i-1)*self.m+(j-1) for k in (0,1,2)],
-                    [k*self.size+(i-1)*self.m+j for k in (0,1)],
-                    [k*self.size+i*self.m+(j-1) for k in (0,2)]
+                    [k*self.size+(i-1)*self.ny+(j-1) for k in (0,1,2)],
+                    [k*self.size+(i-1)*self.ny+j for k in (0,1)],
+                    [k*self.size+i*self.ny+(j-1) for k in (0,2)]
                 ]
                 for k in range(3):
-                    DP[k*self.size+i*self.m+j] = coefficients[k] * np.max(candidates[k])
-                    T[k*self.size+i*self.m+j] = pointers[k][np.argmax(candidates[k])]
-        scores = [DP[(k+1)*self.size-1] for k in range(3)]
-        score = self.tau*max(scores)
+                    self.DPmatrix[k*self.size+i*self.ny+j] = np.log(coefficients[k]) + np.max(candidates[k])
+                    self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+        scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
+        score = np.log(self.tau)+max(scores)
         pointer = (np.argmax(scores)+1)*self.size-1
-        if memorize:
-            self.DP=DP
-            self.TraceBack = T
-        return score,pointer,T
+        return score, pointer
 
     def forward(self,X,Y):
         """
@@ -360,26 +374,28 @@ class PairHMM(Alignment):
         F[k,i,j] means the sum of all alignment('x1,..,xi' and 'y1,...,yj') probabilities
         under the condition that the state is k when xi and yj are considered.
         """
-        self._memorize_seq_info(X,Y)
-        F = self._initialize_DPmatrix()
+        self.nx=len(X)+1
+        self.ny=len(Y)+1
+        self.size=(len(X)+1)*(len(Y)+1)
+        F = self.InitializeDPmatrixForward()
 
-        for i in range(1,self.n):
-            for j in range(1,self.m):
-                F[0*self.size+i*self.m+j] = self.s(X[i-1],Y[j-1]) * np.sum([
-                    (1-2*self.delta-self.tau)*F[0*self.size+(i-1)*self.m+(j-1)],
-                    (1-self.epsilon-self.tau)*F[1*self.size+(i-1)*self.m+(j-1)],
-                    (1-self.epsilon-self.tau)*F[2*self.size+(i-1)*self.m+(j-1)],
+        for i in range(1,self.nx):
+            for j in range(1,self.ny):
+                F[0*self.size+i*self.ny+j] = np.log(self.s(X[i-1],Y[j-1])) + logsumexp([
+                    np.log(1-2*self.delta-self.tau)+F[0*self.size+(i-1)*self.ny+(j-1)],
+                    np.log(1-self.epsilon-self.tau)+F[1*self.size+(i-1)*self.ny+(j-1)],
+                    np.log(1-self.epsilon-self.tau)+F[2*self.size+(i-1)*self.ny+(j-1)],
                 ])
-                F[1*self.size+i*self.m+j] = self.qx * np.sum([
-                    self.delta*F[0*self.size+(i-1)*self.m+j],
-                    self.epsilon*F[1*self.size+(i-1)*self.m+j],
+                F[1*self.size+i*self.ny+j] = np.log(self.qx) + logsumexp([
+                    np.log(self.delta)+F[0*self.size+(i-1)*self.ny+j],
+                    np.log(self.epsilon)+F[1*self.size+(i-1)*self.ny+j],
                 ])
-                F[2*self.size+i*self.m+j] = self.qy * np.sum([
-                    self.delta*F[0*self.size+i*self.m+(j-1)],
-                    self.epsilon*F[2*self.size+i*self.m+(j-1)],
+                F[2*self.size+i*self.ny+j] = np.log(self.qy) + logsumexp([
+                    np.log(self.delta)+F[0*self.size+i*self.ny+(j-1)],
+                    np.log(self.epsilon)+F[2*self.size+i*self.ny+(j-1)],
                 ])
-        P = self.tau*np.sum([F[(k+1)*self.size-1] for k in range(3)])
-        F = F.reshape(3,self.n,self.m)[0,1:,1:]
+        P = np.log(self.tau) + logsumexp([F[(k+1)*self.size-1] for k in range(3)])
+        F = F.reshape(3,self.nx,self.ny)[0,1:,1:]
         return F, P
 
     def backward(self,X,Y):
@@ -388,23 +404,40 @@ class PairHMM(Alignment):
         B[k,i,j] means the sum of all alignment('xi+1,..,xN' and 'yj+1,...,yM') probabilities
         under the condition that the state is k when xi and yj are considered.
         """
-        self._memorize_seq_info(X,Y)
-        B = self._initialize_DPmatrix_Backward()
+        self.nx=len(X)+1
+        self.ny=len(Y)+1
+        self.size=(len(X)+1)*(len(Y)+1)
+        B = self.InitializeDPmatrixBackward()
 
-        for i in reversed(range(self.n-1)):
-            for j in reversed(range(self.m-1)):
-                B[0*self.size+i*self.m+j] = np.sum([
-                    (1-2*self.delta-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
-                    self.delta*self.qx*B[1*self.size+(i+1)*self.m+j],
-                    self.delta*self.qy*B[1*self.size+i*self.m+(j+1)],
+        for i in reversed(range(self.nx-1)):
+            for j in reversed(range(self.ny-1)):
+                B[0*self.size+i*self.ny+j] = logsumexp([
+                    np.log(1-2*self.delta-self.tau)+np.log(self.s(X[i],Y[j]))+B[0*self.size+(i+1)*self.ny+(j+1)],
+                    np.log(self.delta*self.qx)+B[1*self.size+(i+1)*self.ny+j],
+                    np.log(self.delta*self.qy)+B[1*self.size+i*self.ny+(j+1)],
                 ])
-                B[1*self.size+i*self.m+j] = np.sum([
-                    (1-self.epsilon-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
-                    self.epsilon*self.qx*B[1*self.size+(i+1)*self.m+j],
+                B[1*self.size+i*self.ny+j] = logsumexp([
+                    np.log(1-self.epsilon-self.tau)+np.log(self.s(X[i],Y[j]))+B[0*self.size+(i+1)*self.ny+(j+1)],
+                    np.log(self.epsilon*self.qx)+B[1*self.size+(i+1)*self.ny+j],
                 ])
-                B[2*self.size+i*self.m+j] = np.sum([
-                    (1-self.epsilon-self.tau)*self.s(X[i],Y[j])*B[0*self.size+(i+1)*self.m+(j+1)],
-                    self.epsilon*self.qy*B[1*self.size+(i+1)*self.m+j],
+                B[2*self.size+i*self.ny+j] = logsumexp([
+                    np.log(1-self.epsilon-self.tau)+np.log(self.s(X[i],Y[j]))+B[0*self.size+(i+1)*self.ny+(j+1)],
+                    np.log(self.epsilon*self.qy)+B[1*self.size+(i+1)*self.ny+j],
                 ])
-        B = B.reshape(3,self.n,self.m)[0,1:,1:]
+        B = B.reshape(3,self.nx,self.ny)[0,1:,1:]
         return B
+
+    def score(self,X,Y):
+        P_opt   = self.align(X,Y, only_score=True)
+        F,P_all = self.forward(X,Y)
+        print(f"- log(P(X,Y)) = {P_all:.3f}")
+        print(f"- log(P(π*|x, y)) = {P_opt-P_all:.3f}")
+
+    def align_ij(self, X, Y):
+        """ Calcurate the Probability that bases i and j are aligned.
+        Pij[i][j] = P(xi◇yj|x,y)
+        """
+        F,P_all = self.forward(X,Y)
+        B = self.backward(X,Y)
+        Pij = (F+B)-P_all
+        return Pij

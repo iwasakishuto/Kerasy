@@ -35,6 +35,7 @@ def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=No
     return (data, clsses)
 
 def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=False, add_noise=True, noise_scale=5, figsize=(6,6), return_ax=False):
+    """ Generate cls-class, 2-dimensional data. """
     rnd = np.random.RandomState(seed)
     if same:
         Ns = [N//cls for i in range(cls)]
@@ -55,7 +56,22 @@ def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=Fal
         ])
         clsses.append([k for _ in range(n)])
         if plot: ax.scatter(r*np.cos(theta), r*np.sin(theta), color=cm.jet(k/cls), label=f"class {k}: n={n}")
-    if plot: ax.set_xlabel("$x$", fontsize=14), ax.set_xlabel("$y$", fontsize=14), ax.set_title("Generated data", fontsize=14)
+    if plot: ax.set_xlabel("$x$", fontsize=14), ax.set_ylabel("$y$", fontsize=14), ax.set_title("Generated data", fontsize=14)
     if return_ax:
         return ax, np.concatenate(Xs), np.concatenate(clsses)
     return np.concatenate(Xs), np.concatenate(clsses)
+
+def generateWhirlpool(N, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
+    """ Generate 2-class 2-dimensional data. """
+    a = np.linspace(xmin, xmax*np.pi, num=N//2)
+    x = np.concatenate([
+        np.stack([        a*np.cos(a),         a*np.sin(a)], axis=1),
+        np.stack([(a+np.pi)*np.cos(a), (a+np.pi)*np.sin(a)], axis=1)
+    ])
+    x += np.random.RandomState(seed).uniform(size=x.shape)
+    y  = np.repeat(np.arange(2), N//2)
+    if plot:
+        plt.figure(figsize=figsize)
+        plt.scatter(x[:,0], x[:,1], c=y, cmap="jet")
+        plt.xlabel("$x$", fontsize=14), plt.ylabel("$y$", fontsize=14), plt.title("Generated data", fontsize=14)
+    return x, y

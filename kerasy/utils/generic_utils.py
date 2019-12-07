@@ -52,23 +52,30 @@ def get_uid(prefix=""):
     _UID_PREFIXES[prefix] += 1
     return _UID_PREFIXES[prefix]
 
-class pycolor:
-    BLACK = '\033[30m'
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-    PURPLE = '\033[35m'
-    CYAN = '\033[36m'
-    WHITE = '\033[37m'
-    RETURN = '\033[07m' #反転
-    ACCENT = '\033[01m' #強調
-    FLASH = '\033[05m'  #点滅
-    RED_FLASH = '\033[05;41m' #赤背景+点滅
-    END = '\033[0m'
+class priColor:
+    BLACK     = '\033[30m'
+    RED       = '\033[31m'
+    GREEN     = '\033[32m'
+    YELLOW    = '\033[33m'
+    BLUE      = '\033[34m'
+    PURPLE    = '\033[35m'
+    CYAN      = '\033[36m'
+    WHITE     = '\033[37m'
+    RETURN    = '\033[07m'    # 反転
+    ACCENT    = '\033[01m'    # 強調
+    FLASH     = '\033[05m'    # 点滅
+    RED_FLASH = '\033[05;41m' # 赤背景+点滅
+    END       = '\033[0m'
+    @staticmethod
+    def color(value, color="RED"):
+        color = color.upper()
+        handleKeyError(priColor.__dict__.keys(), color=color)
+        if color.upper() not in priColor.__dict__:
+            print(f"Please")
+        return f"{priColor.__dict__[color.upper()]}{value}{priColor.END}"
 
 INITIAL_TIME = 0
-def flush_progress_bar(it, max_iter, metrics="", barname=""):
+def flush_progress_bar(it, max_iter, metrics="", barname="", verbose=1):
     global INITIAL_TIME
     if it == 0: INITIAL_TIME = time.time()
     if len(barname) > 0: barname = " " + barname
@@ -79,5 +86,15 @@ def flush_progress_bar(it, max_iter, metrics="", barname=""):
     bar   = ('#' * n_bar).ljust(20, '-')
 
     percent = f"{rate*100:.2f}"
-    content = f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
+    if verbose==1:
+        content = f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
+    elif verbose>1:
+        content =f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
+    else:
+        content = ""
     sys.stdout.write(content)
+
+def handleKeyError(lst, message="", **kwargs):
+    k,v = kwargs.popitem()
+    if v not in lst:
+        raise KeyError(f"Please chose the argment `{k}` from f{', '.join(lst)}.\n{message}")

@@ -29,3 +29,10 @@ class CategoricalEncoder():
 
     def reverse(self, cls):
         return np.asarray([self.cls2obj[c] for c in cls], dtype=self.dtype)
+
+def findLowerUpper(data, margin=1e-2):
+    """ data.shape=(N,D) """
+    mins = np.min(data, axis=0)
+    maxs = np.max(data, axis=0)
+    margins = (maxs-mins)*margin
+    return (mins-margin, maxs+margin)

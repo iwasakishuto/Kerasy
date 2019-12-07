@@ -2,8 +2,8 @@
 import numpy as np
 
 def get_params_size(layer):
-    trainable_params = np.sum([layer.__dict__.get(key).size for key in layer._trainable_weights])
-    not_trainable_params = np.sum([layer.__dict__.get(key).size for key in layer._non_trainable_weights])
+    trainable_params = np.sum([layer.__dict__.get(key).size for key in layer._trainable_weights]).astype(int)
+    not_trainable_params = np.sum([layer.__dict__.get(key).size for key in layer._non_trainable_weights]).astype(int)
     total_params = trainable_params+not_trainable_params
     return (total_params, trainable_params, not_trainable_params)
 
@@ -27,7 +27,7 @@ def print_summary(self):
         print(arange_row_content(
             f"{layer.name} ({layer.__class__.__name__})",
             str((None,) + layer.output_shape),
-            str(tot)
+            tot,
         ))
 
     print("="*line_length)

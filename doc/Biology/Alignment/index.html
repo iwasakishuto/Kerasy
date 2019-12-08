@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+  <head>
+    <link rel="shortcut icon" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" />
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Shuto" />
+    <meta name="twitter:card" content="summary">
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/Biology/Alignment/index.html" />
+    <meta property="og:title" content="Alignment">
+    <meta property="og:description" content="Brief explanation of Alignment and introduction of modules that can be used in Kerasy">
+    <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
+    <meta property="og:type" content="article" />
+
+    <title>Alignment - Kerasy Documentation</title>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme_extra.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme.css">
+
+    <script>
+      // Current page data
+      var mkdocs_page_name = "Alignment";
+      var mkdocs_page_input_path = "Biology/Alignment.md";
+      var mkdocs_page_url = "/Kerasy/Biology/Alignment/";
+    </script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/theme.js" defer></script>
+
+    <!-- Common CSS in my portofolio  -->
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
+    <!-- Use fontawesome Icon -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" rel="stylesheet" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <!-- Syntax highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+    <!-- Custom CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+      });
+    </script>
+    <!-- Mermaid -->
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" charset="UTF-8"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad:true
+      });
+    </script>
+    <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+  </head>
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Kerasy Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../..">Home</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">DeepLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/CNN/">CNN</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Optimizers/">Optimizers</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/NeuralNetwork/">Neural Network</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/TrainOnlyDense/">TrainOnlyDense</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/ComputationalGraph/">Computational Graph</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Initializers/">Initializers</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">MachineLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Linear Regression/">Linear Regression</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Principal Component Analysis/">Principal Component Analysis</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/EM algorithm/">EM algorithm</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Tree/">Tree</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Support Vector Machine/">Support Vector Machine</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">Biology</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../RefSeq/">RefSeq</a>
+  </li>
+        
+          
+
+
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Alignment
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
+        
+      </ul>
+    </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Kerasy Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Biology &raquo;</li>
+        
+      
+    
+    <li>Alignment</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/iwasakishuto/Kerasy/edit/master/docs/Biology/Alignment.md"> Edit on github<i class="fab fa-github"></i></a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <div class="topRibbon">
+          <h3>Alignment</h3>
+        </div>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-12-10(Tue)</span></li>
+            <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/biology.html">Biology</a></span></li>
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <div class="admonition tip">
+  <p class="admonition-title">Notebook</p>
+  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/alignment.ipynb">Kerasy.examples.alignment.ipynb</a></p>
+</div>
+
+<div class="admonition summary">
+  <p class="admonition-title">Why compare DNA sequences?</p>
+  <ol>
+    <li>To understand the function of the DNA. (The more similar the DNA sequences are the more similar the functions are.)</li>
+    <li>To find where are the important region.</li>
+    <li>To know the phylogenetic tree of organisms.</li>
+    <li>To inspect where the DNA come from.</li>
+  </ol>
+</div>
+
+<h2>Needleman-Wunsch-Gotoh</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">NeedlemanWunshGotoh</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li><strong>Global Alignment</strong>: Align the <font color="red"><b>entire</b></font> two sequences.</li>
+<li>Direction: <strong>Forward</strong></li>
+<li>params:</li>
+<li><code>match</code></li>
+<li><code>mismatch</code></li>
+<li><code>gap_opening</code></li>
+<li><code>gap_extension</code></li>
+</ul>
+<div class="math">$$
+\begin{aligned}
+  M(i,j) &amp;= \max
+  \begin{cases}
+    M(i-1,j-1) + s(x_i, y_j)\\
+    X(i-1,j-1) - s(x_i, y_j)\\
+    Y(i-1,j-1) - s(x_i, y_j)
+  \end{cases}\\
+  X(i,j) &amp;= \max
+  \begin{cases}
+    M(i-1,j) - d\\
+    X(i-1,j) - d\\
+  \end{cases}\\
+  Y(i,j) &amp;= \max
+  \begin{cases}
+    M(i,j-1) - d\\
+    Y(i,j-1) - d\\
+  \end{cases}\\
+  d &amp;= \text{gap opening penalty}\\
+  e &amp;= \text{gap extension penalty}\\
+  s(x_i,y_j) &amp;=   
+    \begin{cases}
+      \text{match score} &amp; (\text{if $x_i=y_j$})\\
+      \text{mismatch score} &amp; (\text{otherwise.})\\
+    \end{cases}
+\end{aligned}
+$$</div>
+<h2>Backward Needleman-Wunsh-Gotoh</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">BackwardNeedlemanWunshGotoh</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li><strong>Global Alignment</strong>:</li>
+<li>Direction: <strong>Backward</strong></li>
+<li>params:</li>
+<li><code>match</code></li>
+<li><code>mismatch</code></li>
+<li><code>gap_opening</code></li>
+<li><code>gap_extension</code></li>
+</ul>
+<div class="math">$$
+\begin{aligned}
+  bM(i,j) &amp;= \max
+  \begin{cases}
+    bM(i+1,j+1) + s(x_{i+1}, y_{j+1})\\
+    bX(i+1,j) - d\\
+    bY(i,j+1) - d
+  \end{cases}\\
+  bX(i,j) &amp;= \max
+  \begin{cases}
+    bM(i+1,j+1) + s(x_{i+1},y_{j+1})\\
+    bX(i+1,j) - e
+  \end{cases}\\
+  bY(i,j) &amp;= \max
+  \begin{cases}
+    bM(i+1,j+1) - s(x_{i+1},y_{j+1})\\
+    Y(i,j+1) - e\\
+  \end{cases}\\
+\end{aligned}
+$$</div>
+<p>This algorithm is for find the maximum alignment <font color="red"><b>under the condition of <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> are aligned.</b></font> It is given by:</p>
+<div class="math">$$A(i,j) = M(i,j) + bM(i,j)$$</div>
+<h2>Smith-Waterman</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">SmithWaterman</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+
+<ul>
+<li><strong>Local Alignment</strong>: Detect the <font color="red"><b>most similar part</b></font> of the sequences and align them.</li>
+<li>Direction: <strong>Forward</strong></li>
+<li>params:</li>
+<li><code>match</code></li>
+<li><code>mismatch</code></li>
+<li><code>gap_opening</code></li>
+<li><code>gap_extension</code></li>
+</ul>
+<div class="math">$$
+\begin{aligned}
+  M(i,j) &amp;= \max
+  \begin{cases}
+    0\\
+    M(i-1,j-1) + s(x_i, y_j)\\
+    X(i-1,j-1) - s(x_i, y_j)\\
+    Y(i-1,j-1) - s(x_i, y_j)
+  \end{cases}\\
+  X(i,j) &amp;= \max
+  \begin{cases}
+    M(i-1,j) - d\\
+    X(i-1,j) - d\\
+  \end{cases}\\
+  Y(i,j) &amp;= \max
+  \begin{cases}
+    M(i,j-1) - d\\
+    Y(i,j-1) - d\\
+  \end{cases}\\
+\end{aligned}
+$$</div>
+<h2>Pair HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">PairHMM</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+
+<p>We can interpret alignment <font color="red"><b>probabilistically.</b></font></p>
+<div class="math">$$
+\begin{aligned}
+P(\pi|x,y) &amp;= \frac{P(x,y,\pi)}{P(x,y)}\\
+P(x,y) &amp;= \sum_{\text{alignments }\pi}P(x,y,\pi)\\
+P(x_i\diamondsuit y_i|x,y)
+&amp;= \frac{\sum_{\pi\in\Omega_{ij}}P(x,y,\pi)}{P(x,y)}\\
+&amp;= \frac{F^M(i,j)\cdot B^M(i,j)}{P(x,y)}
+\end{aligned}
+$$</div>
+<table>
+<thead>
+<tr>
+<th align="center">Probability</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">
+<div class="math">$$P(\pi\mid x,y)$$</div>
+</td>
+<td align="left">The probability of alignment <span class="math">\(\pi\)</span> is obtained given <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span>.</td>
+</tr>
+<tr>
+<td align="center">
+<div class="math">$$P(x_i\diamondsuit y_i\mid x,y)$$</div>
+</td>
+<td align="left">The probability of <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> are aligned.</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="PairHMM" src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_alignment/PairHMM.png"></p>
+<ul>
+<li><strong>Global Alignment</strong></li>
+<li>Direction: <strong>Forward</strong></li>
+<li>params:</li>
+<li><code>delta</code></li>
+<li><code>epsilon</code></li>
+<li><code>tau</code></li>
+<li><code>px_e_y</code></li>
+<li><code>px_ne_y</code></li>
+<li><code>qx</code></li>
+<li><code>qy</code></li>
+</ul>
+<h3>Viterbi Algorithm</h3>
+<div class="math">$$
+\begin{aligned}
+V^M(i,j) &amp;= p_{x_iy_j}\max\begin{cases}(1-2\delta-\tau)V^M(i-1,j-1)\\(1-\varepsilon-\tau)V^X(i-1,j-1)\\(1-\varepsilon-\tau)V^Y(i-1,j-1)\end{cases}\\
+V^X(i,j) &amp;= q_{x_i}\max\begin{cases}\delta V^M(i-1,j)\\\varepsilon V^X(i-1,j)\end{cases}\\
+V^Y(i,j) &amp;= q_{y_j}\max\begin{cases}\delta V^M(i,j-1)\\\varepsilon V^X(i,j-1)\end{cases}\\
+V^E(n,m) &amp;= \tau\max\left(V^M(n,m),V^X(n,m),V^Y(n,m)\right)
+\end{aligned}
+$$</div>
+<h3>Forward Algorithm</h3>
+<div class="math">$$
+\begin{aligned}
+F^M(i,j) &amp;= p_{x_iy_j}\text{sum}\begin{cases}(1-2\delta-\tau)F^M(i-1,j-1)\\(1-\varepsilon-\tau)F^X(i-1,j-1)\\(1-\varepsilon-\tau)F^Y(i-1,j-1)\end{cases}\\
+F^X(i,j) &amp;= q_{x_i}\text{sum}\begin{cases}\delta F^M(i-1,j)\\\varepsilon F^X(i-1,j)\end{cases}\\
+F^Y(i,j) &amp;= q_{y_j}\text{sum}\begin{cases}\delta F^M(i,j-1)\\\varepsilon F^X(i,j-1)\end{cases}\\
+F^E(n,m)
+&amp;= \tau\ \text{sum}\left(F^M(n,m),F^X(n,m),F^Y(n,m)\right)
+\end{aligned}
+$$</div>
+<h3>Backward Algorithm</h3>
+<div class="math">$$
+\begin{aligned}
+B^M(i,j) &amp;= \text{sum}\begin{cases}(1-2\delta-\tau)p_{x_iy_j}B^M(i+1,j+1)\\\delta q_{x_{i+1}}B(i+1,j)\\\delta q_{y_{j+1}}B^Y(i,j+1)\end{cases}\\
+B^X(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{x_{i+1}}B^X(i+1,j)\\
+B^Y(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{y_{j+1}}B^Y(i,j+1)\\
+\end{aligned}
+$$</div>
+<h3>Baum-Welch Algorithm</h3>
+<p>Although the ordinary <a href="">Hidden Markov Models</a> calculate the optimal parameters from the perspective of time span <span class="math">\(t\)</span>, <font color="red"><b>PairHMM focus on the position <span class="math">\(u,v\)</span> of each sequence.</b></font></p>
+<h4>Estep</h4>
+<div class="math">$$
+\begin{aligned}
+\xi_{u,v}\left(i,j\right)
+&amp;=\frac{f_i\left(u,v\right)A_{ij}\phi_j\left(\diamond_1\right)b_j\left(\diamond_2,\diamond_3\right)}{\sum_{k=1}^Kf_k\left(u,v\right)b_k\left(u,v\right)}\\
+\gamma_i\left(u,v\right)
+&amp;=\frac{f_i\left(u,v\right)b_j\left(u,v\right)}{\sum_{k=1}^Kf_k\left(u,v\right)b_k\left(u,v\right)}
+\end{aligned}
+$$</div>
+<table>
+<thead>
+<tr>
+<th align="center">variable</th>
+<th align="left">meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><span class="math">\(f_i\left(u,v\right)\)</span></td>
+<td align="left">The probability of ending up in state <span class="math">\(i\)</span> after aligning the two sequences <span class="math">\(\mathbf{X,Y}\)</span> up to observation <span class="math">\(u\)</span> and <span class="math">\(v\)</span> respectively.</td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(A_{ij}\)</span></td>
+<td align="left">the transition probability from state <span class="math">\(i\)</span> to state <span class="math">\(j\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(\phi_j\left(\diamond_1\right)\)</span></td>
+<td align="left">the emission probability of emitting <span class="math">\(\diamond_1\)</span> in state <span class="math">\(j\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(b_j\left(\diamond_2,\diamond_3\right)\)</span></td>
+<td align="left">the probability of being in state <span class="math">\(j\)</span>, given the sequences <span class="math">\(\mathbf{X,Y}\)</span> are aligned from observation <span class="math">\(\diamond_2+1\)</span> and <span class="math">\(\diamond_3+1\)</span> to the end of the sequences respectively.</td>
+</tr>
+</tbody>
+</table>
+<p><font color="red"><b> ※ "<span class="math">\(\diamond_{[1,2,3]}\)</span>" depends on the states (<span class="math">\(M,X,Y\)</span>) as below:</b></font></p>
+<table>
+<thead>
+<tr>
+<th align="center">state\variable</th>
+<th align="center"><span class="math">\(\phi_j\left(\diamond_1\right)\)</span></th>
+<th align="center"><span class="math">\(b_j\left(\diamond_2,\diamond_3\right)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><span class="math">\(M\)</span></td>
+<td align="center"><span class="math">\(e\left(x_{u+1},y_{v+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u+1,v+1\right)\)</span></td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(X\)</span></td>
+<td align="center"><span class="math">\(e\left(x_{u+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u+1,v\right)\)</span></td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(Y\)</span></td>
+<td align="center"><span class="math">\(e\left(y_{v+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u,v+1\right)\)</span></td>
+</tr>
+</tbody>
+</table>
+<h4>M step</h4>
+<h5><span class="math">\(\pi_k\)</span></h5>
+<div class="math">$$\pi^{\star}_i = \sum_w\gamma_i^w(0,0)$$</div>
+<h5><span class="math">\(A_{ij}\)</span></h5>
+<div class="math">$$A^{\star}_{ij} = \frac{\sum_w\sum_{u=0}^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\xi_{u,v}^{w}\left(i,j\right)}{\sum_w\sum_{u=0}^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\sum_{j}^{K}\xi_{u,v}^{w}\left(i,j\right)}$$</div>
+<table>
+<thead>
+<tr>
+<th align="center">final emitting state</th>
+<th align="center"><span class="math">\(\tilde{U}\)</span></th>
+<th align="center"><span class="math">\(\tilde{V}\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><span class="math">\(M\)</span></td>
+<td align="center"><span class="math">\(U-1\)</span></td>
+<td align="center"><span class="math">\(V-1\)</span></td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(X\)</span></td>
+<td align="center"><span class="math">\(U-1\)</span></td>
+<td align="center"><span class="math">\(V\)</span></td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(Y\)</span></td>
+<td align="center"><span class="math">\(U\)</span></td>
+<td align="center"><span class="math">\(V-1\)</span></td>
+</tr>
+</tbody>
+</table>
+<h5><span class="math">\(\phi_{i}(k)\)</span></h5>
+<div class="math">$$\phi_i\left(k\right) = \frac{\sum_w\sum_{u=0}^{U\ast1}\sum_{v=0}^{V\ast2}\gamma_i^w\left(u,v\right)}{\sum_w\sum_{u=0}^U\sum_{v=0}^V\gamma_i^w\left(u,v\right)}$$</div>
+<ul>
+<li><span class="math">\(\ast1\)</span>：<span class="math">\(x_u=k_x\)</span> and state <span class="math">\(i\)</span> equals the state <span class="math">\(M\)</span> or <span class="math">\(X\)</span>. (in the state <span class="math">\(Y\)</span>, a gap is present in observation stream <span class="math">\(x\)</span> therefore <span class="math">\(k_x\)</span> is not present.)</li>
+<li><span class="math">\(\ast2\)</span>：<span class="math">\(y_v=k_y\)</span> and state <span class="math">\(j\)</span> equals the state <span class="math">\(M\)</span> or <span class="math">\(Y\)</span>.</li>
+</ul>
+<div class="admonition reference">
+  <p class="admonition-title">Reference</p>
+  <ul>
+    <li><a href="http://www.evolaemp.uni-tuebingen.de/pdf/Wahle(2013)_alignment_and_word_comparison_with_PHMM.pdf">Wahle, Johannes and Armin Buch. "Alignment and word comparison with Pair Hidden Markov Models." (2013). pp.22-31</a></li>
+    <li><a href="http://martijnwieling.nl/files/dialects.pdf">Martijn B. Wieling. "Comparison of Dutch Dialects" (2007) pp.36-50</a></li>
+  </ul>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        </section>
+    </div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../RefSeq/" class="btn btn-neutral" title="RefSeq"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../RefSeq/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

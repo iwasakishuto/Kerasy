@@ -2,62 +2,72 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/CNN/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/Optimizers/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/NeuralNetwork/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/TrainOnlyDense/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/ComputationalGraph/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/DeepLearning/Initializers/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/Linear Regression/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/Principal Component Analysis/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/EM algorithm/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/Tree/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
     <url>
      <loc>https://iwasakishuto.github.io/Kerasy/MachineLearning/Support Vector Machine/</loc>
-     <lastmod>2019-11-30</lastmod>
+     <lastmod>2019-12-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/Biology/RefSeq/</loc>
+     <lastmod>2019-12-09</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    <url>
+     <loc>https://iwasakishuto.github.io/Kerasy/Biology/Alignment/</loc>
+     <lastmod>2019-12-09</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

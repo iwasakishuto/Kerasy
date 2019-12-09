@@ -1,13 +1,10 @@
 # coding: utf-8
-import json
 import numpy as np
 from scipy.special import logsumexp
-from fractions import Fraction
 
 from ..utils import Params
 from ..utils import printAlignment
 from ..utils import handleKeyError
-from ..utils import flush_progress_bar
 
 class BaseAlignmentModel(Params):
     """Basement for Alignment models.
@@ -94,7 +91,7 @@ class BaseAlignmentModel(Params):
 class NeedlemanWunshGotoh(BaseAlignmentModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.disp_params = ["match", "mismatch", "gap_opening", "gap_extension"]
         self.direction = "forward"
         self.method = "global"
 
@@ -112,10 +109,10 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
         for i in range(1,self.nx):
             DPmatrix[0*self.size+i*self.ny] = -np.inf # M
             DPmatrix[1*self.size+i*self.ny] = -np.inf # X
-            DPmatrix[2*self.size+i*self.ny] = -self.d-(i-1)*self.e # Y
+            DPmatrix[2*self.size+i*self.ny] = -self.gap_opening-(i-1)*self.gap_extension # Y
         for j in range(1,self.ny):
             DPmatrix[0*self.size+j] = -np.inf # M
-            DPmatrix[1*self.size+j] = -self.d-(j-1)*self.e # X
+            DPmatrix[1*self.size+j] = -self.gap_opening-(j-1)*self.gap_extension # X
             DPmatrix[2*self.size+j] = -np.inf # Y
         self.DPmatrix = DPmatrix
 
@@ -129,12 +126,12 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
                         self.DPmatrix[2*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
                     ],
                     [
-                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.d,
-                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.e,
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.gap_opening,
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.gap_extension,
                     ],
                     [
-                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.d,
-                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.e,
+                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.gap_opening,
+                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.gap_extension,
                     ],
                 ]
                 pointers = [
@@ -190,12 +187,12 @@ class SmithWaterman(BaseAlignmentModel):
                         self.DPmatrix[2*self.size+(i-1)*self.ny+(j-1)]+self.s(X[i-1],Y[j-1]),
                     ],
                     [
-                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.d,
-                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.e,
+                        self.DPmatrix[0*self.size+(i-1)*self.ny+j]-self.gap_opening,
+                        self.DPmatrix[1*self.size+(i-1)*self.ny+j]-self.gap_extension,
                     ],
                     [
-                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.d,
-                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.e,
+                        self.DPmatrix[0*self.size+i*self.ny+(j-1)]-self.gap_opening,
+                        self.DPmatrix[2*self.size+i*self.ny+(j-1)]-self.gap_extension,
                     ],
                 ]
                 pointers = [
@@ -230,12 +227,12 @@ class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
     def InitializeDPmatrix(self):
         DPmatrix = np.zeros(shape=(3*self.size)) # DPmatrix matrix.
         for i in range(1,self.nx):
-            DPmatrix[0*self.size+i*self.ny-1] = -self.d-(self.nx-i-1)*self.e # bM
+            DPmatrix[0*self.size+i*self.ny-1] = -self.gap_opening-(self.nx-i-1)*self.gap_extension # bM
             DPmatrix[1*self.size+i*self.ny-1] = -np.inf # bX
-            DPmatrix[2*self.size+i*self.ny-1] = -(self.nx-i)*self.e # bY
+            DPmatrix[2*self.size+i*self.ny-1] = -(self.nx-i)*self.gap_extension # bY
         for j in range(self.ny-1):
-            DPmatrix[1*self.size-self.ny+j] = -self.d-(self.ny-j-2)*self.e # bM
-            DPmatrix[2*self.size-self.ny+j] = -(self.ny-j-1)*self.e # bX
+            DPmatrix[1*self.size-self.ny+j] = -self.gap_opening-(self.ny-j-2)*self.gap_extension # bM
+            DPmatrix[2*self.size-self.ny+j] = -(self.ny-j-1)*self.gap_extension # bX
             DPmatrix[3*self.size-self.ny+j] = -np.inf # bY
         self.DPmatrix = DPmatrix
 
@@ -245,16 +242,16 @@ class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
                 candidates = [
                     [
                         self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
-                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.d,
-                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.d,
+                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.gap_opening,
+                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.gap_opening,
                     ],
                     [
                         self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
-                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.e,
+                        self.DPmatrix[1*self.size+(i+1)*self.ny+j]-self.gap_extension,
                     ],
                     [
                         self.DPmatrix[0*self.size+(i+1)*self.ny+(j+1)]+self.s(X[i],Y[j]),
-                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.e,
+                        self.DPmatrix[2*self.size+i*self.ny+(j+1)]-self.gap_extension,
                     ],
                 ]
                 pointers = [
@@ -286,7 +283,7 @@ class PairHMM(BaseAlignmentModel):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.disp_params = ["delta","epsilon","tau","px_e_y","px_ne_y","qx","qy"]
         self.direction = "forward"
         self.method = "global"
 

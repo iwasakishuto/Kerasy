@@ -1,72 +1,102 @@
 # coding: utf-8
-from __future__ import absolute_import
-from ..utils.bio import BaseHandler
-
 import numpy as np
+from scipy.special import logsumexp
 
-class Nussinov(BaseHandler):
-    __hidden_params__ = ["gamma", "omega","Z"]
-    __name__ = "Nussinov Algorithm"
+from ..utils import Params
+from ..utils import bpHandler
+from ..utils import printAlignment
+from ..utils import handleKeyError
+from ..utils import flush_progress_bar
 
-    def __init__(self):
-        self.type=None
-        self.Watson_Crick=None
-        self.Wobble=None
-        self.gamma=None
-        self.omega=None
-        self.Z=None
+class BaseStructureModel(Params):
+    def __init__(self, **kwargs):
+        self.disp_params = ["inf", "nucleic_acid", "WatsonCrick", "Wobble"]
 
-    def _printAsTerai(self, array, sequence, as_gamma=False):
-        arr = array.astype(object)
-        N,M = arr.shape
-        digit = len(str(np.max(arr)))
-
-        print("\ " +  " ".join(sequence))
-        for i in range(N):
-            cell = f"{sequence[i]} "
-            for j in range(N):
-                cell += f'{"-" if j+as_gamma<i else arr[i][j]:>{digit}} '
-            print(cell)
-
-    def predict(self, sequence, memorize=True, traceback=True):
+    def predict(self, sequence, width=60, only_score=False, display=True, verbose=1):
         N = len(sequence)
-        gamma = np.zeros(shape=(N,N),dtype=int)
+        self.Initialization()
+        # Recursion
+        score = self.DynamicProgramming(sequence, verbose)
+        if only_score:
+            return score
+
+        # TraceBack
+        structure_info = self.TraceBack(sequence)
+        if display:
+            printAlignment(
+                sequences=[sequence, structure_info],
+                indexes=[np.arange(len(sequence)), np.arange(len(sequence))],
+                seqname=['X', ' '],
+                score=score,
+                width=width,
+                model=self.__class__.__name__
+            )
+        else:
+            return (score,structure_info)
+
+    def Initialization(self):
+        """ Initialize function like `is_bp`, `bp_ps`. """
+        raise NotImplementedError()
+
+    def DynamicProgramming(self, sequence, verbose=1):
+        """ Recursion of Dynamic Programming. """
+        raise NotImplementedError()
+
+    def TraceBack(self, sequence):
+        """ Trace Back. """
+        raise NotImplementedError()
+
+class Nussinov(BaseStructureModel):
+    """ Nussinov Algorithm """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.disp_params += ["minspan"]
+        self.gamma = None
+        self.omega = None
+        self.Z = None
+
+    def Initialization(self):
+        self.is_bp = bpHandler(bp2id=None, nucleic_acid=self.nucleic_acid, WatsonCrick=self.WatsonCrick, Wobble=self.Wobble)
+
+    def DynamicProgramming(self, sequence, verbose=1):
+        """ Recursion of Dynamic Programming. """
+        N = len(sequence)
+        self.gamma = np.zeros(shape=(N, N),dtype=int)
+        max_iter = sum([i for i in range(N)])
+        it = 0
         for ini_i in reversed(range(N)):
             diff = N-ini_i
             for i in reversed(range(ini_i)):
                 j = i+diff
-                delta = 1 if self._is_bp(sequence[i],sequence[j]) and (j-i>3) else 0
-                gamma[i][j] = max(
-                    gamma[i+1][j],
-                    gamma[i][j-1],
-                    gamma[i+1][j-1] + delta,
-                    max([gamma[i][k] + gamma[k+1][j] for k in range(i,j)]) # Bifurcation
+                delta = 1 if (j-i>self.minspan) and self.is_bp(sequence[i],sequence[j]) else 0
+                self.gamma[i][j] = max(
+                    self.gamma[i+1][j],
+                    self.gamma[i][j-1],
+                    self.gamma[i+1][j-1] + delta,
+                    max([self.gamma[i][k] + self.gamma[k+1][j] for k in range(i,j)]) # Bifurcation
                 )
-        # TraceBack
-        if traceback:
-            pairs = self.traceback(gamma, N, sequence)
-            score = gamma[0][-1]
-            self._printAlignment(score, sequence, pairs, width=60, xlabel="seq", ylabel="")
-        # Memorize or Return.
-        if memorize: self.gamma=gamma
-        else: self._printAsTerai(gamma, sequence, as_gamma=True)
+                flush_progress_bar(it, max_iter, barname="γ", metrics=f"max num of base-pairs: {np.max(self.gamma)}", verbose=verbose)
+                it+=1
+        print()
+        score = self.gamma[0][-1]
+        return score
 
-    def traceback(self,gamma,N,sequence):
+    def TraceBack(self, sequence):
         """trackback to find which bases form base-pairs."""
+        N = len(sequence)
         bp = []
         stack = [(0,N-1)]
         while(stack):
             i,j = stack.pop(0)
-            delta = 1 if self._is_bp(sequence[i],sequence[j]) and (j-i>3) else 0
-
+            delta = 1 if (j-i>self.minspan) and self.is_bp(sequence[i],sequence[j]) else 0
             if (i>=j): continue
-            elif gamma[i+1][j] == gamma[i][j]: stack.append((i+1,j))
-            elif gamma[i][j-1] == gamma[i][j]: stack.append((i,j-1))
-            elif gamma[i+1][j-1]+delta == gamma[i][j]: bp.append((i,j)); stack.append((i+1,j-1))
+            elif self.gamma[i+1][j] == self.gamma[i][j]: stack.append((i+1,j))
+            elif self.gamma[i][j-1] == self.gamma[i][j]: stack.append((i,j-1))
+            elif self.gamma[i+1][j-1]+delta == self.gamma[i][j]: bp.append((i,j)); stack.append((i+1,j-1))
             else:
                 # Bifurcation
                 for k in range(i,j):
-                    if gamma[i][k] + gamma[k+1][j] == gamma[i][j]:
+                    if self.gamma[i][k] + self.gamma[k+1][j] == self.gamma[i][j]:
                         stack.append((k+1,j))
                         stack.append((i,k))
                         break
@@ -75,14 +105,16 @@ class Nussinov(BaseHandler):
             pairs[i] = "("; pairs[j] = ")"
         return "".join(pairs)
 
-    def outside(self, sequence, memorize=True):
+    def outside(self, sequence, verbose=1):
         N = len(sequence)
         omega = np.zeros(shape=(N+1,N+1), dtype=int)
-        # omega[i+1][j] and gamma[i][j] indicate same position (seq[i],seq[j])
+        max_iter = sum([i for i in range(N+1)])-1
+        it = 0
+        # NOTE: omega[i+1][j] and gamma[i][j] indicate same position (seq[i],seq[j])
         for ini_j in reversed(range(N-1)):
             for i in range(N-ini_j):
                 j = ini_j+i
-                delta = 1 if (i>0 and j+1<N) and self._is_bp(sequence[i-1],sequence[j+1]) and (j-i>3) else 0
+                delta = 1 if (i>0 and j+1<N) and (j-i>self.minspan) and self.is_bp(sequence[i-1], sequence[j+1]) else 0
                 omega[i+1,j]=max(
                     omega[i][j],
                     omega[i+1][j+1],
@@ -90,67 +122,49 @@ class Nussinov(BaseHandler):
                     max([0]+[omega[k+1][j] + self.gamma[k][i-1] for k in range(i)]),
                     max([0]+[self.gamma[j+1][k] + omega[i+1][k] for k in range(j+1,N)])
                 )
+                flush_progress_bar(it, max_iter, barname="ω", metrics=f"max num of base-pairs: {np.max(omega)}", verbose=verbose)
+                it+=1
+        print()
         omega = omega[1:,:-1]
-        if memorize: self.omega=omega
-        else: self._printAsTerai(omega, sequence)
+        self.omega=omega
+        return omega
 
-    def ConstrainedMaximize(self, sequence, gamma=None, omega=None, memorize=False):
-        if gamma is None:
-            self.predict(sequence, memorize=True, traceback=False)
-            gamma = self.gamma
-        if omega is None:
-            self.outside(sequence)
-            omega = self.omega
-
-        N=len(sequence)
+    def ConstrainedMaximize(self, sequence, verbose=1):
+        """ Calcurate the probability of sequence when xi and yj form base-pairs. """
+        if self.gamma is None:
+            _ = self.predict(sequence, display=False, verbose=verbose)
+        if self.omega is None:
+            _ = self.outside(sequence, verbose=verbose)
+        N = len(sequence)
         Z = np.zeros(shape=(N,N),dtype=int)
         for ini_i in reversed(range(N)):
             diff = N-ini_i
             for i in reversed(range(ini_i)):
                 j = i+diff
-                Z[i][j] = gamma[i+1][j-1]+1+omega[i][j] if self._is_bp(sequence[i],sequence[j]) and (j-i>3) else 0
-        if memorize:  self.Z=Z
-        else: self._printAsTerai(Z, sequence)
+                Z[i][j] = self.gamma[i+1][j-1]+1+self.omega[i][j] if (j-i>self.minspan) and self.is_bp(sequence[i],sequence[j]) else 0
+        self.Z = Z
+        return self.Z
 
-
-class Zuker(BaseHandler):
-    __name__ = "Zuker Algorithm"
-    __initialize_method__ = ['list2np', '_sort_stacking_cols', '_padding_stacking_score', 'replaceINF']
-    __np_params__     = ["hairpin", "internal", "buldge", "stacking_score"]
-    __inf_params__    = ["hairpin", "internal", "buldge"]
-    __hidden_params__ = ["hairpin", "internal", "buldge", "stacking_cols", "stacking_score", "V", "M", "W", "sequence", "bp"]
-
-    def __init__(self):
-        #=== parameter ===
-        self.a = None
-        self.b = None
-        self.c = None
-        self.inf = None
-        self.hairpin = None
-        self.internal = None
-        self.buldge = None
-        self.stacking_cols = None
-        self.stacking_score = None
-        #=== Base Pair Type ===
-        self.type=None
-        self.Watson_Crick=None
-        self.Wobble=None
-        # Momory
-        self.sequence = None
-        self.W  = None # the minimum free energy of subsequence from i to j.
-        self.V  = None # the minimum free energy of subsequence from i to j when i to j forms a base-pair.
-        self.M  = None # the minimum free energy of subsequence when from i to j are in a multiloop and contain more than one base pairs which close it.
-        # TraceBack.
-        self.bp = []
-
-    def _sort_stacking_cols(self):
-        self.stacking_cols = np.array(["".join(sorted(bp)) for bp in self.stacking_cols])
+class Zuker(BaseStructureModel):
+    """ Zuker Algorithm """
+    def __init__(self, **kwargs):
+        self.inf = np.inf # You can adjust this value by parameters file.
+        super().__init__(**kwargs)
+        self.disp_params += ["hairpin","stacking_cols","stacking_score","buldge","internal","a","b","c"]
 
     def _padding_stacking_score(self):
-        N = len(self.stacking_score)
-        tmp = np.full(shape=(N+1,N+1), fill_value=self.inf)
-        tmp[:N,:N] = self.stacking_score
-        self.stacking_score = tmp
+        """ Padding the score array to calcurate the index by `self.is_bp` method. """
+        N_arr  = len(self.stacking_score)
+        N_cols = len(self.stacking_cols)
+        if N_cols==N_arr:
+            padd_statcking_score = np.full(shape=(N_cols+1,N_cols+1), fill_value=self.inf)
+            padd_statcking_score[:N_cols,:N_cols] = self.stacking_score
+            self.stacking_score = padd_statcking_score
+        elif N_cols+1 == N_arr:
+            # Already aranged.
+            pass
+        else:
+            raise ValueError(f"`len(self.stacking_score)` - `len(self.stacking_cols)` should be 0 or 1. However {N_arr-N_cols}.")
 
     def _calW(self,i,j):
         return min(
@@ -160,19 +174,19 @@ class Zuker(BaseHandler):
             min([self.W[i][k] + self.W[k+1][j] for k in range(i,j)])
         )
 
-    def _calV(self,i,j):
+    def _calV(self,sequence,i,j):
         return min(
             self._F1(i,j),
-            min([self.inf]+[self._F2(i,j,h,l)+self.V[h][l] for h in range(i+1,j-1) for l in range(h+1,j) if self._is_bp(self.sequence[h],self.sequence[l])]),
+            min([self.inf]+[self._F2(sequence,i,j,h,l)+self.V[h][l] for h in range(i+1,j-1) for l in range(h+1,j) if self.is_bp(sequence[h],sequence[l])]),
             min([self.inf]+[self.M[i+1][k] + self.M[k+1][j-1] for k in range(i+1,j-1)]) + self.a + self.b,
-        ) if self._is_bp(self.sequence[i],self.sequence[j]) else self.inf
+        ) if self.is_bp(sequence[i], sequence[j]) else self.inf
 
     def _calM(self,i,j):
         return min(
-            self.V[i][j] + self.b,
+            self.V[i][j]   + self.b,
             self.M[i+1][j] + self.c,
             self.M[i][j-1] + self.c,
-            min([self.inf]+[self.M[i][k] + self.M[k+1][j] for k in range(i,j)])
+            min([self.inf] + [self.M[i][k]+self.M[k+1][j] for k in range(i,j)])
         )
 
     def _F1(self,i,j):
@@ -180,73 +194,52 @@ class Zuker(BaseHandler):
         nt=(j-i-1)-1 # 0-origin.
         return self.hairpin[nt] if nt<30 else self.inf
 
-    def _F2(self,i,j,h,l):
+    def _F2(self,sequence,i,j,h,l):
         """ i..h - l...j → length=2+3=5 → nt=4 """
         nt = (h-i-1)+(j-l-1)-1 # 0-origin.
-        if nt>=30: val = self.inf
+        if nt>=30:
+            val = self.inf
         elif (h==i+1) and (l==j-1):
-            """ stacking """
-            rcond = self.stacking_cols=="".join(sorted(self.sequence[i]  +self.sequence[j]))
-            ccond = self.stacking_cols=="".join(sorted(self.sequence[i+1]+self.sequence[j-1]))
-            ridx = np.argmax(rcond) if np.any(rcond) else -1
-            cidx = np.argmax(ccond) if np.any(ccond) else -1
-            val = self.stacking_score[ridx][cidx]
+            # stacking
+            val = self.stacking_score[self.bp_ps(sequence[i],sequence[j])][self.bp_ps(sequence[i+1],sequence[j-1])]
         elif (i+1<h<l<j-1):
-            """ internal loop """
+            # internal loop
             val = self.internal[nt]
         else:
-            """ bulge loop """
+            # bulge loop
             val = self.buldge[nt]
-
         return val
 
-    def predict(self,sequence):
-        """ calcurate DP matrix. (Recursion) """
-        N=len(sequence)
-        self.sequence = sequence
+    def Initialization(self):
+        """ Initialize Dinamyc Programming Matrix. """
+        self._padding_stacking_score()
+        self.bp_ps = bpHandler(bp2id=self.stacking_cols)
+        self.is_bp = bpHandler(nucleic_acid=self.nucleic_acid, WatsonCrick=self.WatsonCrick, Wobble=self.Wobble)
+
+    def DynamicProgramming(self, sequence, verbose=1):
+        """ Recursion of Dynamic Programming. """
+        N = len(sequence)
         self.V  = np.full(shape=(N,N), fill_value=self.inf, dtype=float)
         self.M  = np.full(shape=(N,N), fill_value=self.inf, dtype=float)
-        self.W  = np.full(shape=(N,N), fill_value=0, dtype=float)
+        self.W  = np.full(shape=(N,N), fill_value=0,        dtype=float)
+        max_iter = sum([i for i in range(N)])
+        it = 0
         for ini_i in reversed(range(N)):
             diff = N-ini_i
             for i in reversed(range(ini_i)):
                 j = i+diff
-                self.V[i][j]  = self._calV(i,j)
-                self.M[i][j]  = self._calM(i,j)
-                self.W[i][j]  = self._calW(i,j)
-
+                self.V[i][j] = self._calV(sequence,i,j)
+                self.M[i][j] = self._calM(i,j)
+                self.W[i][j] = self._calW(i,j)
+                flush_progress_bar(it, max_iter, metrics=f"min energy: {np.min(self.W):.3f}", verbose=verbose)
+                it+=1
+        print()
         score = self.W[0][-1]
-        pairs = self.traceback()
-        self._printAlignment(score, self.sequence, pairs, width=60, xlabel="seq", ylabel="")
+        return score
 
-    def tracebackV(self, i, j):
-        self.bp.append((i,j))
-        if self.V[i][j] == self._F1(i,j): pass
-        else:
-            for h in range(i+1,j-1):
-                for l in range(h+1,j):
-                    if self._is_bp(self.sequence[h],self.sequence[l]):
-                        if self.V[i][j] == self._F2(i,j,h,l) + self.V[h][l]:
-                            self.tracebackV(h,l)
-        for k in range(i+1,j-1):
-            if self.V[i][j] == self.M[i+1][k] + self.M[k+1][j-1] + self.a+self.b:
-                self.tracebackM(i+1,k)
-                self.tracebackM(k+1,j-1)
-
-    def tracebackM(self, i, j):
-        if self.M[i][j] == self.V[i][j] + self.b:
-            self.tracebackV(i,j)
-        elif self.M[i][j] == self.M[i+1][j] + self.c: self.tracebackM(i+1,j)
-        elif self.M[i][j] == self.M[i][j-1] + self.c: self.tracebackM(i,j-1)
-        else:
-            for k in range(i,j):
-                if self.M[i][j] == self.M[i][k] + self.M[k+1][j]:
-                    self.tracebackM(i,k)
-                    self.tracebackM(k+1,j)
-
-    def traceback(self):
+    def TraceBack(self, sequence):
         """ Main trackback to find which bases form base-pairs. """
-        N = len(self.sequence)
+        N = len(sequence)
         self.bp = []
         stack = [(0,N-1)]
         while(stack):
@@ -254,7 +247,7 @@ class Zuker(BaseHandler):
             if (i>=j): continue
             elif self.W[i][j] == self.W[i+1][j]: stack.append((i+1,j))
             elif self.W[i][j] == self.W[i][j-1]: stack.append((i,j-1))
-            elif self.W[i][j] == self.V[i][j]: self.tracebackV(i,j)
+            elif self.W[i][j] == self.V[i][j]: self.tracebackV(sequence, i,j)
             else:
                 for k in range(i,j):
                     if self.W[i][j] == self.W[i][k]+self.W[k+1][j]:
@@ -266,3 +259,28 @@ class Zuker(BaseHandler):
         for c,(i,j) in enumerate(self.bp):
             pairs[i] = "("; pairs[j] = ")"
         return "".join(pairs)
+
+    def tracebackV(self, sequence, i, j):
+        self.bp.append((i,j))
+        if self.V[i][j] == self._F1(i,j): pass
+        else:
+            for h in range(i+1,j-1):
+                for l in range(h+1,j):
+                    if self.is_bp(sequence[h],sequence[l]):
+                        if self.V[i][j] == self._F2(sequence, i,j,h,l) + self.V[h][l]:
+                            self.tracebackV(sequence,h,l)
+        for k in range(i+1,j-1):
+            if self.V[i][j] == self.M[i+1][k] + self.M[k+1][j-1] + self.a+self.b:
+                self.tracebackM(sequence,i+1,k)
+                self.tracebackM(sequence,k+1,j-1)
+
+    def tracebackM(self, sequence, i, j):
+        if self.M[i][j] == self.V[i][j] + self.b:
+            self.tracebackV(sequence, i,j)
+        elif self.M[i][j] == self.M[i+1][j] + self.c: self.tracebackM(sequence, i+1,j)
+        elif self.M[i][j] == self.M[i][j-1] + self.c: self.tracebackM(sequence, i,j-1)
+        else:
+            for k in range(i,j):
+                if self.M[i][j] == self.M[i][k] + self.M[k+1][j]:
+                    self.tracebackM(sequence, i,k)
+                    self.tracebackM(sequence, k+1,j)

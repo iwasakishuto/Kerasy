@@ -1,0 +1,7 @@
+{
+  "inf": 10e3,
+  "nucleic_acid": "RNA",
+  "WatsonCrick": true,
+  "Wobble": true,
+  "minspan": 3
+}

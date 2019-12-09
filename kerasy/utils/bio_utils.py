@@ -3,9 +3,9 @@ from __future__ import absolute_import
 import numpy as np
 from .generic_utils import priColor
 
-def is_bp(self, base_i, base_j, nucleic_acid="DNA", WatsonCrick=True, Wobble=False):
-    """ Check is the 2 bases form a base pair.
-    @params base        : (str)  Single letter base.
+def bpHandler(bp2id=None, nucleic_acid="DNA", WatsonCrick=True, Wobble=False):
+    """ Make the function which checks 'whether 2 bases form a base pairs' or 'the energy of them'.
+    @params score_dict  : (list) Describes the relationship between base pairs and the index.
     @params nucleic_acid: (str)  DNA: deoxyribonucleic acid, RNA: ribonucleic acid.
     @params WatsonCrick : (bool)
         - In canonical Watson–Crick base pairing in DNA,
@@ -22,16 +22,18 @@ def is_bp(self, base_i, base_j, nucleic_acid="DNA", WatsonCrick=True, Wobble=Fal
             - hypoxanthine (I) forms a base pair with cytosine (C) using 2 hydrogen bonds.
             ※ hypoxanthine is the nucleobase of inosine.
     """
-    bases = base_i+base_j
-    flag = False
-    if WatsonCrick:
-        WC_1 = ("A" in bases) and ("T" in bases) if nucleic_acid=="DNA" else ("A" in bases) and ("U" in bases)
-        WC_2 = ("G" in bases) and ("C" in bases)
-        flag = flag or (WC_1 or WC_2)
-    if Wobble:
-        Wob_1  = ("G" in bases) and ("U" in bases)
-        flag = flag or Wob
-    return flag
+    if bp2id is not None:
+        cond_expression = "".join([f'{i} if ("{b1}" in x and "{b2}" in x) else ' for i,(b1,b2) in enumerate(bp2id)]) + f"{len(bp2id)}"
+        cond_branch = lambda x: eval(cond_expression)
+    else:
+        cond_branch = lambda x: \
+        ("A" in x and "T" in x) if nucleic_acid=="DNA" else ("A" in x and "U" in x) or \
+        ("G" in x and "C" in x) or \
+        ("G" in x and "U" in x) if Wobble else False
+    def func(base_i, base_j):
+        bases = base_i+base_j
+        return cond_branch(bases)
+    return func
 
 def arangeFor_printAlignment(sequence, idxes, blank="-"):
     """Rewrite sequence information for `printAlignment` function.
@@ -42,13 +44,18 @@ def arangeFor_printAlignment(sequence, idxes, blank="-"):
     aligned_seq = "".join(blank if mask else sequence[idx] for mask,idx in zip(masks, idxes))
     return aligned_seq
 
-def printAlignment(sequences, indexes, score, model="", width=60, blank="-"):
+def printAlignment(sequences, indexes, score, seqname=None, model="", width=60, blank="-"):
     """print Alignment Result.
     @params sequences: (list) Raw sequences.
     @params idxes    : (list) indexes. 0-origin indexes. -1 means the 'deletion' at the header.
+    @params seqname  : (list) If not specified, sequence name will be chr(65+i).
     """
-    if not isinstance(sequences, list): aligned_seqs = list(aligned_seqs)
+    if not isinstance(sequences, list): sequences = list(sequences)
     if not isinstance(indexes, list): idxes = list(idxes)
+
+    if seqname is None: seqname = [chr(65+i) for i in range(len(sequences))]
+    if not isinstance(seqname, list): seqname = list(seqname)
+
     if len(sequences) != len(indexes):
         raise ValueError("`sequences` and `indexes` must be the same length, meaning that same number of sequences.")
 
@@ -65,7 +72,7 @@ def printAlignment(sequences, indexes, score, model="", width=60, blank="-"):
         "\n\n".join([
             "\n".join([
                 # Handling for idxes[0]==-1, and pos+width>aligned_length-1
-                f"{chr(65+i)}: [{max(0,idxes[pos]):>0{digit}}] {aligned_seq[pos: pos+width]} [{idxes[min(pos+width, aligned_length-1)]:>0{digit}}]" for i,(idxes,aligned_seq) in enumerate(zip(indexes, aligned_seqs))
+                f"{seqname[i]}: [{max(0,idxes[pos]):>0{digit}}] {aligned_seq[pos: pos+width]} [{idxes[min(pos+width, aligned_length-1)]:>0{digit}}]" for i,(idxes,aligned_seq) in enumerate(zip(indexes, aligned_seqs))
             ]) for pos in range(0, aligned_length, width)
         ])
     )

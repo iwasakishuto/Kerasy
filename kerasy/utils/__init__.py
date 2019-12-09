@@ -13,6 +13,7 @@ from . import training_utils
 from . import vis_utils
 
 # Globally-importable utils.
+from .bio_utils import bpHandler
 from .bio_utils import arangeFor_printAlignment
 from .bio_utils import printAlignment
 
@@ -23,6 +24,7 @@ from .generic_utils import flush_progress_bar
 from .generic_utils import get_file
 from .generic_utils import priColor
 from .generic_utils import handleKeyError
+from .generic_utils import urlDecorate
 
 from .metric_utils import mean_squared_error
 from .metric_utils import root_mean_squared_error
@@ -43,6 +45,7 @@ from .toydata_utils import generateGausian
 from .toydata_utils import generateMultivariateNormal
 from .toydata_utils import generateWholeCakes
 from .toydata_utils import generateWhirlpool
+from .toydata_utils import generateSeq
 
 from .training_utils import make_batches
 

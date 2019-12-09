@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
+from .generic_utils import handleKeyError
+
 def generateX(size, xmin=-1, xmax=1, seed=None):
     x = np.linspace(xmin, xmax, size+2)[1:-1]
     x += np.random.normal(0, scale=(xmax-xmin)/(4*size), size=size)
@@ -75,3 +77,19 @@ def generateWhirlpool(N, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
         plt.scatter(x[:,0], x[:,1], c=y, cmap="jet")
         plt.xlabel("$x$", fontsize=14), plt.ylabel("$y$", fontsize=14), plt.title("Generated data", fontsize=14)
     return x, y
+
+def generateSeq(size, nucleic_acid="DNA", weights=None, seed=None):
+    """Generate Sample Sequences.
+    @params size        : sequence size.
+    @params nucleic_acid: DNA or RNA
+    @params weights     : weights for each base. it must sum to 1.
+    @params seed        : for the porpose of Reproducibility.
+    """
+    if nucleic_acid == "DNA":
+        bases = ["A","T","G","C"]
+    elif nucleic_acid == "RNA":
+        bases = ["A","U","G","C"]
+    else:
+        handleKeyError(["DNA","RNA"], nucleic_acid=nucleic_acid)
+    sequences = np.random.RandomState().choice(bases, p=weights, size=size)
+    return sequences

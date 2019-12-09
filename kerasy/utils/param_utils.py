@@ -1,8 +1,12 @@
+#coding: utf-8
+import os
 import re
 import json
 import datetime
 import numpy as np
 from fractions import Fraction
+
+UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 class AdditionalTypeSupportJSONEncoder(json.JSONEncoder):
     """ Support the additional type for saving to JSON file. """
@@ -31,13 +35,15 @@ class Params():
         if verbose>0:
             print(message)
 
-    def load_params(self, path, verbose=1, list_params=["disp_params"], fraction_params=[], **kwargs):
+    def load_params(self, path=None, verbose=1, list_params=["disp_params"], fraction_params=[], **kwargs):
         """Load parameters from json file.
         @params path      : JSON file path.
         @params verbose   : Display message if verbose > 0
         @params listparams: If some params want to remain list instance, please specify.
         """
-        message = f"Loading Parameters from '{path}'...\n"
+        if path is None:
+            path = os.path.join(UTILS_DIR_PATH, "default_params", f"{self.__class__.__name__}.json")
+        message = f"Loading Parameters from '{path}'..."
         with open(path, 'r') as f:
             params = json.load(f)
             self.__dict__.update(params)
@@ -55,10 +61,10 @@ class Params():
         for k,v in self.__dict__.items():
             if isinstance(v, str) and re.search(pattern, v):
                 self.__dict__[k] = float(Fraction(v))
-                message += f"Converted {k} from Fraction to Float.\n"
-            elif isinstance(v, list) and re.search(pattern, "".join(v)):
+                message += f"\nConverted {k} from Fraction to Float."
+            elif isinstance(v, list) and re.search(pattern, "".join(map(str,v))):
                 self.__dict__[k] = [float(Fraction(e)) for e in v]
-                message += f"Converted {k} from Fraction to Float.\n"
+                message += f"\nConverted {k} from Fraction to Float."
         if retmessage: return message
 
     def list2np(self, list_params=["disp_params"], message="", retmessage=False):
@@ -67,7 +73,7 @@ class Params():
         for k,v in self.__dict__.items():
             if isinstance(v, list) and k not in list_params:
                 self.__dict__[k] = np.asarray(v)
-                message += f"Converted {k} type from list to np.ndarray.\n"
+                message += f"\nConverted {k} type from list to np.ndarray."
         if retmessage: return message
 
     def params(self, key_title='Parameter', val_title="Value", max_width=65):
@@ -85,4 +91,5 @@ class Params():
         print(f"|{key_title:<{p_name_width}}|{val_title:>{val_width}}|")
         print('-'*(p_name_width+val_width+3))
         for i,(key,val) in enumerate(params_dict.items()):
-            print(f"|{key:<{p_name_width}}|{str(val)[:val_width]:>{val_width}}|")
+            val = str(val).replace('\n', '\\n')
+            print(f"|{key:<{p_name_width}}|{val[:val_width]:>{val_width}}|")

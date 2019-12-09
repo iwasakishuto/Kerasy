@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import datetime
 from six.moves.urllib.request import urlretrieve
 from collections import defaultdict
 
@@ -70,12 +71,11 @@ class priColor:
     def color(value, color="RED"):
         color = color.upper()
         handleKeyError(priColor.__dict__.keys(), color=color)
-        if color.upper() not in priColor.__dict__:
-            print(f"Please")
         return f"{priColor.__dict__[color.upper()]}{value}{priColor.END}"
 
 INITIAL_TIME = 0
 def flush_progress_bar(it, max_iter, metrics="", barname="", verbose=1):
+    if verbose<1: return
     global INITIAL_TIME
     if it == 0: INITIAL_TIME = time.time()
     if len(barname) > 0: barname = " " + barname
@@ -88,13 +88,16 @@ def flush_progress_bar(it, max_iter, metrics="", barname="", verbose=1):
     percent = f"{rate*100:.2f}"
     if verbose==1:
         content = f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
-    elif verbose>1:
+    else: # (verbose>1)
         content =f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
-    else:
-        content = ""
     sys.stdout.write(content)
 
 def handleKeyError(lst, message="", **kwargs):
     k,v = kwargs.popitem()
     if v not in lst:
         raise KeyError(f"Please chose the argment `{k}` from f{', '.join(lst)}.\n{message}")
+
+def urlDecorate(url, addDate=True):
+    """ Decorate URL like Wget. (Add datetime information and coloring url to blue.) """
+    now = datetime.datetime.now().strftime("--%Y-%m-%d %H:%M:%S--  ") if addDate else ""
+    return now + priColor.color(url, color="BLUE")

@@ -20,6 +20,7 @@ from .bio_utils import printAlignment
 from .deep_utils import get_params_size
 from .deep_utils import print_summary
 
+from .generic_utils import flatten_dual
 from .generic_utils import flush_progress_bar
 from .generic_utils import get_file
 from .generic_utils import priColor

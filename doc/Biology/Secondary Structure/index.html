@@ -310,10 +310,9 @@ secondary structure, so <b>the correctness of secondary structure should be eval
 
 <ul>
 <li>params:<ul>
-<li><code>match</code></li>
-<li><code>mismatch</code></li>
-<li><code>gap_opening</code></li>
-<li><code>gap_extension</code></li>
+<li><code>nucleic_acid</code></li>
+<li><code>WatsonCrick</code></li>
+<li><code>minspan</code></li>
 </ul>
 </li>
 </ul>
@@ -374,6 +373,21 @@ $$</div>
 </pre></div>
 
 
+<ul>
+<li>params:<ul>
+<li><code>nucleic_acid</code></li>
+<li><code>WatsonCrick</code></li>
+<li><code>hairpin</code></li>
+<li><code>internal</code></li>
+<li><code>buldge</code></li>
+<li><code>a</code></li>
+<li><code>b</code></li>
+<li><code>c</code></li>
+<li><code>stacking_cols</code></li>
+<li><code>stacking_score</code></li>
+</ul>
+</li>
+</ul>
 <p>The free energy of a secondary structure is approximated as the sum of the free energy of <b>"loops".</b></p>
 <div class="math">$$E = \sum_iE_i$$</div>
 <p>The free energy of individual loop is <b>given</b> by experimental data. (ex. <span class="math">\(\mathrm{C-G: }-3.4\mathrm{kcal/mol}\)</span>, <span class="math">\(\mathrm{U-A: }-0.9\mathrm{kcal/mol}\)</span>)</p>

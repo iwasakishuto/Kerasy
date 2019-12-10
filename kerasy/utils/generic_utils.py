@@ -5,8 +5,10 @@ import datetime
 from six.moves.urllib.request import urlretrieve
 from collections import defaultdict
 
-_UID_PREFIXES = defaultdict(int)
+def flatten_dual(lst):
+    return [e for sublist in lst for e in sublist]
 
+_UID_PREFIXES = defaultdict(int)
 def get_file(fname, origin, cache_subdir='datasets', file_hash=None):
     """Downloads a file from a URL if not already in the cache.
     ref: https://github.com/keras-team/keras/blob/7a39b6c62d43c25472b2c2476bd2a8983ae4f682/keras/utils/data_utils.py#L123

@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+from ._kernel import kernel_handler
 from ..utils import basis_transformer
 from ..utils import flush_progress_bar
 
@@ -126,3 +127,27 @@ class EvidenceApproxBayesianRegression(BayesianLinearRegression):
         EmN = self.beta/2 * np.sum( (train_y - train_x.dot(self.mN))**2 ) + self.alpha/2 * self.mN.dot(self.mN)
         logmarg = M/2*np.log(self.alpha) + N/2*np.log(self.beta) - EmN - 1/2*np.log(np.linalg.det(A)) - N/2*np.log(2*np.pi)
         return logmarg
+
+class KernelRegression():
+    def __init__(self, lamda, kernel="gaussian", **kernelargs):
+        self.lamda = lamda
+        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.x_train = None # shape=(N,D)
+
+    def fit(self, x_train, y_train):
+        """
+        @param x_train: shape=(N, D)
+        @param y_train: shape=(N, M)
+        """
+        N = x_train.shape[0]
+        K = np.asarray([[self.kernel(x, x_prime) for x in x_train] for x_prime in x_train])
+        self.theta = np.linalg.solve(K.T.dot(K)+self.lamda*np.identity(N), K.T.dot(y_train))
+        self.x_train = x_train
+
+    def predict(self, X):
+        """
+        @param X: shape=(N', D)
+        """
+        K = np.asarray([[self.kernel(x, x_prime) for x_prime in self.x_train] for x in X])
+        predictions = K.dot(self.theta) # (N',N)@(N,M) = (N',M)
+        return predictions

@@ -5,6 +5,8 @@ from scipy.special import logsumexp
 from ..utils import Params
 from ..utils import printAlignment
 from ..utils import handleKeyError
+from ..utils import flush_progress_bar
+from ..utils import flatten_dual
 
 class BaseAlignmentModel(Params):
     """Basement for Alignment models.
@@ -37,14 +39,14 @@ class BaseAlignmentModel(Params):
         """ Calcurate the match/mismatch score s[xi,yj] """
         return self.match if base_x==base_y else self.mismatch
 
-    def align(self,X,Y, width=60, only_score=False, display=True):
+    def align(self,X,Y, width=60, only_score=False, display=True, verbose=1):
         self.nx=len(X)+1
         self.ny=len(Y)+1
         self.size=(len(X)+1)*(len(Y)+1)
         # Initialization
         self.InitializeDPmatrix()
         self.InitializeTraceBackPointer()
-        score,pointer = self.DynamicProgramming(X,Y)
+        score,pointer = self.DynamicProgramming(X,Y,verbose=verbose)
         if only_score:
             return score
         Xidxes,Yidxes = self.TraceBack(pointer)
@@ -66,7 +68,7 @@ class BaseAlignmentModel(Params):
         """ Initialize TraceBack Pointer Matrix. """
         raise NotImplementedError()
 
-    def DynamicProgramming(self):
+    def DynamicProgramming(self, X, Y, verbose=1):
         """ Recursion of Dynamic Programming. """
         raise NotImplementedError()
 
@@ -116,7 +118,8 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
             DPmatrix[2*self.size+j] = -np.inf # Y
         self.DPmatrix = DPmatrix
 
-    def DynamicProgramming(self,X,Y):
+    def DynamicProgramming(self,X,Y,verbose=1):
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in range(1,self.nx):
             for j in range(1,self.ny):
                 candidates = [
@@ -142,6 +145,8 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+        if verbose>=1: print()
         scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
         score = np.max(scores)
         pointer = (np.argmax(scores)+1)*self.size-1
@@ -150,7 +155,7 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
 class SmithWaterman(BaseAlignmentModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.disp_params = ["match", "mismatch", "gap_opening", "gap_extension"]
         self.direction = "forward"
         self.method = "local"
 
@@ -176,7 +181,8 @@ class SmithWaterman(BaseAlignmentModel):
             DPmatrix[2*self.size+j] = -np.inf # Y
         self.DPmatrix = DPmatrix
 
-    def DynamicProgramming(self,X,Y):
+    def DynamicProgramming(self,X,Y, verbose=1):
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in range(1,self.nx):
             for j in range(1,self.ny):
                 candidates = [
@@ -203,6 +209,8 @@ class SmithWaterman(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics=f"max alignment score: {np.max(self.DPmatrix)}", verbose=verbose)
+        if verbose>=1: print()
         score = np.max(self.DPmatrix)
         pointer = np.argmax(self.DPmatrix)
         return score,pointer
@@ -210,7 +218,7 @@ class SmithWaterman(BaseAlignmentModel):
 class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.disp_params = ["match", "mismatch", "d", "e"]
+        self.disp_params = ["match", "mismatch", "gap_opening", "gap_extension"]
         self.direction = "backward"
         self.method = "global"
 
@@ -236,7 +244,8 @@ class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
             DPmatrix[3*self.size-self.ny+j] = -np.inf # bY
         self.DPmatrix = DPmatrix
 
-    def DynamicProgramming(self,X,Y):
+    def DynamicProgramming(self,X,Y,verbose=1):
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in reversed(range(self.nx-1)):
             for j in reversed(range(self.ny-1)):
                 candidates = [
@@ -272,6 +281,8 @@ class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="DP", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+        if verbose>=1: print()
         score = self.DPmatrix[0]
         pointer = self.TraceBackMatrix[0]
         return score,pointer
@@ -332,8 +343,9 @@ class PairHMM(BaseAlignmentModel):
             B[2*self.size+(self.nx-1)*self.ny+j] = np.log(self.epsilon*self.qy) + B[2*self.size+(self.nx-1)*self.ny+(j+1)]
         return B
 
-    def DynamicProgramming(self,X,Y):
+    def DynamicProgramming(self,X,Y,verbose=1):
         """ Viterbi Algorithm """
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in range(1,self.nx):
             for j in range(1,self.ny):
                 candidates = [
@@ -360,12 +372,14 @@ class PairHMM(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.log(coefficients[k]) + np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Viterbi", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+        if verbose>=1: print()
         scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
         score = np.log(self.tau)+max(scores)
         pointer = (np.argmax(scores)+1)*self.size-1
         return score, pointer
 
-    def forward(self,X,Y):
+    def forward(self,X,Y,verbose=1):
         """
         Forward Algorithm.
         F[k,i,j] means the sum of all alignment('x1,..,xi' and 'y1,...,yj') probabilities
@@ -375,7 +389,7 @@ class PairHMM(BaseAlignmentModel):
         self.ny=len(Y)+1
         self.size=(len(X)+1)*(len(Y)+1)
         F = self.InitializeDPmatrixForward()
-
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in range(1,self.nx):
             for j in range(1,self.ny):
                 F[0*self.size+i*self.ny+j] = np.log(self.s(X[i-1],Y[j-1])) + logsumexp([
@@ -391,11 +405,14 @@ class PairHMM(BaseAlignmentModel):
                     np.log(self.delta)+F[0*self.size+i*self.ny+(j-1)],
                     np.log(self.epsilon)+F[2*self.size+i*self.ny+(j-1)],
                 ])
+                max_score = max([F[k*self.size+i*self.ny+j] for k in range(3)])
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Forward", metrics=f"max alignment score: {max_score}", verbose=verbose)
+        if verbose>=1: print()
         P = np.log(self.tau) + logsumexp([F[(k+1)*self.size-1] for k in range(3)])
         F = F.reshape(3,self.nx,self.ny)[0,1:,1:]
         return F, P
 
-    def backward(self,X,Y):
+    def backward(self,X,Y,verbose=1):
         """
         Backward Algorithm.
         B[k,i,j] means the sum of all alignment('xi+1,..,xN' and 'yj+1,...,yM') probabilities
@@ -405,7 +422,7 @@ class PairHMM(BaseAlignmentModel):
         self.ny=len(Y)+1
         self.size=(len(X)+1)*(len(Y)+1)
         B = self.InitializeDPmatrixBackward()
-
+        max_iter = (self.nx-1)*(self.ny-1)
         for i in reversed(range(self.nx-1)):
             for j in reversed(range(self.ny-1)):
                 B[0*self.size+i*self.ny+j] = logsumexp([
@@ -421,20 +438,23 @@ class PairHMM(BaseAlignmentModel):
                     np.log(1-self.epsilon-self.tau)+np.log(self.s(X[i],Y[j]))+B[0*self.size+(i+1)*self.ny+(j+1)],
                     np.log(self.epsilon*self.qy)+B[1*self.size+(i+1)*self.ny+j],
                 ])
+                max_score = max([B[k*self.size+i*self.ny+j] for k in range(3)])
+                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="BackWard", metrics=f"max alignment score: {max_score}", verbose=verbose)
+        if verbose>=1: print()
         B = B.reshape(3,self.nx,self.ny)[0,1:,1:]
         return B
 
-    def score(self,X,Y):
-        P_opt   = self.align(X,Y, only_score=True)
-        F,P_all = self.forward(X,Y)
+    def score(self,X,Y,verbose=1):
+        P_opt   = self.align(X,Y, only_score=True,verbose=verbose)
+        F,P_all = self.forward(X,Y,verbose=verbose)
         print(f"- log(P(X,Y)) = {P_all:.3f}")
         print(f"- log(P(π*|x, y)) = {P_opt-P_all:.3f}")
 
-    def align_ij(self, X, Y):
+    def align_ij(self, X, Y,verbose=1):
         """ Calcurate the Probability that bases i and j are aligned.
         Pij[i][j] = P(xi◇yj|x,y)
         """
-        F,P_all = self.forward(X,Y)
-        B = self.backward(X,Y)
+        F,P_all = self.forward(X,Y,verbose=verbose)
+        B = self.backward(X,Y,verbose=verbose)
         Pij = (F+B)-P_all
         return Pij

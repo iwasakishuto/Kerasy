@@ -1,0 +1,9 @@
+{
+  "nucleic_acid": "RNA",
+  "WatsonCrick": true,
+  "Wobble": true,
+  "match": 1,
+  "mismatch": -1,
+  "gap_opening": 5,
+  "gap_extension": 1
+}

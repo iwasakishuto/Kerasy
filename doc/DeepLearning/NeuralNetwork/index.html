@@ -234,6 +234,13 @@
     <a class="" href="../../Biology/Alignment/">Alignment</a>
   </li>
         
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../Biology/Suffix Array/">Suffix Array</a>
+  </li>
+        
       </ul>
     </li>
     
@@ -266,7 +273,7 @@
     <li>Neural Network</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/iwasakishuto/Kerasy"> Edit on github &nbsp; <i class="fab fa-github"></i></a>
+        <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
       
     </li>
   </ul>
@@ -326,7 +333,7 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img alt="Perceptron" src="theme/img/NeuralNetworks/Perceptron.png" /></p>
+<p><img alt="Perceptron" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/Perceptron.png" /></p>
 </div>
 </div>
 </div>
@@ -401,7 +408,7 @@ $$h(\mathbf{a}) = \frac{\exp(a_i)}{\sum_j \exp(a_i)}\qquad (4.63)$$</li>
 <h2 id="anchor2">2. 多層パーセプロトン (Multilayer Perceptron)</h2><p>それでは、複数の単子（単純パーセプロトン）を繋げて２層のパーセプトロンを作ります。なお、<b>２層以上のパーセプトロンを<font color="red">ニューラルネットワーク</font></b>と言います。</p>
 <p>例えば１層目に $m$ 個の素子を用意し、入力が $D$ 次元の場合、関数で表すと</p>
 $$y = h_2\left(\sum_{i=0}^{m} w^{(2)}_ih_1\left(\sum_{j=0}^{D}w^{(1)}_{ij} x_j\right)\right)\qquad(5.9)$$<p>となります。</p>
-<p><img alt="Multilayer Perceptron" src="theme/img/NeuralNetworks/Multilayer-Perceptron.png" /></p>
+<p><img alt="Multilayer Perceptron" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/Multilayer-Perceptron.png" /></p>
 <table>
 <thead><tr>
 <th style="text-align:center">記号</th>
@@ -452,7 +459,7 @@ $$ y = h_2\left(\sum_{i=0}^{m} w^{(2)}_i\textcolor{red}{h_1\left(\sum_{j=0}^{D}w
 </ul>
 <p>として、説明します。</p>
 <p>したがって、学習のプロセスにおいては<b>「素子 $i$ から素子 $j$ への接続の重み $w_{ji}$ として、全ての $i,j$ の組合せ（＝全ノードの重み）に対して$ \frac{\partial E_n}{\partial w_{ji}} $を計算すること」</b>が目標となります。</p>
-<p><img alt="Back Propagation" src="theme/img/NeuralNetworks/BackPropagation1.png" /></p>
+<p><img alt="Back Propagation" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/BackPropagation1.png" /></p>
 </div>
 </div>
 </div>
@@ -467,14 +474,14 @@ $$ \frac{\partial E_n}{\partial w_{ji}} = \frac{\partial E_n}{\partial a_j}\frac
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img alt="Back Propagation2" src="theme/img/NeuralNetworks/BackPropagation2.png" /></p>
+<p><img alt="Back Propagation2" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/BackPropagation2.png" /></p>
 <p>続いて、$\delta_i$ について考えると、$E_n$ は素子 $i$ の出力を受け取る素子 $j$ の入力 $a_j$ を介して $a_i$ に依存するので、合成微分則より</p>
 $$ \delta_i = \frac{\partial E_n}{\partial a_i} = \sum_j \frac{\partial E_n}{\partial a_j}\frac{\partial a_j}{\partial a_i} = \sum_j\delta_j\frac{\partial a_j}{\partial a_i}\qquad(5.55)$$<p>となります。（下図参照）</p>
-<p><img alt="Back Propagation3" src="theme/img/NeuralNetworks/BackPropagation3.png" /></p>
+<p><img alt="Back Propagation3" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/BackPropagation3.png" /></p>
 <p>さらに、素子 $i$ の活性化関数を $h_i$ とすると、</p>
 $$a_j = \sum_i w_{ji} h_i(a_i)\qquad(5.48)$$<p>だった（素子 $i$ への入力和を活性化関数に通しそれぞれに重み $w_{ji}$ をかけた和を素子 $j$ に伝える）ので、</p>
 $$ \frac{\partial a_j}{\partial a_i} = w_{ji} h_i'(a_i)$$<p>となります。</p>
-<p><img alt="Back Propagation4" src="theme/img/NeuralNetworks/BackPropagation4.png" /></p>
+<p><img alt="Back Propagation4" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/NeuralNetworks/BackPropagation4.png" /></p>
 <p>ここまでをまとめると、誤差 $\delta_i$ の逆伝播公式</p>
 $$ \delta_i = h_i'(a_i) \sum_j w_{ji}\delta_j\qquad(5.56)$$<p>が得られます。</p>
 </div>

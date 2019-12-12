@@ -969,6 +969,11 @@ big, small {
   content: "\f040";
 }
 
+.qtitle .admonition-title:before {
+  /* Question (question mark) */
+  content: "\f059";
+}
+
 .tip .admonition-title:before {
   /* Notebook (book) */
   content: "\f02d";

@@ -86,8 +86,9 @@ class Dense(Layer):
 
     def backprop(self, dEdXout):
         """ @param dEdXout: shape=(Dout,) """
-        dXoutda = self.h.diff(self.a) # shape=(Dout,)
-        dEda = dEdXout.dot(dXoutda) if len(dXoutda.shape)==2 else dEdXout * dXoutda # shape=(Dout,)
+        # dXoutda = self.h.diff(self.a) # shape=(Dout,)
+        # dEda = dEdXout.dot(dXoutda) if dXoutda.ndim==2 else dEdXout * dXoutda # shape=(Dout,)
+        dEda = self.h.diff(self.a) * dEdXout
         dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
         if self.trainable:
             self.memorize_delta(dEda)
@@ -95,7 +96,7 @@ class Dense(Layer):
         return dEdXin # shape=(Din,) delta of bias is not propagated.
 
     def memorize_delta(self, dEda):
-        dEdw = np.outer(dEda, self.Xin) # (Dout, Din+1)
+        dEdw = np.outer(dEda, self.Xin)
         if self.use_bias:
             self._losses['kernel'] += dEdw[:,:-1] # shape=(Dout, Din)
             self._losses['bias'] += dEdw[:,-1:] # shape=(Dout, 1)

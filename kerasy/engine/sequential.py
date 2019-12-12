@@ -54,22 +54,29 @@ class Sequential():
                 val_x, val_y, val_sample_weight = validation_data
             else: raise ValueError(f"When passing validation_data, it must contain 2 (x_val, y_val) or 3 (x_val, y_val, val_sample_weights) items. However, it contains {len(validation)} items.")
 
+        # Prepare for the trainig.
+        epoch_digit = len(str(epochs))
         num_train_samples = len(x)
+        batches = make_batches(num_train_samples, batch_size)
+        num_batchs = len(batches)
         index_array = np.arange(num_train_samples)
-        digit=len(str(epochs))
+
         for epoch in range(epochs):
             if shuffle: np.random.shuffle(index_array)
-            batches = make_batches(num_train_samples, batch_size)
-            n_train = 0
+            losses = 0
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
-                for bs, (x_, y_) in enumerate(zip(x[batch_ids], y[batch_ids])):
-                    out = self.forward(x_)
-                    self.backprop(y_, out)
-                    flush_progress_bar(n_train, num_train_samples, barname=f"Epoch {epoch+1:>0{digit}}/{epochs} |")
-                    n_train+=1
+                for bs, (x_train, y_true) in enumerate(zip(x[batch_ids], y[batch_ids])):
+                    y_pred = self.forward(x_train)
+                    losses += self.loss.loss(y_true=y_true, y_pred=y_pred)
+                    self.backprop(y_true=y_true, y_pred=y_pred)
                 self.updates(bs+1)
-            print()
+                flush_progress_bar(batch_index,
+                                   num_batchs,
+                                   barname=f"Epoch {epoch+1:>0{epoch_digit}}/{epochs} |",
+                                   metrics=f"{self.loss.__name__}: {losses/min((batch_index+1)*batch_size, num_train_samples):.4f}",
+                                   verbose=verbose)
+            if verbose>=1: print()
 
     def forward(self, input):
         out=input
@@ -77,8 +84,8 @@ class Sequential():
             out = layer.forward(out)
         return out
 
-    def backprop(self, y_true, out):
-        dEdXout = self.loss.diff(y_true, out)
+    def backprop(self, y_true, y_pred):
+        dEdXout = self.loss.diff(y_true, y_pred)
         for layer in reversed(self.layers):
             dEdXout = layer.backprop(dEdXout)
 

@@ -46,6 +46,16 @@ class Optimizer():
             grads = [np.clip(g, -self.clipvalue, self.clipvalue) for g in grads]
         return grads
 
+class GradientDescent(Optimizer):
+    def __init__(self, eta=0.01, **kwargs):
+        self.eta = eta
+        super().__init__(**kwargs)
+
+    def get_updates(self, grads, past_params, name):
+        grads = self.get_gradients(grads) # Cliped.
+        last_param = past_params[-1]
+        return last_param - self.eta*grads
+
 class SGD(Optimizer):
     """Stochastic gradient descent optimizer.
     @param learning_rate: (float) Learning rate.
@@ -87,6 +97,7 @@ class SGD(Optimizer):
 
 OptimizerHandler = {
     'sgd': SGD,
+    'gra': GradientDescent,
 }
 
 def Optimizer(optimizer_name):

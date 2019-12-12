@@ -394,7 +394,7 @@
 </tr>
 </tbody>
 </table>
-<p>Finally, we get </p>
+<p>Finally, we get</p>
 <p><img alt="Step7-4" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step7-4.png"></p>
 <div class="admonition qtitle">
   <p class="admonition-title">How to Sort LMS suffix?? (Step5)</p>
@@ -450,6 +450,106 @@
 </div>
 
 <h2>Burrows-Wheeler Transform; BWT</h2>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">BWT</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+
+
+<table>
+<thead>
+<tr>
+<th align="center">Explanation</th>
+<th align="center">ex. <span class="math">\(S="\mathrm{TATAA\\)</span>}"$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>BWT(Burrows-Wheeler Transform)</strong> is the "characters just to the left of the suffixes in the suffix array", and it can be used to recover the entire string. It is given by<div class="math">$$BWT[i] = \begin{cases}S[SA[i] - 1] &amp; (\text{if $SA[i]&gt;0$})\\\mathrm{\$} &amp; (\text{otherwise})\end{cases}$$</div>
+</td>
+<td align="center"><img alt="BWT" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT.png"></td>
+</tr>
+</tbody>
+</table>
+<h3>Reverse BWT with Suffix Array</h3>
+<p>We will denote <span class="math">\(T\)</span> and <span class="math">\(ISA\)</span> as followings.</p>
+<div class="math">$$
+\begin{cases}
+SA[k] = v &amp;\Longleftrightarrow ISA[v] = k\\
+\mathrm{T}[i] &amp;\Longleftrightarrow \mathrm{ISA}\left[\mathrm{SA}[i] - 1\right]\\
+\end{cases}
+$$</div>
+<p>This means that <font color="red"><b>the order of suffix whose initial character is <span class="math">\(BWT[i]\)</span> is <span class="math">\(T[i]\)</span></b></font>, and under the above definition, the following equation holds.</p>
+<div class="math">$$
+\begin{aligned}
+\mathrm{BWT}\left[\mathrm{T}\left[i\right]\right]
+&amp;= \mathrm{BWT}\left[\mathrm{ISA}\left[\mathrm{SA}\left[i\right] - 1\right]\right]\\
+&amp;= \mathrm{BWT}\left[k\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\\
+&amp;= \mathrm{S}\left[SA[k] - 1\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\\
+&amp;= \mathrm{S}\left[\left(SA[i] - 1\right) - 1\right]\\
+&amp;= \text{$BWT[i]$'s one left character in $S$}
+\end{aligned}
+$$</div>
+<p><b>Now that we can get the original <span class="math">\(S\)</span> from BWT <font color="red">and</font> SA.</b></p>
+<h3>Reverse BWT without Suffix Array</h3>
+<p>In fact, we could recover the original strings only from BWT, because we can make <span class="math">\(T\)</span> only from BWT. One of the important properties to realize it is <font color="red"><b>LF Mapping</b></font>.</p>
+<div class="admonition summary">
+  <p class="admonition-title">LF Mapping</p>
+  <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA.png">
+  <p><center>The i-th occurrence of a character x in L and the i-th occurrence of x in F correspond to the same occurrence.</center></p>
+</div>
+
+<p>To calculate <span class="math">\(T[i]\)</span> only from BWT, we will introduce auxiliary storages <span class="math">\(C[x]\)</span>, and <span class="math">\(Occ(x,i)\)</span></p>
+<table>
+<thead>
+<tr>
+<th align="center">Name</th>
+<th align="left">Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><span class="math">\(C[x]\)</span></td>
+<td align="left">the total occurrence of a characters which is smaller than <span class="math">\(x\)</span> in lexicographical order in BWT.</td>
+</tr>
+<tr>
+<td align="center"><span class="math">\(Occ(x,i)\)</span></td>
+<td align="left">the total occurrence of a character <span class="math">\(x\)</span> up to <span class="math">\(i\)</span>-th in the BWT.</td>
+</tr>
+</tbody>
+</table>
+<p>Using these variable, we can calculate <span class="math">\(T[i]\)</span> by</p>
+<div class="math">$$T[i] =
+\begin{cases}
+  0 &amp;(\mathrm{BWT}[i] = \text{\$})\\
+  C\left[\mathrm{BWT}[i]\right] + Occ(\mathrm{BWT}[i], i) - 1 &amp; (\text{otherwise.})\\
+\end{cases}
+$$</div>
+<p>The above formula is guaranteed by the following properties.</p>
+<div class="math">$$
+\begin{cases}
+  [lb(W),ub(W)] &amp;= \text{the range of words in SA whose prefix is W}\\
+  lb(\{\}) &amp;= 0\\
+  ub(\{\}) &amp;= len(S) - 1\\
+  Occ(x, -1) &amp;= 0\\
+  lb(xW) &amp;= C(x) + Occ(x, lb(W) - 1) &amp;\cdots (1)\\
+  ub(xW) &amp;= C(x) + Occ(x, ub(W)) - 1 &amp;\cdots (2)
+\end{cases}
+$$</div>
+<p>These properties (especially the recursion (1) and (2)) are proved by</p>
+<table>
+<thead>
+<tr>
+<th align="left"><span class="math">\((1)\)</span></th>
+<th align="left"><span class="math">\((2)\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><img alt="BWT-without-SA2" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA2.png"></td>
+<td align="left"><img alt="BWT-without-SA3" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA3.png"></td>
+</tr>
+</tbody>
+</table>
+<p>This allows us to search the occurrence range of characters with a specific prefix.</p>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",

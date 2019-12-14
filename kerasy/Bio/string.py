@@ -310,3 +310,5 @@ def simple_decompression(compressed_string):
         if i==len_string:
             break
     return string
+
+# TODE: "Move-to-front encoding" and "Run-length encoding".

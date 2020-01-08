@@ -1,7 +1,7 @@
 # coding: utf-8
 import numpy as np
 
-def cross_validation(k, x, y, metrics, modelcls, shuffle=True, seed=None, **modelargs):
+def cross_validation(k, x, y, metrics, modelcls, shuffle=True, seed=None, modelkwargs={}, trainkwargs={}):
     """
     @params k        : k-fold
     @params x        : Explanatory variables.
@@ -18,8 +18,8 @@ def cross_validation(k, x, y, metrics, modelcls, shuffle=True, seed=None, **mode
     for cls in range(k):
         x_train = x[idx==cls]; x_test = x[idx!=cls]
         y_train = y[idx==cls]; y_test = y[idx!=cls]
-        model = modelcls(**modelargs)
-        model.fit(x_train, y_train)
+        model = modelcls(**modelkwargs)
+        model.fit(x_train, y_train, **trainkwargs)
         y_pred = model.predict(x_test)
         score += metrics(y_test, y_pred)
     return score/k

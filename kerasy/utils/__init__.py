@@ -50,6 +50,8 @@ from .toydata_utils import generateWhirlpool
 from .toydata_utils import generateSeq
 
 from .training_utils import make_batches
+from .training_utils import train_test_split
 
 from .vis_utils import galleryplot
 from .vis_utils import plot_2D
+from .vis_utils import objVSexp

@@ -1,7 +1,15 @@
 # coding: utf-8
 import numpy as np
 
-def cross_validation(k, x, y, modelcls, metrics, shuffle=True, seed=None, **modelargs):
+def cross_validation(k, x, y, metrics, modelcls, shuffle=True, seed=None, **modelargs):
+    """
+    @params k        : k-fold
+    @params x        : Explanatory variables.
+    @params y        : Objective variables.
+    @params metrics  : (func) How to measure prediction error.
+    @params modelcls : Model Class. We will create k instances.
+    @params modelargs: Model instance's argments.
+    """
     n_samples = len(x)
     idx = np.repeat(np.arange(k), np.round(n_samples/k))
     if shuffle: np.random.RandomState(seed).shuffle(idx)

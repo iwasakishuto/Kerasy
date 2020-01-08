@@ -32,12 +32,16 @@ class CategoricalEncoder():
     def reverse(self, cls):
         return np.asarray([self.cls2obj[c] for c in cls], dtype=self.dtype)
 
-def findLowerUpper(data, margin=1e-2):
+def findLowerUpper(data, margin=1e-2, N=None):
     """ data.shape=(N,D) """
     mins = np.min(data, axis=0)
     maxs = np.max(data, axis=0)
     margins = (maxs-mins)*margin
-    return (mins-margin, maxs+margin)
+    lbs = mins-margins; ubs = maxs+margins
+    if N is None:
+        return (lbs, ubs)
+    else:
+        return np.concatenate([[np.linspace(lb,ub,N) for lb,ub in zip(lbs, ubs)]])
 
 def inverse_arr(arr):
     """

@@ -3,10 +3,10 @@
 import numpy as np
 
 def mean_squared_error(y_true, y_pred, sample_weight=None):
-    return np.average((y_true - y_pred)**2, axis=0, weights=sample_weight)
+    return np.average((y_true - y_pred)**2, axis=0, weights=sample_weight).astype(float)
 
 def root_mean_squared_error(y_true, y_pred, sample_weight=None):
-    return np.average(np.sqrt((y_true - y_pred)**2), axis=0, weights=sample_weight)
+    return np.sqrt(mean_squared_error(y_true, y_pred, sample_weight=sample_weight))
 
 def pairwise_euclid_distances(X, squared=False):
     """Calculate euclid distance

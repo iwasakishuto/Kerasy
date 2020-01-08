@@ -22,7 +22,7 @@ class LinearRegression():
         @param train_y: shape=(N,M)
         @val         w: shape=()
         """
-        train_x = self.basis_transform(train_x)
+        train_x = self.basis_transform(train_x).astype(float)
         self.w = np.linalg.solve(train_x.T.dot(train_x), train_x.T.dot(train_y))
 
     def predict(self, X):

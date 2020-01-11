@@ -6,6 +6,7 @@ from ..utils import findLowerUpper
 from ..utils import flush_progress_bar
 from ..utils import euclid_distances
 from ..utils import pairwise_euclid_distances
+
 class BaseEMmodel():
     def __init__(self, K, random_state=None, metrics="euclid"):
         self.K=K
@@ -109,16 +110,32 @@ class HamerlyKMeans(KMeans):
         self.sum=None     # shape=(K,D)
         # self.mu=None      # shape=(K,D) mu = sum/num_cls
 
+    def calcLowerBound(self, X, idx):
+        """ Calculate the Lower Bounds for all data (Xi)
+        @param X          : shape=(N,D) 
+        @param idx        : shape=(N,)
+        @return second_min: shape=(N,) Minmum distance to the centroid which is not belong to.
+        """
+        one = np.eye(self.K)
+        return np.asarray([
+            np.min(np.where(one[y]==1, np.inf, euclid_distances(x, self.mu))) for x,y in zip(X, idx)
+        ])
+
     def Hamerly_initialize(self, X):
         """
         @param X: shape=(N,D)
         """
+        N,D = X.shape
         idx = self.Estep(X)
+        self.num_cls=np.zeros(shape=self.K)
+        self.sum=np.zeros(shape=(self.K, D))
         for k in np.arange(self.K):
-            self.num_cls=np.count_nonzero(idx==k)
-            self.sum=np.sum(X[idx==k], axis=1)
+            self.num_cls[k]=np.count_nonzero(idx==k)
+            self.sum[k]=np.sum(X[idx==k], axis=0)
+        self.mu = self.sum/self.num_cls.reshape(-1,1)
         self.upper=euclid_distances(X, self.mu[idx])
         self.lower=self.calcLowerBound(X, idx)
+        return idx
 
     def fit(self, X, max_iter=100, memorize=False, verbose=1):
         """ @param X: shape=(N,D) """
@@ -130,14 +147,14 @@ class HamerlyKMeans(KMeans):
         # EM algorithm.
         for it in range(max_iter):
             not_meet, new_idx = self.SparseEstep(X, idx)
-            changed = np.nonzero(new_idx!=idx[not_meet])
+            changed = np.nonzero(new_idx!=idx[not_meet])[0]
             if len(changed)==0: break
             # Update centroid.
             dmu = self.Mstep(X[not_meet][changed], idx[not_meet][changed], new_idx[changed])
             # Update index.
             idx[not_meet] = new_idx
             self.updateUpperLower(idx, dmu)
-            flush_progress_bar(it, max_iter, metrics=f"changed: {len(change):>0{dim}}/{N}", verbose=verbose)               
+            flush_progress_bar(it, max_iter, metrics=f"changed: {len(changed):>0{dim}}/{N}", verbose=verbose)               
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
         if verbose: print()
@@ -152,14 +169,13 @@ class HamerlyKMeans(KMeans):
         """
         pairwise_cent_dist = pairwise_euclid_distances(self.mu, squared=False)
         pairwise_cent_dist += np.max(pairwise_cent_dist)*np.identity(self.K) # Add maximum to diagonal components.
-        nearest_cent_dist = np.min(pairwise_cent_dist, axis=1)        
+        nearest_cent_dist = np.min(pairwise_cent_dist, axis=0) 
         harmerly_right_side = np.maximum(nearest_cent_dist[idx]/2, self.lower)
         """ Hamerly' Proposition step.1 """
-        not_meet = np.nonzero(self.upper>harmerly_right_side) # Index of Xi who does not meet the Hamerly's Proposition.
+        not_meet = np.nonzero(self.upper>harmerly_right_side)[0] # Index of Xi who does not meet the Hamerly's Proposition.
         self.upper[not_meet] = euclid_distances(X[not_meet], self.mu[idx[not_meet]]) # Update the upper bound.
         """ Hamerly' Proposition step.2 """
-        not_meet_again = not_meet[np.nonzero(self.upper[not_meet]>m[not_meet])]
-        
+        not_meet_again = not_meet[np.nonzero(self.upper[not_meet]>harmerly_right_side[not_meet])]
         # Apply Estep Only to `X[not_meet_again]`
         new_idx = self.Estep(X[not_meet_again])
         # Update lower bounds and upper bounds.
@@ -168,20 +184,6 @@ class HamerlyKMeans(KMeans):
         
         changed = np.nonzero(new_idx==idx[not_meet_again]) 
         return not_meet_again, new_idx
-    
-    def calcLowerBound(self, X, idx):
-        """ Calculate the Lower Bounds for all data (Xi)
-        @param X          : shape=(N,D) 
-        @param idx        : shape=(N,)
-        @return second_min: shape=(N,) Minmum distance to the centroid which is not belong to.
-        """
-        one_hot = np.eye(self.K)
-        second_min = np.apply_along_axis(
-            lambda x,y: np.min(np.where(one_hot[y]!=1, euclid_distances(x, model.mu), np.inf)),
-            1,
-            X,idx
-        )
-        return second_min
     
     def Mstep(self, X, bid, aid):
         """Think about only changed data.
@@ -196,7 +198,7 @@ class HamerlyKMeans(KMeans):
             self.sum[k]     -= np.sum(X[bid==k], axis=0)
             self.num_cls[k] += np.count_nonzero(aid==k)
             self.sum[k]     += np.sum(X[aid==k], axis=0)
-        mu = self.sum / self.num_cls
+        mu = self.sum/self.num_cls.reshape(-1,1)
         dmu = euclid_distances(mu, self.mu)
         self.mu = mu
         return dmu
@@ -204,8 +206,8 @@ class HamerlyKMeans(KMeans):
     def updateUpperLower(self, idx, dmu):
         """ Update lower bounds and upper bounds. """
         max_dmu = np.max(dmu)
-        self.upper += p[idx]
-        self.lower -= dmu
+        self.upper += dmu[idx]
+        self.lower -= max_dmu
 class MixedGaussian(BaseEMmodel):
     def __init__(self, K, random_state=None):
         super().__init__(K=K, random_state=random_state)

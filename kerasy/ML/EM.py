@@ -20,13 +20,19 @@ class BaseEMmodel():
         """
         self.history=[]
         N,D  = X.shape
+        np.random.seed(self.seed)
         if initializer=="uniform":
             Xmin,Xmax = findLowerUpper(X, margin=0, N=None)
-            self.mu = np.random.RandomState(self.seed).uniform(
-                low=Xmin, high=Xmax, size=(self.K, D)
-            )
+            self.mu = np.random.uniform(low=Xmin, high=Xmax, size=(self.K, D))
         elif initializer=="k++":
-            self.mu = "hoge"
+            data_idx = np.arange(N)
+            idx = np.random.choice(data_idx)
+            mu = X[idx, None]
+            for k in range(1,self.K):
+                min_distance = np.apply_along_axis(lambda x:np.min(euclid_distances(x, mu)), 1, X)
+                idx = np.random.choice(data_idx, p=min_distance/np.sum(min_distance))
+                mu = np.r_[mu, X[idx,None]]
+            self.mu = mu
         else:
             handleKeyError(["uniform", "k++"], initializer=initializer)
 
@@ -137,12 +143,12 @@ class HamerlyKMeans(KMeans):
         self.lower=self.calcLowerBound(X, idx)
         return idx
 
-    def fit(self, X, max_iter=100, memorize=False, verbose=1):
+    def fit(self, X, max_iter=100, memorize=False, initializer="uniform", verbose=1):
         """ @param X: shape=(N,D) """
         N,D = X.shape
         dim = len(str(N))
         # Initialization.
-        self.train_initialize(X)
+        self.train_initialize(X, initializer=initializer)
         idx = self.Hamerly_initialize(X)
         # EM algorithm.
         for it in range(max_iter):

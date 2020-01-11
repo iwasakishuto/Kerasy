@@ -8,6 +8,13 @@ def mean_squared_error(y_true, y_pred, sample_weight=None):
 def root_mean_squared_error(y_true, y_pred, sample_weight=None):
     return np.sqrt(mean_squared_error(y_true, y_pred, sample_weight=sample_weight))
 
+def euclid_distances(x,y):
+    """
+    @param x,y shape=(N,D)
+    @return shape=(N,)
+    """
+    return np.sqrt(np.sum(np.square(x-y), axis=1))
+
 def pairwise_euclid_distances(X, squared=False):
     """Calculate euclid distance
     @param X         : (ndarray) shape=(N,D)

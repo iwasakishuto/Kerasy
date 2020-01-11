@@ -2,26 +2,37 @@
 import numpy as np
 import scipy.stats as stats
 
+from ..utils import findLowerUpper
 from ..utils import flush_progress_bar
-
-class EMmodel():
-    def __init__(self, K, random_state=None):
+from ..utils import euclid_distances
+from ..utils import pairwise_euclid_distances
+class BaseEMmodel():
+    def __init__(self, K, random_state=None, metrics="euclid"):
         self.K=K
         self.seed=random_state
         self.history=[]
-    def train_initialize(self, X):
+        self.metrics=metrics
+
+    def train_initialize(self, X, initializer="uniform"):
         """
         @param X: shape=(N,D)
         """
         self.history=[]
         N,D  = X.shape
-        Xmin = np.min(X, axis=0); Xmax = np.max(X, axis=0) #shape=(D,)
-        self.mu = np.random.RandomState(self.seed).uniform(low=Xmin, high=Xmax, size=(self.K, D))
+        if initializer=="uniform":
+            Xmin,Xmax = findLowerUpper(X, margin=0, N=None)
+            self.mu = np.random.RandomState(self.seed).uniform(
+                low=Xmin, high=Xmax, size=(self.K, D)
+            )
+        elif initializer=="k++":
+            self.mu = "hoge"
+        else:
+            handleKeyError(["uniform", "k++"], initializer=initializer)
 
-    def fit(self, X, max_iter=100, memorize=False):
+    def fit(self, X, max_iter=100, memorize=False, initializer="uniform", verbose=1):
         raise NotImplementedError()
         #=== Initialization. ===
-        self.train_initialize(X) # Initialize the mean value `self.mu` within data space.
+        self.train_initialize(X, initializer=initializer) # Initialize the mean value `self.mu` within data space.
         # If you need, you also initialize some parameters.
         #=== EM algorithm. ===
         for it in range(max_iter):
@@ -29,42 +40,44 @@ class EMmodel():
             if memorize: self.memorize_param(responsibilities)
             self.Mstep(X, responsibilities)
             ll = self.loglikelihood(X)
-            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}")
+            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}", verbose=verbose)
             if it>0 and "Any Break Condition": break
         if memorize: self.memorize_param(responsibilities)
-        print()
+        if verbose>=1: print()
 
     def predict(self, X):
         raise NotImplementedError()
         responsibilities = self.Estep(X)
         return responsibilities
+
     def Estep(self, X):
         raise NotImplementedError()
+
     def Mstep(self, X, responsibilities):
         raise NotImplementedError()
 
-class KMeans(EMmodel):
+class KMeans(BaseEMmodel):
     def __init__(self, K, random_state=None):
         super().__init__(K=K, random_state=random_state)
         self.mu=None
 
-    def fit(self, X, max_iter=100, memorize=False):
+    def fit(self, X, max_iter=100, memorize=False, initializer="uniform", verbose=1):
         """
         @param X: shape=(N,D)
         """
         # Initialization.
-        self.train_initialize(X)
+        self.train_initialize(X, initializer=initializer)
         # EM algorithm.
         for it in range(max_iter):
             idx = self.Estep(X)
             if memorize: self.memorize_param(idx)
             self.Mstep(X, idx)
             J = np.sum([np.sum(np.square(X[idx==k]-self.mu[k])) for k in range(self.K)])
-            flush_progress_bar(it, max_iter, metrics=f"distortion measure: {J:.3f}")
+            flush_progress_bar(it, max_iter, metrics=f"distortion measure: {J:.3f}", verbose=verbose)
             if it>0 and not np.any(pidx!=idx): break
             pidx=idx
         if memorize: self.memorize_param(idx)
-        print()
+        if verbose: print()
 
     def memorize_param(self, idx):
         self.history.append([
@@ -87,16 +100,122 @@ class KMeans(EMmodel):
         for k in np.unique(idx):
             self.mu[k] = np.mean(X[idx==k], axis=0)
 
-class MixedGaussian(EMmodel):
+class HamerlyKMeans(KMeans):
+    def __init__(self, K, random_state=None):
+        super().__init__(K=K, random_state=random_state)
+        self.lower=None   # shape=(N), Lower bound of distance to second nearest centroid.
+        self.upper=None   # shape=(N), Upper bound of distance to nearest centroid.
+        self.num_cls=None # shape=(K), Number of data belonging to class k.
+        self.sum=None     # shape=(K,D)
+        # self.mu=None      # shape=(K,D) mu = sum/num_cls
+
+    def Hamerly_initialize(self, X):
+        """
+        @param X: shape=(N,D)
+        """
+        idx = self.Estep(X)
+        for k in np.arange(self.K):
+            self.num_cls=np.count_nonzero(idx==k)
+            self.sum=np.sum(X[idx==k], axis=1)
+        self.upper=euclid_distances(X, self.mu[idx])
+        self.lower=self.calcLowerBound(X, idx)
+
+    def fit(self, X, max_iter=100, memorize=False, verbose=1):
+        """ @param X: shape=(N,D) """
+        N,D = X.shape
+        dim = len(str(N))
+        # Initialization.
+        self.train_initialize(X)
+        idx = self.Hamerly_initialize(X)
+        # EM algorithm.
+        for it in range(max_iter):
+            not_meet, new_idx = self.SparseEstep(X, idx)
+            changed = np.nonzero(new_idx!=idx[not_meet])
+            if len(changed)==0: break
+            # Update centroid.
+            dmu = self.Mstep(X[not_meet][changed], idx[not_meet][changed], new_idx[changed])
+            # Update index.
+            idx[not_meet] = new_idx
+            self.updateUpperLower(idx, dmu)
+            flush_progress_bar(it, max_iter, metrics=f"changed: {len(change):>0{dim}}/{N}", verbose=verbose)               
+            if memorize: self.memorize_param(idx)
+        if memorize: self.memorize_param(idx)
+        if verbose: print()
+
+    def SparseEstep(self, X, idx):
+        """ Hamerly' Proposition
+        Reduce the number of data to be calculated the distance using the Hamerly' Proposition.
+        @param X  :
+        @param idx:
+        @return not_meet_again: shape=(?,) Index of data that did not meet the Hamerly' Proposition
+        @return new_idx       : shape=(?,) X[not_meet_again]'s new idx.
+        """
+        pairwise_cent_dist = pairwise_euclid_distances(self.mu, squared=False)
+        pairwise_cent_dist += np.max(pairwise_cent_dist)*np.identity(self.K) # Add maximum to diagonal components.
+        nearest_cent_dist = np.min(pairwise_cent_dist, axis=1)        
+        harmerly_right_side = np.maximum(nearest_cent_dist[idx]/2, self.lower)
+        """ Hamerly' Proposition step.1 """
+        not_meet = np.nonzero(self.upper>harmerly_right_side) # Index of Xi who does not meet the Hamerly's Proposition.
+        self.upper[not_meet] = euclid_distances(X[not_meet], self.mu[idx[not_meet]]) # Update the upper bound.
+        """ Hamerly' Proposition step.2 """
+        not_meet_again = not_meet[np.nonzero(self.upper[not_meet]>m[not_meet])]
+        
+        # Apply Estep Only to `X[not_meet_again]`
+        new_idx = self.Estep(X[not_meet_again])
+        # Update lower bounds and upper bounds.
+        self.upper[not_meet_again] = euclid_distances(X[not_meet_again], self.mu[new_idx])
+        self.lower[not_meet_again] = self.calcLowerBound(X[not_meet_again], new_idx)
+        
+        changed = np.nonzero(new_idx==idx[not_meet_again]) 
+        return not_meet_again, new_idx
+    
+    def calcLowerBound(self, X, idx):
+        """ Calculate the Lower Bounds for all data (Xi)
+        @param X          : shape=(N,D) 
+        @param idx        : shape=(N,)
+        @return second_min: shape=(N,) Minmum distance to the centroid which is not belong to.
+        """
+        one_hot = np.eye(self.K)
+        second_min = np.apply_along_axis(
+            lambda x,y: np.min(np.where(one_hot[y]!=1, euclid_distances(x, model.mu), np.inf)),
+            1,
+            X,idx
+        )
+        return second_min
+    
+    def Mstep(self, X, bid, aid):
+        """Think about only changed data.
+        @param X   : shape=(?, D)
+        @param bid : shape=(?,) Before Id
+        @param aid : shape=(?,) After Id
+        @return dmu: shape=(K,) Delta distance of centoroids.
+        """
+        # Update the cluster.
+        for k in np.arange(self.K):
+            self.num_cls[k] -= np.count_nonzero(bid==k)
+            self.sum[k]     -= np.sum(X[bid==k], axis=0)
+            self.num_cls[k] += np.count_nonzero(aid==k)
+            self.sum[k]     += np.sum(X[aid==k], axis=0)
+        mu = self.sum / self.num_cls
+        dmu = euclid_distances(mu, self.mu)
+        self.mu = mu
+        return dmu
+    
+    def updateUpperLower(self, idx, dmu):
+        """ Update lower bounds and upper bounds. """
+        max_dmu = np.max(dmu)
+        self.upper += p[idx]
+        self.lower -= dmu
+class MixedGaussian(BaseEMmodel):
     def __init__(self, K, random_state=None):
         super().__init__(K=K, random_state=random_state)
         self.mu=None
         self.S=None
         self.pi=None
 
-    def fit(self, X, max_iter=100, memorize=False, tol=1e-5):
+    def fit(self, X, max_iter=100, memorize=False, tol=1e-5, initializer="uniform", verbose=1):
         # Initialization.
-        self.train_initialize(X) # Initialize the mean value `self.mu` within data space.
+        self.train_initialize(X, initializer=initializer) # Initialize the mean value `self.mu` within data space.
         self.S  = [1*np.eye(2) for k in range(self.K)] # Initialize with Diagonal matrix
         self.pi = np.ones(self.K)/self.K # Initialize with Uniform.
         # EM algorithm.
@@ -105,7 +224,7 @@ class MixedGaussian(EMmodel):
             if memorize: self.memorize_param(gamma)
             self.Mstep(X, gamma)
             ll = self.loglikelihood(X)
-            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}")
+            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}", verbose=verbose)
             mus = np.copy(self.mu.ravel())
             if it>0 and np.mean(np.linalg.norm(mus-pmus)) < tol: break
             pmus = mus

@@ -30,6 +30,7 @@ from .generic_utils import urlDecorate
 from .metric_utils import mean_squared_error
 from .metric_utils import root_mean_squared_error
 from .metric_utils import pairwise_euclid_distances
+from .metric_utils import euclid_distances
 
 from .model_select_utils import cross_validation
 

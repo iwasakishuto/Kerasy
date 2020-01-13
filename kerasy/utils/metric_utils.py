@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from ..utils import handleKeyError
-
+from .generic_utils import handleKeyError
+from .np_utils import CategoricalEncoder
 
 def norm_vectors(*args, axis=-1, squared=True):
     if squared:
@@ -19,6 +19,22 @@ def mean_squared_error(y_true, y_pred, sample_weight=None):
 
 def root_mean_squared_error(y_true, y_pred, sample_weight=None):
     return np.sqrt(mean_squared_error(y_true, y_pred, sample_weight=sample_weight))
+
+def silhouette_samples(X, labels, metric='euclidean'):
+    encoder = CategoricalEncoder()
+    labels = encoder.to_categorical(labels)
+    all_dists = pairwise_euclidean_distances(X)
+    cluster_mean_dists = np.asarray([np.mean(all_dists[labels==label], axis=0) for label in np.unique(labels)]).T
+    silhouette_scores = np.zeros(shape=(len(X)))
+    for i,(dists,cls) in enumerate(zip(cluster_mean_dists,labels)):
+        intra_dists = dists[cls]
+        extra_dists = np.delete(dists, cls).min()
+        silhouette_scores[i] = (extra_dists-intra_dists)/max(intra_dists,extra_dists)
+
+    return silhouette_scores
+
+def silhouette_score(X, labels, metric='euclidean', **kwargs):
+    return np.mean(silhouette_samples(X, labels, metric=metric, **kwargs))
 
 # Paired Distances
 def check_paired_array(X,Y):
@@ -36,8 +52,8 @@ def check_paired_array(X,Y):
     if Dx != Dy:
         raise ValueError(f"X.shape[1], and Y.shape[1] should be the same shape, but X.shape[1]={Dx} while Y.shape[1]={Dy}")
     if Nx!=Ny:
-        if Nx==1:   x=np.repeat(x, Ny, axis=1)
-        elif Ny==1: y=np.repeat(y, Nx, axis=1)
+        if Nx==1:   X=np.tile(X, [Ny, 1])
+        elif Ny==1: Y=np.repeat(Y, [Nx, 1])
         else:
             raise ValueError(f"X.shape={X.shape}, and Y.shape={Y.shape}, so we couldn't understand how to pair of 2 arrays.")
     return X,Y
@@ -128,7 +144,7 @@ def pairwise_euclidean_distances(X,Y=None,squared=False):
     @return distances: Dij means the distance between Xi and Xj.
     """
     X,Y = check_pairwise_array(X,Y)
-    Xnorm,Ynorm = l2norm_vectors(X,Y,axis=-1,squared=True)
+    Xnorm,Ynorm = norm_vectors(X,Y,axis=-1,squared=True)
     # ||a - b||^2 = ||a||^2 + ||b||^2 - 2 <a, b>
     distances = np.expand_dims(Xnorm, axis=1) + np.expand_dims(Ynorm, axis=0) - 2*X.dot(Y.T)
     distances = np.maximum(distances, 0.0) # for numerical errors.

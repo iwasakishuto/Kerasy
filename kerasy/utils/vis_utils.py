@@ -1,11 +1,14 @@
 # coding: utf-8
 import copy
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
 
 from .generic_utils import handleKeyError
+from .metric_utils import silhouette_samples
+from .metric_utils import silhouette_score
 
 def galleryplot(func, argnames, iterator, ncols=5, figsize=(4,4), sharex="none", sharey="none", **kwargs):
 
@@ -79,18 +82,18 @@ def objVSexp(obj, *exp, **options):
     """ Visualize 'Objective variable' vs. 'Explanatory variable' plot.
     @params
     @params var_type: str, 'continuous' or 'discrete' (default='continuous')
-    """   
+    """
     n_features = len(exp)
     if n_features==0 or n_features>3:
         raise ValueError(f"The number of explanatory variables should be 1 or 2, but {n_features}")
-        
+
     var_type = options.pop("var_type", "continuous")
     figsize  = options.pop("figsize", None)
     ax       = options.pop("ax", None)
     color    = options.pop("color", "#722f37")
     alpha    = options.pop("alpha", .2)
     handleKeyError(["continuous", "discrete"], var_type=var_type)
-        
+
     if ax is None:
         fig = plt.figure(figsize=figsize)
         projection = None if n_features==1 else "3d"
@@ -103,5 +106,71 @@ def objVSexp(obj, *exp, **options):
             sns.boxplot(*exp, obj, ax=ax)
     else:
         ax.scatter(*exp, obj, color=color, alpha=alpha)
-        
+
+    return ax
+
+def silhouette_plot(X, labels, centers, axes=None, set_style=True):
+    if axes is None:
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+        fig.set_size_inches(18, 7)
+    else:
+        ax1,ax2=axes
+
+    ax1 = _left_silhouette_plot(X, labels, ax=ax1, set_style=set_style)
+    ax2 = _right_silhouette_plot(X, labels, centers, ax=ax2, set_style=set_style)
+    if axes is None:
+        plt.suptitle((f"Silhouette analysis"), fontsize=14, fontweight='bold')
+        plt.show()
+    else:
+        return (ax1,ax2)
+
+def _left_silhouette_plot(X, labels, ax=None, set_style=True):
+    if ax is None:
+        fig, ax = plt.subplots()
+        fig.set_size_inches(9, 7)
+
+    silhouette_values = silhouette_samples(X, labels)
+    silhouette_avg = np.mean(silhouette_values)
+
+    y_lower = 10
+    uniq_labels = np.unique(labels)
+    n_clusters = len(uniq_labels)
+    for i,k in enumerate(uniq_labels):
+        Si_k = np.sort(silhouette_values[labels==k])
+        Nk = Si_k.shape[0]
+        y_upper = y_lower + Nk
+
+        color = cm.nipy_spectral(float(i) / n_clusters)
+        ax.fill_betweenx(np.arange(y_lower, y_upper), 0, Si_k,
+                          facecolor=color, edgecolor=color, alpha=0.7)
+        ax.text(-0.05, y_lower + 0.5 * Nk, str(i))
+        y_lower = y_upper + 10
+
+    ax.set_xlim([-0.1, 1])
+    ax.set_ylim([0, len(X) + (n_clusters + 1) * 10])
+    if set_style:
+        ax.set_title("The silhouette plot for the various clusters.")
+        ax.set_xlabel("The silhouette coefficient values")
+        ax.set_ylabel("Cluster label")
+        ax.axvline(x=silhouette_avg, color="red", linestyle="--")
+        ax.set_yticks([])  # Clear the yaxis labels / ticks
+        ax.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+    return ax
+
+def _right_silhouette_plot(X, labels, centers, ax=None, set_style=True):
+    if ax is None:
+        fig, ax = plt.subplots()
+        fig.set_size_inches(9, 7)
+
+    colors = cm.nipy_spectral(labels.astype(float) / (np.max(labels)+1.))
+
+    ax.scatter(X[:,0], X[:,1], marker='.', s=30, lw=0, alpha=0.7, c=colors, edgecolor='k')
+    ax.scatter(centers[:,0], centers[:,1], marker='o', s=200, alpha=1, c="white", edgecolor='k')
+    for i,c in enumerate(centers):
+        ax.scatter(c[0], c[1], marker='$%d$' % i, s=50, alpha=1, edgecolor='k')
+
+    if set_style:
+        ax.set_title("The visualization of the clustered data.")
+        ax.set_xlabel("Feature space for the 1st feature")
+        ax.set_ylabel("Feature space for the 2nd feature")
     return ax

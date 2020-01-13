@@ -31,6 +31,8 @@ from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors
 from .metric_utils import mean_squared_error
 from .metric_utils import root_mean_squared_error
+from .metric_utils import silhouette_samples
+from .metric_utils import silhouette_score
 from .metric_utils import check_paired_array
 from .metric_utils import paired_distances
 from .metric_utils import paired_euclidean_distances
@@ -64,3 +66,6 @@ from .training_utils import train_test_split
 from .vis_utils import galleryplot
 from .vis_utils import plot_2D
 from .vis_utils import objVSexp
+from .vis_utils import silhouette_plot
+from .vis_utils import _left_silhouette_plot
+from .vis_utils import _right_silhouette_plot

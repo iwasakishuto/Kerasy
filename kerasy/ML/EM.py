@@ -6,6 +6,7 @@ from ..utils import findLowerUpper
 from ..utils import flush_progress_bar
 from ..utils import paired_euclidean_distances
 from ..utils import pairwise_euclidean_distances
+from ..utils import silhouette_plot
 
 class BaseEMmodel():
     def __init__(self, K, random_state=None, metrics="euclid"):
@@ -106,6 +107,10 @@ class KMeans(BaseEMmodel):
         """ Assign a new average(mu) """
         for k in np.unique(idx):
             self.mu[k] = np.mean(X[idx==k], axis=0)
+
+    def silhouette(self, X, axes=None, set_style=True):
+        idx = self.Estep(X)
+        silhouette_plot(X, idx, self.mu, axes=axes, set_style=set_style)
 
 class HamerlyKMeans(KMeans):
     def __init__(self, K, random_state=None):

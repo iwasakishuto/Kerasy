@@ -27,10 +27,18 @@ from .generic_utils import priColor
 from .generic_utils import handleKeyError
 from .generic_utils import urlDecorate
 
+from .metric_utils import norm_vectors
+from .metric_utils import normalize_vectors
 from .metric_utils import mean_squared_error
 from .metric_utils import root_mean_squared_error
-from .metric_utils import pairwise_euclid_distances
-from .metric_utils import euclid_distance
+from .metric_utils import check_paired_array
+from .metric_utils import paired_distances
+from .metric_utils import paired_euclidean_distances
+from .metric_utils import paired_manhattan_distances
+from .metric_utils import paired_cosine_distances
+from .metric_utils import check_pairwise_array
+from .metric_utils import pairwise_distances
+from .metric_utils import pairwise_euclidean_distances
 
 from .model_select_utils import cross_validation
 

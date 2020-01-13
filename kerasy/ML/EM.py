@@ -253,7 +253,7 @@ class ElkanKMeans(KMeans):
             # Update centroid.
             dmu = self.Mstep()
             self.updateUpperLower(idx, dmu)
-            flush_progress_bar(it, max_iter, metrics=f"changed: {len(changed):>0{dim}}/{N}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics=f"changed: {changed:>0{dim}}/{N}", verbose=verbose)
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
         if verbose: print()
@@ -288,7 +288,7 @@ class ElkanKMeans(KMeans):
                             self.num_cls[cls] -= 1; self.sum[cls] -= x
                             self.num_cls[k] += 1; self.sum[k] += x
                             cls = k
-                            ub = distance
+                            ub = dist
             self.upper[i] = ub
             if idx[i] != cls:
                 changed += 1

@@ -2,7 +2,7 @@
 import numpy as np
 
 from ..utils import flush_progress_bar
-from ..utils import pairwise_euclid_distances
+from ..utils import pairwise_euclidean_distances
 
 from ._kernel import kernel_handler
 
@@ -116,7 +116,7 @@ class tSNE():
         """
         print(f"Each conditional Gaussian has the same perplexity: {perplexity}")
         n_samples, _ = X.shape
-        D = pairwise_euclid_distances(X, squared=True)
+        D = pairwise_euclidean_distances(X, squared=True)
         # Initialization.
         P = np.zeros((n_samples, n_samples)) # Pij means that pj|i
         beta = np.ones(shape=(n_samples))    # Precisions
@@ -176,7 +176,7 @@ class tSNE():
             print(f"{it+1}/{max_iter}")
             for inner_it in range(100):
                 # equation (4)
-                propto_qij = 1. / (1. + pairwise_euclid_distances(Y, squared=True))
+                propto_qij = 1. / (1. + pairwise_euclidean_distances(Y, squared=True))
                 propto_qij[range(n_samples), range(n_samples)] = 0.
                 Q = propto_qij / np.sum(propto_qij)
                 Q = np.maximum(Q, 1e-12)

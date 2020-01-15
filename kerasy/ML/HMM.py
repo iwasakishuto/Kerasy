@@ -1,6 +1,8 @@
 #coding: utf-8
 from __future__ import absolute_import
-from ..utils.params import Params
+
+from ..utils import Params
+from ..utils import flush_progress_bar
 
 import numpy as np
 
@@ -27,7 +29,7 @@ class HMM(Params):
         self.base2int = dict(zip(self.basetypes, range(self.M)))
         self.int2base = dict(zip(range(self.M), self.basetypes))
 
-    def fit(self, sequences, epochs=1, verbose=True, rtol=1e-7):
+    def fit(self, sequences, epochs=1, verbose=1, rtol=1e-7):
         pMLL = 0 # post Mean Log Likelihood
         N = len(sequences)
         sequences = [np.array([self.base2int[s] for s in seq]) for seq in sequences]
@@ -49,12 +51,13 @@ class HMM(Params):
             for sequence in sequences:
                 LLs+=self.Estep(sequence, only_LL=True)
             MLL = LLs/N
-            if verbose: print(f"[epoch {epoch+1:>0{len(str(epochs))}}] Log likelihood: {MLL:.3f}")
+            flush_progress_bar(epoch, epochs, metrics={"Log likelihood": MLL}, verbose=verbose)
             self.epoch+=1
             self.history.append(MLL)
             if abs(MLL-pMLL)<rtol:
                 break
             pMLL=MLL
+        if verbose: print()
 
     def Estep(self,sequence, only_LL=False):
         """Calcurate the γ and ξ for M step."""

@@ -40,7 +40,7 @@ class BaseSVM():
                 if verbose>0: print(f"Convert {t} to {valid_train[i]:>2} to suit for the SVM train data format.")
         return y_train
 
-    def fit(self, x_train, y_train, max_iter=500, zero_eps=1e-2, sparse_memorize=True):
+    def fit(self, x_train, y_train, max_iter=500, zero_eps=1e-2, sparse_memorize=True, verbose=1):
         """
         @param x_train : (ndarray) shape=(N,M)
         @param t_train : (ndarray) shape=(N,)
@@ -60,7 +60,7 @@ class BaseSVM():
         self.b = self.calcuBias()
 
         # Optimization.
-        self.SMO(max_iter=max_iter)
+        self.SMO(max_iter=max_iter, verbose=verbose)
 
         # Memorize only support vector data.
         if sparse_memorize:
@@ -68,7 +68,7 @@ class BaseSVM():
 
         return self
 
-    def SMO(self, max_iter):
+    def SMO(self, max_iter, verbose=1):
         N = self.N
         idxes = np.arange(N)
         for it in range(max_iter):
@@ -85,8 +85,8 @@ class BaseSVM():
                 self.b = self.calcuBias()
                 self.SVidx = self.isSV()
             if not changed: break
-            flush_progress_bar(it, max_iter, metrics=f"Rate of Support Vector = {100*len(self.SVidx)/N:.1f}%")
-        print()
+            flush_progress_bar(it, max_iter, metrics={"Rate of Support Vector": 100*len(self.SVidx)/N}, verbose=verbose)
+        if verbose: print()
 
     def sparseMemorize(self):
         self.N = np.count_nonzero(self.SVidx)

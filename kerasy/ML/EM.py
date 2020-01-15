@@ -48,7 +48,7 @@ class BaseEMmodel():
             if memorize: self.memorize_param(responsibilities)
             self.Mstep(X, responsibilities)
             ll = self.loglikelihood(X)
-            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics={"Log Likelihood": ll}, verbose=verbose)
             if it>0 and "Any Break Condition": break
         if memorize: self.memorize_param(responsibilities)
         if verbose>=1: print()
@@ -81,7 +81,7 @@ class KMeans(BaseEMmodel):
             if memorize: self.memorize_param(idx)
             self.Mstep(X, idx)
             J = np.sum(paired_euclidean_distances(X, self.mu[idx]))
-            flush_progress_bar(it, max_iter, metrics=f"distortion measure: {J:.3f}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics={"distortion measure": J}, verbose=verbose)
             if it>0 and not np.any(pidx!=idx): break
             pidx=idx
         if memorize: self.memorize_param(idx)
@@ -164,7 +164,7 @@ class HamerlyKMeans(KMeans):
             # Update index.
             idx[not_meet] = new_idx
             self.updateUpperLower(idx, dmu)
-            flush_progress_bar(it, max_iter, metrics=f"changed: {len(changed):>0{dim}}/{N}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics={"changed": len(changed)}, verbose=verbose)
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
         if verbose: print()
@@ -258,7 +258,7 @@ class ElkanKMeans(KMeans):
             # Update centroid.
             dmu = self.Mstep()
             self.updateUpperLower(idx, dmu)
-            flush_progress_bar(it, max_iter, metrics=f"changed: {changed:>0{dim}}/{N}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics={"changed": changed}, verbose=verbose)
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
         if verbose: print()
@@ -330,7 +330,7 @@ class MixedGaussian(BaseEMmodel):
             if memorize: self.memorize_param(gamma)
             self.Mstep(X, gamma)
             ll = self.loglikelihood(X)
-            flush_progress_bar(it, max_iter, metrics=f"Log Likelihood: {ll:.3f}", verbose=verbose)
+            flush_progress_bar(it, max_iter, metrics={"Log Likelihood": ll}, verbose=verbose)
             mus = np.copy(self.mu.ravel())
             if it>0 and np.mean(np.linalg.norm(mus-pmus)) < tol: break
             pmus = mus

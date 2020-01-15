@@ -58,7 +58,7 @@ class LinearRegressionLASSO(LinearRegression):
         c = lambda_/rho
         return z0-c if c<z0 else z0+c if z0<-c else 0
 
-    def fit(self, train_x, train_y, rho=1e-3, tol=1e-7, max_iter=100):
+    def fit(self, train_x, train_y, rho=1e-3, tol=1e-7, max_iter=100, verbose=verbose):
         """
         @param train_x: shape=(N,?)
         @param train_y: shape=(N,M)
@@ -75,8 +75,10 @@ class LinearRegressionLASSO(LinearRegression):
             alpha += rho*(w-z)
             diff = np.sqrt(np.sum(np.square(w-z)))
             if diff < tol: break
-            flush_progress_bar(it, max_iter)
+            flush_progress_bar(it, max_iter, metrics={"diff": diff}, verbose=verbose)
+        if verbose: print()
         self.w = w
+
 
 class BayesianLinearRegression(LinearRegression):
     def __init__(self, alpha=1, beta=25, basis="none", **basisargs):
@@ -116,7 +118,7 @@ class EvidenceApproxBayesianRegression(BayesianLinearRegression):
             self.alpha = self.gamma / self.mN.dot(self.mN)
             self.beta  = (N-self.gamma) / np.sum( (train_y-train_x_.dot(self.mN))**2 )
             if np.allclose(params, [self.alpha, self.beta]): break
-            flush_progress_bar(it, max_iter)
+            flush_progress_bar(it, max_iter, barname="Search for Hyper Parameters (alpha, beta)", verbose=verbose)
         super().fit(train_x, train_y)
 
     def evidence(self, train_x, train_y):

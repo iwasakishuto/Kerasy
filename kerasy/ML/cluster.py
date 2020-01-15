@@ -5,7 +5,7 @@ from ..utils import flush_progress_bar
 from ..utils import paired_euclidean_distances
 from ..utils import pairwise_euclidean_distances
 
-def dbscan_inner(is_core, neighborhoods, labels):
+def dbscan_inner(is_core, neighborhoods, labels, verbose=1):
     """Algorithms for DBSCAN.
     @params is_core      : shape=(N,) Whether ith data is core or not.
     @params neighborhoods: shape=(N,) ith data's neighbor
@@ -13,7 +13,9 @@ def dbscan_inner(is_core, neighborhoods, labels):
     """
     label = 0
     stack = []
-    for i in range(labels.shape[0]):
+    num_data = labels.shape[0]
+    for i in range(num_data):
+        flush_progress_bar(i, num_data, metrics={"num cluster": label+2}, verbose=verbose)
         if labels[i] != -1 or not is_core[i]:
             continue
         # Depth-first search starting from i, 
@@ -36,7 +38,7 @@ class DBSCAN():
         self.min_samples = min_samples
         self.metric = metric
     
-    def fit(self, X):
+    def fit(self, X, verbose=1):
         if not self.eps > 0.0: raise ValueError("`eps` must be positive.")
         # Initially, all samples are noise.
         labels = np.full(X.shape[0], -1, dtype=np.int)
@@ -46,7 +48,7 @@ class DBSCAN():
         n_neighbors = np.asarray([np.count_nonzero(dist<self.eps) for dist in distances], dtype=np.int)
         # A list of all core samples found.
         core_samples = np.asarray(n_neighbors >= self.min_samples, dtype=np.uint8)
-        labels = dbscan_inner(core_samples, neighborhoods, labels)
+        labels = dbscan_inner(core_samples, neighborhoods, labels, verbose=verbose)
         
         self.core_sample_indices_ = np.where(core_samples)[0]
         self.labels_ = labels

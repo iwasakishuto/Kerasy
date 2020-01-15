@@ -108,13 +108,15 @@ class tSNE():
                  eta = 500,
                  min_gain = 0.1,
                  tol = 1e-5,
-                 prec_max_iter = 50):
+                 prec_max_iter = 50, 
+                 random_state = None):
         self.initial_momentum = initial_momentum
         self.final_momoentum = final_momoentum
         self.eta = eta
         self.min_gain = min_gain
         self.tol = tol
         self.prec_max_iter = prec_max_iter
+        self.random_state = random_state
 
     @staticmethod
     def dist2shannon(Di, beta):
@@ -176,7 +178,7 @@ class tSNE():
         print(f"Mean value of sigma: {np.mean(np.sqrt(1/2*beta)):.3f}")
         return P
 
-    def fit_transform(self, X, n_components=2, initial_dims=50, perplexity=30.0, max_iter=10, random_state=None):
+    def fit_transform(self, X, n_components=2, initial_dims=50, perplexity=30.0, epochs=1000, verbose=1):
         # If the number of initial features are too large, using PCA to reduce the dimentions.
         n_samples, n_ori_features = X.shape
         if n_ori_features > initial_dims:
@@ -187,7 +189,7 @@ class tSNE():
 
         n_samples, n_features = X.shape
         # Initialization.
-        Y = np.random.RandomState(random_state).randn(n_samples, n_components)
+        Y = np.random.RandomState(self.random_state).randn(n_samples, n_components)
         dY = np.zeros_like(Y)
         iY = np.zeros_like(Y)
         gains = np.ones(shape=Y.shape)
@@ -199,40 +201,39 @@ class tSNE():
         P = P * 4.
         P = np.maximum(P, 1e-12)
 
-        max_digit = len(str(max_iter))
-        print()
-        for it in range(max_iter):
-            print(f"{it+1}/{max_iter}")
-            for inner_it in range(100):
-                # equation (4)
-                propto_qij = 1. / (1. + pairwise_euclidean_distances(Y, squared=True))
-                propto_qij[range(n_samples), range(n_samples)] = 0.
-                Q = propto_qij / np.sum(propto_qij)
-                Q = np.maximum(Q, 1e-12)
+        max_digit = len(str(epochs))
+        for epoch in range(epochs):
+            # equation (4)
+            propto_qij = 1. / (1. + pairwise_euclidean_distances(Y, squared=True))
+            propto_qij[range(n_samples), range(n_samples)] = 0.
+            Q = propto_qij / np.sum(propto_qij)
+            Q = np.maximum(Q, 1e-12)
 
-                # Compute the gradient
-                PQ = P - Q
-                for i in range(n_samples):
-                    """
-                    dC/dyi = 4 Σj (pij - qij)(yi - yj)(1 + ||yi-yj||^2)^(-1)    (5)
-                    PQ[i].shape            = (n_samples, )
-                    (Y[i,:] - Y).shape     = (n_samples, n_components)
-                    propto_qij[i,: ].shape = (n_samples, )
-                    """
-                    dY[i, :] = np.dot(PQ[i,:]*propto_qij[i,:], Y[i,]-Y)
+            # Compute the gradient
+            PQ = P - Q
+            for i in range(n_samples):
+                """
+                dC/dyi = 4 Σj (pij - qij)(yi - yj)(1 + ||yi-yj||^2)^(-1)    (5)
+                PQ[i].shape            = (n_samples, )
+                (Y[i,:] - Y).shape     = (n_samples, n_components)
+                propto_qij[i,: ].shape = (n_samples, )
+                """
+                dY[i, :] = np.dot(PQ[i,:]*propto_qij[i,:], Y[i,]-Y)
 
-                # Perform the update
-                momentum = self.initial_momentum if it < 20 else self.final_momoentum
-                gains = (gains + 0.2) * ((dY > 0.) != (iY > 0.)) + (gains * 0.8) * ((dY > 0.) == (iY > 0.))
-                gains[gains < self.min_gain] = self.min_gain
+            # Perform the update
+            momentum = self.initial_momentum if epoch < 20 else self.final_momoentum
+            gains = (gains + 0.2) * ((dY > 0.) != (iY > 0.)) + (gains * 0.8) * ((dY > 0.) == (iY > 0.))
+            gains[gains < self.min_gain] = self.min_gain
 
-                iY = momentum * iY - self.eta * (gains * dY)
-                Y += iY
-                Y  = Y - np.tile(np.mean(Y, axis=0), (n_samples, 1))
-                flush_progress_bar(inner_it, 100, metrics=f"KL(P||Q) = {np.sum(P * np.log(P / Q)):.3f}")
-            # Stop lying about P-values
-            if it == 0: P = P / 4.
+            iY = momentum * iY - self.eta * (gains * dY)
+            Y += iY
+            Y  = Y - np.tile(np.mean(Y, axis=0), (n_samples, 1))
             # Compute current value of cost function
+            KL = np.sum(P * np.log(P / Q))
+            flush_progress_bar(epoch, epochs, metrics={"KL(P||Q)": KL}, verbose=verbose)
+            # Stop lying about P-values
+            if epoch == 100: 
+                P = P / 4.
         return Y
 
 class UMAP():
@@ -253,7 +254,7 @@ class UMAP():
         self.n_neighbors=n_neighbors
         self.n_components=n_components
         self.history = []
-        
+
         n_samples, n_features = X.shape
         x_distances = pairwise_euclidean_distances(X)
         rhos = np.partition(x_distances, kth=1, axis=1)[:,1]
@@ -290,7 +291,7 @@ class UMAP():
             
             # Update TODE: Implement SGD.
             y -= learning_rate * y_gradients
-            flush_progress_bar(epoch, epochs, metrics=f"CE(P,Q) = {CE:.3f}", verbose=verbose)
+            flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
         if verbose: print()
         return y
 

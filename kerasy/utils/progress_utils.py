@@ -25,7 +25,7 @@ def flush_progress_bar(it, max_iter, metrics={}, barname="", verbose=1, **kwargs
     if verbose<0: 
         return
     elif verbose>1:
-        flush_progress_plot(it, metrics=metrics, **kwargs)
+        flush_progress_plot(it, max_iter, metrics=metrics, **kwargs)
     else:
         global INITIAL_TIME
         if it == 0: 
@@ -40,13 +40,15 @@ def flush_progress_bar(it, max_iter, metrics={}, barname="", verbose=1, **kwargs
         bar   = ('#' * n_bar).ljust(20, '-')
         percent = f"{rate*100:.2f}"
 
+
         if verbose==1:
-            content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
+            metric = ", ".join([f"{k}: {v}" for  k,v in metrics.items()])
+            content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metric}"
         else: # verbose==0
             content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
         sys.stdout.write(content)
 
-def flush_progress_plot(it, ncols_max=3, metrics={}, **kwargs):
+def flush_progress_plot(it, max_iter, ncols_max=3, metrics={}, **kwargs):
     """If verbose==2, this function will be called.
     """
     num_values=len(metrics)
@@ -55,16 +57,24 @@ def flush_progress_plot(it, ncols_max=3, metrics={}, **kwargs):
     fig,axes = plt.subplots(nrows=nrows, ncols=ncols)
     fig.set_size_inches(*figsize)
     
+    it+=1
     global VALUES
     for i, (k,v) in enumerate(metrics.items()):
-        if it==0:
+        if it==1:
             VALUES[k] = [v]
         else:
             clear_output(wait=True)
-            VALUES[k].append()
+            VALUES[k].append(v)
         if num_values==1:
             axes.plot(VALUES[k])
+            axes.set_title(f"{it}/{max_iter} {k}: {v}")
+            axes.set_xlabel("iteration")
         else:
             axes[i].plot(VALUES[k])
-    plt.pause(0.05)
-    clear_output(wait=True)
+            axes[i].set_title(f"{it+1}/{max_iter} {k}: {v}")
+            axes[i].set_xlabel("iteration")
+    if it<max_iter:
+        plt.pause(0.05)
+        clear_output(wait=True)
+    else:
+        plt.show()

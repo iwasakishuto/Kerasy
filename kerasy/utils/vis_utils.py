@@ -10,6 +10,22 @@ from .generic_utils import handleKeyError
 from .metric_utils import silhouette_samples
 from .metric_utils import silhouette_score
 
+def measureCanvas(nfigs, ncols_max=2, figinches=(6,4)):
+    """
+    @params nfigs    : (int) Total number of figures.
+    @params ncols_max: (int) The number of columns.
+    @params figinches: (tuple) The figure size for 1 plot.
+    """
+    if nfigs>=ncols_max:
+        ncols=ncols_max
+        nrows=(nfigs-1)//ncols_max+1
+    else:
+        ncols=nfigs
+        nrows=1
+    w,h = figinches
+    figsize=(w*ncols,h*nrows)
+    return (ncols, nrows, figsize)
+
 def galleryplot(func, argnames, iterator, ncols=5, figsize=(4,4), sharex="none", sharey="none", **kwargs):
 
     """Plot many figures as a gallery.
@@ -46,12 +62,11 @@ def galleryplot(func, argnames, iterator, ncols=5, figsize=(4,4), sharex="none",
     >>> plt.tight_layout()
     >>> plt.show()
     """
-
-    W,H = figsize
     iter_for_count = copy.deepcopy(iterator)
     nfigs = len([e for e in iter_for_count])
-    nrows = nfigs//ncols if nfigs%ncols==0 else nfigs//ncols+1
-    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=sharex, sharey=sharey, figsize=(W*ncols, H*nrows))
+    ncols, nrows, figsize = measureCanvas(nfigs, ncols_max=ncols, figinches=figsize)
+
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, sharex=sharex, sharey=sharey, figsize=figsize)
     axes = axes if axes.ndim>1 else axes.reshape(1,-1)
     for i,vals in enumerate(iterator):
         kwargs = {argnames:vals} if isinstance(argnames, str) else dict(zip(argnames,vals))

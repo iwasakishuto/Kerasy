@@ -75,25 +75,6 @@ class priColor:
         handleKeyError(priColor.__dict__.keys(), color=color)
         return f"{priColor.__dict__[color.upper()]}{value}{priColor.END}"
 
-INITIAL_TIME = 0
-def flush_progress_bar(it, max_iter, metrics="", barname="", verbose=1):
-    if verbose<1: return
-    global INITIAL_TIME
-    if it == 0: INITIAL_TIME = time.time()
-    if len(barname) > 0: barname = " " + barname
-    it+=1
-    digit = len(str(max_iter))
-    rate  = it/max_iter
-    n_bar = int(rate/0.05)
-    bar   = ('#' * n_bar).ljust(20, '-')
-
-    percent = f"{rate*100:.2f}"
-    if verbose==1:
-        content = f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
-    else: # (verbose>1)
-        content =f"\r{barname} {it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
-    sys.stdout.write(content)
-
 def handleKeyError(lst, message="", **kwargs):
     k,v = kwargs.popitem()
     if v not in lst:

@@ -21,7 +21,6 @@ from .deep_utils import get_params_size
 from .deep_utils import print_summary
 
 from .generic_utils import flatten_dual
-from .generic_utils import flush_progress_bar
 from .generic_utils import get_file
 from .generic_utils import priColor
 from .generic_utils import handleKeyError
@@ -52,6 +51,9 @@ from .param_utils import Params
 
 from .prepro_utils import basis_transformer
 
+from .progress_utils import flush_progress_bar
+from .progress_utils import flush_progress_plot
+
 from .toydata_utils import generateX
 from .toydata_utils import generateSin
 from .toydata_utils import generateGausian
@@ -63,8 +65,10 @@ from .toydata_utils import generateSeq
 from .training_utils import make_batches
 from .training_utils import train_test_split
 
+from .vis_utils import measureCanvas
 from .vis_utils import galleryplot
 from .vis_utils import plot_2D
+from .vis_utils import flush_progress_plot
 from .vis_utils import objVSexp
 from .vis_utils import silhouette_plot
 from .vis_utils import _left_silhouette_plot

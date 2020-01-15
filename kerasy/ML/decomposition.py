@@ -1,5 +1,6 @@
 #coding: utf-8
 import numpy as np
+from scipy import optimize
 
 from ..utils import flush_progress_bar
 from ..utils import pairwise_euclidean_distances
@@ -68,6 +69,34 @@ class LDA():
         # Fisher's linear discriminant.
         x_transformed = x.dot(self.w) # (N,D)@(D,) = (N,)
         return x_transformed
+
+class KernelPCA():
+    def __init__(self, n_components=None, kernel="gaussian", **kernelargs):
+        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.n_components = n_components
+
+    def fit_transform(self, X):
+        """
+        @param X: shape=(N,M)
+        """
+        if self.n_components is None:
+            self.n_components = min(X.shape)
+        N, M = X.shape
+        K = np.array([[self.kernel(xi, xj) for xj in X] for xi in X])
+        I = 1/N * np.ones(shape=(N,N))
+        K_tilde = K - I.dot(K) - K.dot(I) + np.dot(I,np.dot(K,I)) # shape=(N,N)
+        eigenvals, eigenvecs = np.linalg.eig(K_tilde) # K@a_i = lambda_i*N*a_i
+        total_var = eigenvals.sum()
+        explained_variance_ratio_ = eigenvals / total_var
+
+        # Memorization.
+        self.components_ = eigenvecs[:,:self.n_components].T # shape=(n_components,N)
+        self.explained_variance_ = eigenvals[:self.n_components]
+        self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]
+        self.N,self.M = N,M
+        self.X = X
+        X_transformed = np.dot(K_tilde, self.components_.T) # (N,N)@(N,n_components) = (N,n_components)
+        return X_transformed
 
 class tSNE():
     """Stochastic Neighbor Embedding.
@@ -206,37 +235,6 @@ class tSNE():
             # Compute current value of cost function
         return Y
 
-class KernelPCA():
-    def __init__(self, n_components=None, kernel="gaussian", **kernelargs):
-        self.kernel = kernel_handler(kernel, **kernelargs)
-        self.n_components = n_components
-
-    def fit_transform(self, X):
-        """
-        @param X: shape=(N,M)
-        """
-        if self.n_components is None:
-            self.n_components = min(X.shape)
-        N, M = X.shape
-        K = np.array([[self.kernel(xi, xj) for xj in X] for xi in X])
-        I = 1/N * np.ones(shape=(N,N))
-        K_tilde = K - I.dot(K) - K.dot(I) + np.dot(I,np.dot(K,I)) # shape=(N,N)
-        eigenvals, eigenvecs = np.linalg.eig(K_tilde) # K@a_i = lambda_i*N*a_i
-        total_var = eigenvals.sum()
-        explained_variance_ratio_ = eigenvals / total_var
-
-        # Memorization.
-        self.components_ = eigenvecs[:,:self.n_components].T # shape=(n_components,N)
-        self.explained_variance_ = eigenvals[:self.n_components]
-        self.explained_variance_ratio_ = explained_variance_ratio_[:self.n_components]
-        self.N,self.M = N,M
-        self.X = X
-        X_transformed = np.dot(K_tilde, self.components_.T) # (N,N)@(N,n_components) = (N,n_components)
-        return X_transformed
-
-from scipy import optimize
-from kerasy.utils import flush_progress_bar
-
 class UMAP():
     def __init__(self, metric="euclidean", metric_kwds=None, min_dist=0.1, a=None, b=None, random_state=None, sigma_iter=20, sigma_tol=1e-5, sigma_lower=0, sigma_upper=1e3):
         self.metric=metric
@@ -249,11 +247,13 @@ class UMAP():
         self.a=a
         self.b=b
         self.random_state=random_state
+        self.history = []
         
-    def fit_transform(self, X, n_neighbors=15, n_components=2, epochs=10, learning_rate=1, verbose=1):
+    def fit_transform(self, X, n_components=2, n_neighbors=15, epochs=1, learning_rate=1, verbose=1):
         self.n_neighbors=n_neighbors
         self.n_components=n_components
-
+        self.history = []
+        
         n_samples, n_features = X.shape
         x_distances = pairwise_euclidean_distances(X)
         rhos = np.partition(x_distances, kth=1, axis=1)[:,1]
@@ -277,7 +277,8 @@ class UMAP():
             
             # Calculate the Cross Entropy.
             CE = np.sum( -P*np.log(Q + 1e-4) - (1-P)*np.log(1-Q+1e-4) )
-            
+            self.history.append(CE)
+
             # Calculate the Cross Entropy's gradients.
             # adij^{2(b-1)}P
             first_term = a*P*(1e-8+y_squared_distances)**(b-1)

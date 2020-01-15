@@ -68,7 +68,6 @@ from .training_utils import train_test_split
 from .vis_utils import measureCanvas
 from .vis_utils import galleryplot
 from .vis_utils import plot_2D
-from .vis_utils import flush_progress_plot
 from .vis_utils import objVSexp
 from .vis_utils import silhouette_plot
 from .vis_utils import _left_silhouette_plot

@@ -1,5 +1,6 @@
 #coding:utf-8
 import sys
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import clear_output
@@ -23,27 +24,27 @@ def flush_progress_bar(it, max_iter, metrics={}, barname="", verbose=1, **kwargs
     """
     if verbose<0: 
         return
-    if verbose>1:
+    elif verbose>1:
         flush_progress_plot(it, metrics=metrics, **kwargs)
+    else:
+        global INITIAL_TIME
+        if it == 0: 
+            INITIAL_TIME = time.time()
+        if len(barname)>0 and barname[-1]!=" ":
+            barname = barname + " "
+        
+        it+=1
+        digit = len(str(max_iter))
+        rate  = it/max_iter
+        n_bar = int(rate/0.05)
+        bar   = ('#' * n_bar).ljust(20, '-')
+        percent = f"{rate*100:.2f}"
 
-    global INITIAL_TIME
-    if it == 0: 
-        INITIAL_TIME = time.time()
-    if len(barname)>0 and barname[-1]!=" ":
-        barname = barname + " "
-    
-    it+=1
-    digit = len(str(max_iter))
-    rate  = it/max_iter
-    n_bar = int(rate/0.05)
-    bar   = ('#' * n_bar).ljust(20, '-')
-    percent = f"{rate*100:.2f}"
-
-    if verbose==1:
-        content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
-    else: # verbose==0
-        content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
-    sys.stdout.write(content)
+        if verbose==1:
+            content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s  {metrics}"
+        else: # verbose==0
+            content = f"\r{barname}{it:>0{digit}}/{max_iter} [{bar}] {percent:>6}% - {time.time()-INITIAL_TIME:.3f}s"
+        sys.stdout.write(content)
 
 def flush_progress_plot(it, ncols_max=3, metrics={}, **kwargs):
     """If verbose==2, this function will be called.

@@ -145,7 +145,7 @@ class NeedlemanWunshGotoh(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
-                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics={"max alignment score": max(flatten_dual(candidates))}, verbose=verbose)
         if verbose>=1: print()
         scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
         score = np.max(scores)
@@ -209,7 +209,7 @@ class SmithWaterman(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
-                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics=f"max alignment score: {np.max(self.DPmatrix)}", verbose=verbose)
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="DP", metrics={"max alignment score": np.max(self.DPmatrix)}, verbose=verbose)
         if verbose>=1: print()
         score = np.max(self.DPmatrix)
         pointer = np.argmax(self.DPmatrix)
@@ -281,7 +281,7 @@ class BackwardNeedlemanWunshGotoh(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
-                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="DP", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="DP", metrics={"max alignment score": max(flatten_dual(candidates))}, verbose=verbose)
         if verbose>=1: print()
         score = self.DPmatrix[0]
         pointer = self.TraceBackMatrix[0]
@@ -372,7 +372,7 @@ class PairHMM(BaseAlignmentModel):
                 for k in range(3):
                     self.DPmatrix[k*self.size+i*self.ny+j] = np.log(coefficients[k]) + np.max(candidates[k])
                     self.TraceBackMatrix[k*self.size+i*self.ny+j] = pointers[k][np.argmax(candidates[k])]
-                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Viterbi", metrics=f"max alignment score: {max(flatten_dual(candidates))}", verbose=verbose)
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Viterbi", metrics={"max alignment score": max(flatten_dual(candidates))}, verbose=verbose)
         if verbose>=1: print()
         scores = [self.DPmatrix[(k+1)*self.size-1] for k in range(3)]
         score = np.log(self.tau)+max(scores)
@@ -406,7 +406,7 @@ class PairHMM(BaseAlignmentModel):
                     np.log(self.epsilon)+F[2*self.size+i*self.ny+(j-1)],
                 ])
                 max_score = max([F[k*self.size+i*self.ny+j] for k in range(3)])
-                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Forward", metrics=f"max alignment score: {max_score}", verbose=verbose)
+                flush_progress_bar((i-1)*(self.ny-1)+(j-1), max_iter, barname="Forward", metrics={"max alignment score": max_score}, verbose=verbose)
         if verbose>=1: print()
         P = np.log(self.tau) + logsumexp([F[(k+1)*self.size-1] for k in range(3)])
         F = F.reshape(3,self.nx,self.ny)[0,1:,1:]
@@ -439,7 +439,7 @@ class PairHMM(BaseAlignmentModel):
                     np.log(self.epsilon*self.qy)+B[1*self.size+(i+1)*self.ny+j],
                 ])
                 max_score = max([B[k*self.size+i*self.ny+j] for k in range(3)])
-                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="BackWard", metrics=f"max alignment score: {max_score}", verbose=verbose)
+                flush_progress_bar(((self.nx-1)-i-1)*(self.ny-1)+(self.ny-1)-j-1, max_iter, barname="BackWard", metrics={"max alignment score": max_score}, verbose=verbose)
         if verbose>=1: print()
         B = B.reshape(3,self.nx,self.ny)[0,1:,1:]
         return B

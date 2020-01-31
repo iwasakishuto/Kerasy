@@ -75,7 +75,7 @@ class Nussinov(BaseStructureModel):
                     self.gamma[i+1][j-1] + delta,
                     max([self.gamma[i][k] + self.gamma[k+1][j] for k in range(i,j)]) # Bifurcation
                 )
-                flush_progress_bar(it, max_iter, barname="γ", metrics=f"max num of base-pairs: {np.max(self.gamma)}", verbose=verbose)
+                flush_progress_bar(it, max_iter, barname="γ", metrics={"max num of base-pairs": np.max(self.gamma)}, verbose=verbose)
                 it+=1
         print()
         score = self.gamma[0][-1]
@@ -122,7 +122,7 @@ class Nussinov(BaseStructureModel):
                     max([0]+[omega[k+1][j] + self.gamma[k][i-1] for k in range(i)]),
                     max([0]+[self.gamma[j+1][k] + omega[i+1][k] for k in range(j+1,N)])
                 )
-                flush_progress_bar(it, max_iter, barname="ω", metrics=f"max num of base-pairs: {np.max(omega)}", verbose=verbose)
+                flush_progress_bar(it, max_iter, barname="ω", metrics={"max num of base-pairs": np.max(omega)}, verbose=verbose)
                 it+=1
         print()
         omega = omega[1:,:-1]
@@ -231,7 +231,7 @@ class Zuker(BaseStructureModel):
                 self.V[i][j] = self._calV(sequence,i,j)
                 self.M[i][j] = self._calM(i,j)
                 self.W[i][j] = self._calW(i,j)
-                flush_progress_bar(it, max_iter, metrics=f"min energy: {np.min(self.W):.3f}", verbose=verbose)
+                flush_progress_bar(it, max_iter, metrics={"min energy": np.min(self.W)}, verbose=verbose)
                 it+=1
         print()
         score = self.W[0][-1]

@@ -29,7 +29,7 @@ class MSS():
         """
         @params r: Real numbers. 1-dimentional score sequence
         @params L: Minimum segment length. (Constraint)
-        @return isin_sets:
+        @return score:
         """
         r = np.asarray(r)
         N = len(r)
@@ -62,7 +62,7 @@ class MSS():
                     updateSLT.reshape(1,-1)
                 ]
                 T[-1,n] = 1
-                flush_progress_bar(n,N,barname="DP",metrics=f"Maximum segment score: {max(S[:,n+1])}",verbose=verbose)
+                flush_progress_bar(n,N,barname="DP",metrics={"Maximum segment score": max(S[:,n+1])},verbose=verbose)
             if verbose>=1: print()
             score,idx = self.maxargmax(*S[:,-1])
             isin_sets = T[-2+idx,:]

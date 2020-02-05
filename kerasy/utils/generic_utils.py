@@ -3,6 +3,7 @@ import sys
 import time
 import datetime
 from six.moves.urllib.request import urlretrieve
+
 from collections import defaultdict
 
 def flatten_dual(lst):
@@ -84,3 +85,9 @@ def urlDecorate(url, addDate=True):
     """ Decorate URL like Wget. (Add datetime information and coloring url to blue.) """
     now = datetime.datetime.now().strftime("--%Y-%m-%d %H:%M:%S--  ") if addDate else ""
     return now + priColor.color(url, color="BLUE")
+
+def measure_complexity(func, *args, repetitions_=10, **kwargs):
+    s = time.time()
+    for _ in range(repetitions_):
+        func(*args, **kwargs)
+    return (time.time()-s)/repetitions_

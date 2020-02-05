@@ -25,6 +25,7 @@ from .generic_utils import get_file
 from .generic_utils import priColor
 from .generic_utils import handleKeyError
 from .generic_utils import urlDecorate
+from .generic_utils import measure_complexity
 
 from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors

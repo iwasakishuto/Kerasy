@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+import time
 
 from ..utils import printAlignment
 from ..utils import flush_progress_bar

@@ -87,7 +87,23 @@ def urlDecorate(url, addDate=True):
     return now + priColor.color(url, color="BLUE")
 
 def measure_complexity(func, *args, repetitions_=10, **kwargs):
-    s = time.time()
-    for _ in range(repetitions_):
-        func(*args, **kwargs)
-    return (time.time()-s)/repetitions_
+    times=0
+    metrics=[]
+    if "random_state" in kwargs:
+        base_seed = kwargs.get("random_state")
+        for i in range(repetitions_):
+            kwargs["random_state"] = base_seed+i
+            s = time.time()
+            ret = func(*args, **kwargs)
+            times += time.time()-s
+            metrics.append(ret)
+    else:
+        for _ in range(repetitions_):
+            s = time.time()
+            ret = func(*args, **kwargs)
+            times += time.time()-s
+            metrics.append(ret)
+    if metrics[0] is None:
+        return times/repetitions_
+    else:
+        return (times/repetitions_, metrics)

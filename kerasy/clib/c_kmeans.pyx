@@ -8,6 +8,7 @@ cimport cython
 
 from cython cimport floating
 from libc.math cimport sqrt
+from libc.stdio cimport printf
 from ..utils import pairwise_euclidean_distances
 from ..utils import flush_progress_bar
 
@@ -232,8 +233,8 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         flush_progress_bar(
             it, max_iter, verbose=verbose, barname="KMeans Elkan",
             metrics={
-                "average inertia" : "{:.3f}".format(inertia/n_samples),
-                "center shift": "{:.3f}".format(center_shift_total),
+                "average inertia"    : "{:.3f}".format(inertia/n_samples),
+                "center shift total" : "{:.3f}".format(center_shift_total),
             }
         )
         if center_shift_total < tol:
@@ -245,8 +246,8 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         update_for_elkan(X_p, centers_p, half_cent2cent, labels, lower_bounds,
                          upper_bounds, n_samples, n_features, n_clusters)
     if verbose>0:
-        print()
-    return centers, labels_
+        printf("\n")
+    return centers, inertia, labels_, it+1
 
 def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
                     np.ndarray[floating, ndim=1, mode='c'] sample_weight,
@@ -327,8 +328,8 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
         flush_progress_bar(
             it, max_iter, verbose=verbose, barname="KMeans Hamerly",
             metrics={
-                "average inertia" : "{:.3f}".format(inertia/n_samples),
-                "center shift": "{:.3f}".format(center_shift_total),
+                "average inertia"    : "{:.3f}".format(inertia/n_samples),
+                "center shift total" : "{:.3f}".format(center_shift_total),
             }
         )
         if center_shift_total < tol:
@@ -337,6 +338,6 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
         half_cent2cent = pairwise_euclidean_distances(centers) / 2.
 
     if verbose>0:
-        print()
-        
-    return centers, labels_
+        printf("\n")
+
+    return centers, inertia, labels_, it+1

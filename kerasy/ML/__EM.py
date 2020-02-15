@@ -181,12 +181,12 @@ class HamerlyKMeans(KMeans):
         pairwise_cent_dist = pairwise_euclidean_distances(self.mu, squared=False)
         pairwise_cent_dist += np.max(pairwise_cent_dist)*np.identity(self.K) # Add maximum to diagonal components.
         nearest_cent_dist = np.min(pairwise_cent_dist, axis=0)
-        harmerly_right_side = np.maximum(nearest_cent_dist[idx]/2, self.lower)
+        hamerly_right_side = np.maximum(nearest_cent_dist[idx]/2, self.lower)
         """ Hamerly' Proposition step.1 """
-        not_meet = np.nonzero(self.upper>harmerly_right_side)[0] # Index of Xi who does not meet the Hamerly's Proposition.
+        not_meet = np.nonzero(self.upper>hamerly_right_side)[0] # Index of Xi who does not meet the Hamerly's Proposition.
         self.upper[not_meet] = paired_euclidean_distances(X[not_meet], self.mu[idx[not_meet]]) # Update the upper bound.
         """ Hamerly' Proposition step.2 """
-        not_meet_again = not_meet[np.nonzero(self.upper[not_meet]>harmerly_right_side[not_meet])]
+        not_meet_again = not_meet[np.nonzero(self.upper[not_meet]>hamerly_right_side[not_meet])]
         # Apply Estep Only to `X[not_meet_again]`
         new_idx = self.Estep(X[not_meet_again])
         # Update lower bounds and upper bounds.

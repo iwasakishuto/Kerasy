@@ -7,7 +7,6 @@ from ..utils import findLowerUpper
 from ..utils import _check_sample_weight
 from ..utils import flush_progress_bar
 from ..utils import paired_euclidean_distances
-from ..utils import pairwise_euclidean_distances
 from ..utils import silhouette_plot
 from ..clib import c_kmeans
 
@@ -18,6 +17,7 @@ class BaseEMmodel():
         self.init=init
         self.history=[]
         self.metrics=metrics
+        self.iterations_=0
 
     def _find_initial_centroids(self, X, n_clusters=8, init="k++", random_state=None):
         """Initialize the centroids.
@@ -60,36 +60,46 @@ class BaseEMmodel():
 class KMeans(BaseEMmodel):
     def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):
         super().__init__(n_clusters=n_clusters, init=init, random_state=random_state, metrics=metrics)
+        self.centroids   = None
+        self.iterations_ = 0
+        self.labels_     = None
+        self.inertia_    = None
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        self.centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
+        centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
         sample_weight = _check_sample_weight(sample_weight, X)
         n_samples = X.shape[0]
         labels    = np.full(n_samples, -1, dtype=np.int32)
         distances = np.zeros(n_samples, dtype=X.dtype)
         for it in range(max_iter):
             if memorize:
-                self._memorize_param(self.centroids)
-            labels, inertia = self.Estep(X, labels=labels, distances=distances)
+                self._memorize_param(centroids)
+            labels, inertia = self.Estep(X, centroids, labels=labels, distances=distances)
             new_centroids = self.Mstep(X, labels, sample_weight=sample_weight, distances=distances)
-            center_shift_total = np.sum(np.sum((self.centroids-new_centroids)**2, axis=1))
+            center_shift_total = np.sum(np.sum((centroids-new_centroids)**2, axis=1))
             flush_progress_bar(
-                it, max_iter, verbose=verbose, barname=self.__class__.__name__,
+                it, max_iter, verbose=verbose, barname="KMeans Lloyd",
                 metrics={
                     "average inertia" : f"{inertia/n_samples:.3f}",
                     "center shift total": f"{center_shift_total:.3f}",
                 }
             )
-            self.centroids = new_centroids
+            centroids = new_centroids
             if center_shift_total < tol:
                 break
+        if center_shift_total != 0:
+            labels, inertia = self.Estep(X, centroids, labels=labels, distances=distances)
+        self.centroids   = centroids
+        self.iterations_ = it+1
+        self.labels_     = labels
+        self.inertia_    = inertia
 
     def predict(self, X):
         """ Same with Estep """
-        labels, inertia = self.Estep(X)
+        labels, inertia = self.Estep(X, centroids=self.centroids)
         return labels
 
-    def Estep(self, X, labels=None, distances=None):
+    def Estep(self, X, centroids, labels=None, distances=None):
         """ Compute the labels and the inertia of the given samples and centers. """
         if labels is None:
             n_samples = X.shape[0]
@@ -97,7 +107,7 @@ class KMeans(BaseEMmodel):
         if distances is None:
             # shape=(0,) means that don't store the distances.
             distances = np.zeros(shape=(0,), dtype=X.dtype)
-        inertia = c_kmeans._kmeans_Estep(X, self.centroids, labels, distances)
+        inertia = c_kmeans._kmeans_Estep(X, centroids, labels, distances)
         return labels, inertia
 
     def Mstep(self, X, labels, sample_weight=None, distances=None):
@@ -106,7 +116,7 @@ class KMeans(BaseEMmodel):
         return centers
 
     def silhouette(self, X, axes=None, set_style=True):
-        labels, inertia = self.Estep(X)
+        labels = self.predict(X)
         silhouette_plot(X, labels, self.centroids, axes=axes, set_style=set_style)
 
 class HamerlyKMeans(KMeans):
@@ -116,7 +126,7 @@ class HamerlyKMeans(KMeans):
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
         init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
         sample_weight = _check_sample_weight(sample_weight, X)
-        self.centroids, labels = c_kmeans.k_means_hamerly(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
+        self.centroids, self.inertia_, self.labels_, self.iterations_ = c_kmeans.k_means_hamerly(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
 
 class ElkanKMeans(KMeans):
     def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):
@@ -125,7 +135,7 @@ class ElkanKMeans(KMeans):
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
         init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
         sample_weight = _check_sample_weight(sample_weight, X)
-        self.centroids, labels = c_kmeans.k_means_elkan(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
+        self.centroids, self.inertia_, self.labels_, self.iterations_ = c_kmeans.k_means_elkan(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
 
 class MixedGaussian(BaseEMmodel):
     def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):

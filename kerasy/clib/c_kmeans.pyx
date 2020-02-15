@@ -63,24 +63,30 @@ cdef update_labels_distances_inplace(
         upper_bounds[idx] = d_c
 
 def _kmeans_Estep_dense(
-        np.ndarray[floating, ndim=2] X,
-        np.ndarray[floating, ndim=2] centers,
-        np.ndarray[int, ndim=1] labels,):
+        np.ndarray[floating, ndim=2, mode='c'] X,
+        np.ndarray[floating, ndim=2, mode='c'] centers,
+        np.ndarray[int, ndim=1] labels,
+        np.ndarray[floating, ndim=1, mode='c'] distances):
     """
     Assign the labels inplace. (dense matrix)
     @params X               : Input data.               shape=(n_samples, n_features)
-    @return centers         : The current centers.      shape=(n_clusters, n_features)
-    @return labels          : Current label assignment. shape=(n_samples,)
+    @params centers         : The current centers.      shape=(n_clusters, n_features)
+    @params labels          : Current label assignment. shape=(n_samples,)
+    @params distances       : Distance to closest cluster for each sample. if shape=(n_samples), store the distances.
     @return inertia         :
     """
     cdef int n_clusters = centers.shape[0]
     cdef int n_features = centers.shape[1]
+    cdef int n_samples  = X.shape[0]
     cdef floating* centers_p = <floating*>centers.data
-    cdef int n_samples = X.shape[0]
     cdef floating* X_p = <floating*>X.data
     cdef Py_ssize_t idx, k
     cdef float inertia = 0.0
     cdef float min_dist, dist
+    cdef int store_dist = 0
+    # if shape=(n_samples), store the distances.
+    if n_samples == distances.shape[0]:
+        store_dist = 1
 
     for idx in range(n_samples):
         min_dist = -1
@@ -89,6 +95,8 @@ def _kmeans_Estep_dense(
             if min_dist == -1 or dist < min_dist:
                 min_dist = dist
                 labels[idx] = k
+        if store_dist:
+            distances[idx] = min_dist
         inertia += min_dist
 
     return inertia

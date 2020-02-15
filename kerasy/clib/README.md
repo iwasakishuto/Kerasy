@@ -17,6 +17,7 @@ $ python setup.py build_ext --inplace
 ```py
 %%cython -n test_cython_code
 
+import numpy as np
 cimport numpy as np
 from cython cimport floating
 from libc.math cimport sqrt
@@ -45,4 +46,13 @@ def pairwise_euclidean_distances(
     for idx in range(n_samples):
         distances[idx] = euclidean_distance(X_p+idx*n_features, Y_p+idx*n_features, n_features)
     return distances
+```
+
+```python
+import numpy as np
+
+X = np.arange(1,11).reshape(-1,1).astype(float)
+Y = np.arange(1,11)[::-1].reshape(-1,1).astype(float)
+pairwise_euclidean_distances(X,Y)
+>>> array([9., 7., 5., 3., 1., 1., 3., 5., 7., 9.])
 ```

@@ -121,6 +121,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
 
     # Initialization.
     cdef np.ndarray[floating, ndim=2, mode='c'] centers = init
+    cdef np.ndarray[floating, ndim=2, mode='c'] new_centers
     cdef floating* centers_p = <floating*>centers.data
     cdef floating* X_p = <floating*>X.data
     cdef floating* x_p
@@ -130,26 +131,23 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
     cdef int k, label
     cdef floating ub, dist
     cdef floating[:, :] half_cent2cent = pairwise_euclidean_distances(centers) / 2.
-    cdef floating[:, :] lower_bounds = np.zeros((n_samples, n_clusters), dtype=dtype)
     cdef floating[:] nearest_center_dist
-    labels_ = np.empty(n_samples, dtype=np.int32)
-    cdef int[:] labels = labels_
+    cdef floating[:, :] lower_bounds = np.zeros((n_samples, n_clusters), dtype=dtype)
     upper_bounds_ = np.empty(n_samples, dtype=dtype)
     cdef floating[:] upper_bounds = upper_bounds_
+    cdef np.uint8_t[:] is_tight = np.ones(n_samples, dtype=np.uint8)
+    labels_ = np.empty(n_samples, dtype=np.int32)
+    cdef int[:] labels = labels_
 
     # Get the initial set of upper bounds and lower bounds for each sample.
     update_labels_distances_inplace(X_p, centers_p, half_cent2cent,
                                     labels, lower_bounds, upper_bounds,
                                     n_samples, n_features, n_clusters)
-    cdef np.uint8_t[:] is_tight = np.ones(n_samples, dtype=np.uint8)
-    cdef np.ndarray[floating, ndim=2, mode='c'] new_centers
-
-    col_indices = np.arange(half_cent2cent.shape[0], dtype=np.int)
     for it in range(max_iter):
+        # START) Elkan's Estep
         # 1) For all clusters c and c', compute d(c,c').
-        pairwise_center_half_dist = np.asarray(half_cent2cent)
         # nearest_center_dist[k] means the distance from center k to nearest center j(≠k)
-        nearest_center_dist = np.partition(pairwise_center_half_dist, kth=1, axis=0)[1]
+        nearest_center_dist = np.partition(half_cent2cent, kth=1, axis=0)[1]
         for idx in range(n_samples):
             ub = upper_bounds[idx]
             label = labels[idx]
@@ -176,13 +174,14 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
                             ub = dist
             upper_bounds[idx] = ub
             labels[idx] = label
+        # END) Elkan's Estep
 
         # compute new centers
         new_centers = _kmeans_Mstep(X, sample_weight, labels_, n_clusters, upper_bounds_)
         is_tight[:] = 0
 
-        center_shift = np.sqrt(np.sum((centers - new_centers) ** 2, axis=1))
-        center_shift_total = np.sum(center_shift ** 2)
+        center_shift = np.sqrt(np.sum((centers-new_centers)**2, axis=1))
+        center_shift_total = np.sum(center_shift**2)
 
         # Update lower bounds and upper bounds.
         lower_bounds = np.maximum(lower_bounds - center_shift, 0)
@@ -196,18 +195,16 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         flush_progress_bar(
             it, max_iter, verbose=verbose,
             metrics={
-                "inertia" : np.sum((X - centers[labels]) ** 2 * sample_weight[:,np.newaxis]),
+                "inertia" : np.sum((X-centers[labels])**2*sample_weight[:,np.newaxis]),
                 "center shift": center_shift_total,
             }
         )
-
         if center_shift_total < tol:
             break
 
-    # We need this to make sure that the labels give the same output as
-    # predict(X)
-    if center_shift_total > 0:
+    if center_shift_total != 0:
         update_labels_distances_inplace(X_p, centers_p, half_cent2cent,
                                         labels, lower_bounds, upper_bounds,
                                         n_samples, n_features, n_clusters)
-    return centers, labels_, it+1
+
+    return centers, labels_

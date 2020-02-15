@@ -244,7 +244,8 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
     if center_shift_total != 0:
         update_for_elkan(X_p, centers_p, half_cent2cent, labels, lower_bounds,
                          upper_bounds, n_samples, n_features, n_clusters)
-    if verbose>0: print()
+    if verbose>0:
+        print()
     return centers, labels_
 
 def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
@@ -316,7 +317,7 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
         nd,st = np.partition(center_shift, kth=-2)[-2:]
         upper_bounds += center_shift[labels_]
         center_shift_most_other = np.where(center_shift==st, nd, st)
-        lower_bounds = np.maximum(lower_bounds - center_shift_most_other, 0)
+        lower_bounds = np.maximum(lower_bounds - center_shift_most_other[labels_], 0)
 
         # Reassign centers
         centers = new_centers
@@ -335,5 +336,7 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
 
         half_cent2cent = pairwise_euclidean_distances(centers) / 2.
 
-    if verbose>0: print()
+    if verbose>0:
+        print()
+        
     return centers, labels_

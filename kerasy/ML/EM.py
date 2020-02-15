@@ -9,7 +9,7 @@ from ..utils import flush_progress_bar
 from ..utils import paired_euclidean_distances
 from ..utils import pairwise_euclidean_distances
 from ..utils import silhouette_plot
-from ..libc import c_kmeans
+from ..clib import c_kmeans
 
 class BaseEMmodel():
     def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):

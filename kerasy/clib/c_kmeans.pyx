@@ -62,7 +62,7 @@ cdef update_labels_distances_inplace(
         labels[idx] = c_x
         upper_bounds[idx] = d_c
 
-def _kmeans_Estep_dense(
+def _kmeans_Estep(
         np.ndarray[floating, ndim=2, mode='c'] X,
         np.ndarray[floating, ndim=2, mode='c'] centers,
         np.ndarray[int, ndim=1] labels,
@@ -101,7 +101,7 @@ def _kmeans_Estep_dense(
 
     return inertia
 
-def _kmeans_Mstep_dense(
+def _kmeans_Mstep(
         np.ndarray[floating,   ndim=2] X,
         np.ndarray[floating,   ndim=1] sample_weight,
         np.ndarray[np.int32_t, ndim=1] labels,
@@ -216,7 +216,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         # END) Elkan's Estep
 
         # compute new centers
-        new_centers = _kmeans_Mstep_dense(X, sample_weight, labels_, n_clusters, upper_bounds_)
+        new_centers = _kmeans_Mstep(X, sample_weight, labels_, n_clusters, upper_bounds_)
         is_tight[:] = 0
 
         center_shift = np.sqrt(np.sum((centers-new_centers)**2, axis=1))
@@ -235,7 +235,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         flush_progress_bar(
             it, max_iter, verbose=verbose, barname="KMeans elkan",
             metrics={
-                "inertia" : "{:.3f}".format(inertia),
+                "average inertia" : "{:.3f}".format(inertia/n_samples),
                 "center shift": "{:.3f}".format(center_shift_total),
             }
         )

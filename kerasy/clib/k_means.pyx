@@ -11,7 +11,7 @@ from libc.math cimport sqrt
 from ..utils import pairwise_euclidean_distances
 from ..utils import flush_progress_bar
 
-cdef floating euclidean_dist(floating* a, floating* b, int n_features) nogil:
+cdef floating euclidean_distance(floating* a, floating* b, int n_features) nogil:
     """
     Compute the euclidean distance between `a` and `b`. (Each data has the `n_features` features.)
     As the function start with `nogil`, this function will be executed without GIL.
@@ -25,7 +25,7 @@ cdef floating euclidean_dist(floating* a, floating* b, int n_features) nogil:
     return sqrt(result)
 
 cdef update_labels_distances_inplace(
-        floating* X, floating* centers,floating[:, :] half_cent2cent,
+        floating* X, floating* centers, floating[:, :] half_cent2cent,
         int[:] labels, floating[:, :] lower_bounds, floating[:] upper_bounds,
         Py_ssize_t n_samples, int n_features, int n_clusters):
     """
@@ -48,13 +48,13 @@ cdef update_labels_distances_inplace(
         # first cluster (exception)
         c_x = 0
         x = X + idx * n_features
-        d_c = euclidean_dist(x, centers, n_features) # temporal upper bound.
+        d_c = euclidean_distance(x, centers, n_features) # temporal upper bound.
         lower_bounds[idx, 0] = d_c
         for k in range(1, n_clusters):
             # If this hold, then k is a good candidate fot the sample to be relabeled.
             if d_c > half_cent2cent[c_x, k]:
                 c = centers + k * n_features
-                dist = euclidean_dist(x, c, n_features)
+                dist = euclidean_distance(x, c, n_features)
                 lower_bounds[idx, k] = dist
                 if dist < d_c:
                     d_c = dist
@@ -62,10 +62,10 @@ cdef update_labels_distances_inplace(
         labels[idx] = c_x
         upper_bounds[idx] = d_c
 
-def _centers_dense(
+def _kmeans_Mstep(
         np.ndarray[floating, ndim=2] X,
         np.ndarray[floating, ndim=1] sample_weight,
-        np.ndarray[int, ndim=1]      labels,
+        np.ndarray[int,      ndim=1] labels,
         int n_clusters,
         np.ndarray[floating, ndim=1] distances):
     """ M step of the K-means EM algorithm
@@ -103,13 +103,13 @@ def _centers_dense(
     centers /= weight_in_cluster[:, np.newaxis]
     return centers
 
-def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
+def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
                   np.ndarray[floating, ndim=1, mode='c'] sample_weight,
                   int n_clusters,
                   np.ndarray[floating, ndim=2, mode='c'] init,
                   float tol=1e-4, int max_iter=30, verbose=False):
     """Run Elkan's k-means.
-    @params X_            : The input data. shape=(n_samples, n_features)
+    @params X             : The input data. shape=(n_samples, n_features)
     @params sample_weight : The weights for each observation in X. shape=(n_samples,)
     @params n_clusters    : Number of clusters to find.
     @params init          : Initial position of centers.
@@ -120,16 +120,16 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
     dtype = np.float32 if floating is float else np.float64
 
     # Initialization.
-    cdef np.ndarray[floating, ndim=2, mode='c'] centers_ = init
-    cdef floating* centers_p = <floating*>centers_.data
-    cdef floating* X_p = <floating*>X_.data
+    cdef np.ndarray[floating, ndim=2, mode='c'] centers = init
+    cdef floating* centers_p = <floating*>centers.data
+    cdef floating* X_p = <floating*>X.data
     cdef floating* x_p
-    cdef Py_ssize_t n_samples = X_.shape[0]
-    cdef Py_ssize_t n_features = X_.shape[1]
+    cdef Py_ssize_t n_samples = X.shape[0]
+    cdef Py_ssize_t n_features = X.shape[1]
     cdef Py_ssize_t idx
     cdef int k, label
     cdef floating ub, dist
-    cdef floating[:, :] half_cent2cent = pairwise_euclidean_distances(centers_) / 2.
+    cdef floating[:, :] half_cent2cent = pairwise_euclidean_distances(centers) / 2.
     cdef floating[:, :] lower_bounds = np.zeros((n_samples, n_clusters), dtype=dtype)
     cdef floating[:] nearest_center_dist
     labels_ = np.empty(n_samples, dtype=np.int32)
@@ -141,7 +141,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
     update_labels_distances_inplace(X_p, centers_p, half_cent2cent,
                                     labels, lower_bounds, upper_bounds,
                                     n_samples, n_features, n_clusters)
-    cdef np.uint8_t[:] is_tight = np.ones(n_samples, dtype=bool)
+    cdef np.uint8_t[:] is_tight = np.ones(n_samples, dtype=np.uint8)
     cdef np.ndarray[floating, ndim=2, mode='c'] new_centers
 
     col_indices = np.arange(half_cent2cent.shape[0], dtype=np.int)
@@ -163,13 +163,13 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
                 if (k!=label and (ub > lower_bounds[idx, k]) and (ub > half_cent2cent[k, label])):
                     # 3.a Recomputing the actual distance between sample and label.
                     if not is_tight[idx]:
-                        ub = euclidean_dist(x_p, centers_p + label*n_features, n_features)
+                        ub = euclidean_distance(x_p, centers_p + label*n_features, n_features)
                         lower_bounds[idx, label] = ub
-                        is_tight[idx] = True
+                        is_tight[idx] = 1
 
                     # 3.b
                     if (ub > lower_bounds[idx, k] or (ub > half_cent2cent[label, k])):
-                        dist = euclidean_dist(x_p, centers_p + k*n_features, n_features)
+                        dist = euclidean_distance(x_p, centers_p + k*n_features, n_features)
                         lower_bounds[idx, k] = dist
                         if dist < ub:
                             label = k
@@ -178,10 +178,10 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
             labels[idx] = label
 
         # compute new centers
-        new_centers = _centers_dense(X_, sample_weight, labels_, n_clusters, upper_bounds_)
-        is_tight[:] = False
+        new_centers = _kmeans_Mstep(X, sample_weight, labels_, n_clusters, upper_bounds_)
+        is_tight[:] = 0
 
-        center_shift = np.sqrt(np.sum((centers_ - new_centers) ** 2, axis=1))
+        center_shift = np.sqrt(np.sum((centers - new_centers) ** 2, axis=1))
         center_shift_total = np.sum(center_shift ** 2)
 
         # Update lower bounds and upper bounds.
@@ -189,14 +189,14 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
         upper_bounds = upper_bounds + center_shift[labels_]
 
         # Reassign centers
-        centers_ = new_centers
+        centers = new_centers
         centers_p = <floating*>new_centers.data
-        half_cent2cent = pairwise_euclidean_distances(centers_) / 2.
+        half_cent2cent = pairwise_euclidean_distances(centers) / 2.
 
         flush_progress_bar(
             it, max_iter, verbose=verbose,
             metrics={
-                "inertia" : np.sum((X_ - centers_[labels]) ** 2 * sample_weight[:,np.newaxis]),
+                "inertia" : np.sum((X - centers[labels]) ** 2 * sample_weight[:,np.newaxis]),
                 "center shift": center_shift_total,
             }
         )
@@ -210,4 +210,4 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X_,
         update_labels_distances_inplace(X_p, centers_p, half_cent2cent,
                                         labels, lower_bounds, upper_bounds,
                                         n_samples, n_features, n_clusters)
-    return centers_, labels_, it+1
+    return centers, labels_, it+1

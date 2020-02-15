@@ -47,6 +47,7 @@ from .model_select_utils import cross_validation
 from .np_utils import CategoricalEncoder
 from .np_utils import findLowerUpper
 from .np_utils import inverse_arr
+from .np_utils import _check_sample_weight
 
 from .param_utils import Params
 

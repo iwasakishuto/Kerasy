@@ -51,3 +51,22 @@ def inverse_arr(arr):
     for i in range(len(arr)):
         arr_inv[arr[i]] = i
     return arr_inv
+
+def _check_sample_weight(sample_weight, X, dtype=np.float64):
+    """ Validate sample weights.
+    @params sample_weight : ndarray shape=(n_samples,) or None
+    @params X             : Input data. shape=(n_samples, *n_features)
+    @params dtype         : sample weight's data type.
+    @return sample_weight : shape=(n_samples,)
+    """
+    n_samples = X.shape[0]
+
+    if sample_weight is None:
+        sample_weight = np.ones(n_samples, dtype=dtype)
+    else:
+        sample_weight = np.asarray(sample_weight, dtype=dtype)
+        if sample_weight.ndim != 1:
+            raise ValueError("Sample weights must be 1D array or scalar")
+        if sample_weight.shape != (n_samples,):
+            raise ValueError(f"sample_weight.shape == {sample_weight.shape}, expected {(n_samples,)}!")
+    return sample_weight

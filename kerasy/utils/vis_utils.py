@@ -125,19 +125,33 @@ def objVSexp(obj, *exp, **options):
     return ax
 
 def silhouette_plot(X, labels, centers, axes=None, set_style=True):
-    if axes is None:
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-        fig.set_size_inches(18, 7)
+    """Silhouette Plotting.
+    @params X       : Input data.               shape=(n_samples, n_features)
+    @params labels  : Current label assignment. shape=(n_samples,)
+    @params centers : The current centers.      shape=(n_clusters, n_features)
+    @params axes    : (axL, axR) if `n_features` <= 3 else ax
+    """
+    n_features = X.shape[1]
+    if n_features <= 3:
+        if axes is None:
+            fig = plt.figure(figsize=(18, 7))
+            projection = "3d" if n_features==3 else None
+            axes = (fig.add_subplot(1,2,1), fig.add_subplot(1,2,2,projection=projection))
+        ax1 = _left_silhouette_plot(X, labels, ax=axes[0], set_style=set_style)
+        ax2 = _right_silhouette_plot(X, labels, centers, ax=axes[1], set_style=set_style)
+        axes = (ax1, ax2)
     else:
-        ax1,ax2=axes
+        if axes is None:
+            fig, axes = plt.subplots()
+            fig.set_size_inches(18, 7)
+        axes = _left_silhouette_plot(X, labels, ax=axes, set_style=set_style)
 
-    ax1 = _left_silhouette_plot(X, labels, ax=ax1, set_style=set_style)
-    ax2 = _right_silhouette_plot(X, labels, centers, ax=ax2, set_style=set_style)
-    if axes is None:
+    if set_style:
         plt.suptitle((f"Silhouette analysis"), fontsize=14, fontweight='bold')
+    if axes is None:
         plt.show()
     else:
-        return (ax1,ax2)
+        return axes
 
 def _left_silhouette_plot(X, labels, ax=None, set_style=True):
     if ax is None:
@@ -155,7 +169,7 @@ def _left_silhouette_plot(X, labels, ax=None, set_style=True):
         Nk = Si_k.shape[0]
         y_upper = y_lower + Nk
 
-        color = cm.nipy_spectral(float(i) / n_clusters)
+        color = cm.hsv(float(i) / n_clusters)
         ax.fill_betweenx(np.arange(y_lower, y_upper), 0, Si_k,
                           facecolor=color, edgecolor=color, alpha=0.7)
         ax.text(-0.05, y_lower + 0.5 * Nk, str(i))
@@ -167,25 +181,43 @@ def _left_silhouette_plot(X, labels, ax=None, set_style=True):
         ax.set_title("The silhouette plot for the various clusters.")
         ax.set_xlabel("The silhouette coefficient values")
         ax.set_ylabel("Cluster label")
-        ax.axvline(x=silhouette_avg, color="red", linestyle="--")
+        ax.axvline(x=silhouette_avg, color="black", linestyle="--", label="Average")
         ax.set_yticks([])  # Clear the yaxis labels / ticks
         ax.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+        ax.legend()
     return ax
 
 def _right_silhouette_plot(X, labels, centers, ax=None, set_style=True):
+    n_features = X.shape[1]
     if ax is None:
-        fig, ax = plt.subplots()
-        fig.set_size_inches(9, 7)
+        fig = plt.figure(figsize=(9, 7))
+        projection = "3d" if n_features==3 else None
+        ax = fig.add_subplot(1,1,1,projection=projection)
 
-    colors = cm.nipy_spectral(labels.astype(float) / (np.max(labels)+1.))
-
-    ax.scatter(X[:,0], X[:,1], marker='.', s=30, lw=0, alpha=0.7, c=colors, edgecolor='k')
-    ax.scatter(centers[:,0], centers[:,1], marker='o', s=200, alpha=1, c="white", edgecolor='k')
-    for i,c in enumerate(centers):
-        ax.scatter(c[0], c[1], marker='$%d$' % i, s=50, alpha=1, edgecolor='k')
-
+    colors = cm.hsv(labels.astype(float) / (np.max(labels)+1.))
+    if n_features == 1:
+        X_zeros = np.zeros_like(X)
+        C_zeros = np.zeros_like(centers)
+        ax.scatter(X,       X_zeros, marker='.', s=30, lw=0, alpha=0.7, c=colors, edgecolor='k')
+        ax.scatter(centers, C_zeros, marker='o', s=200, alpha=1, c="white", edgecolor='k')
+        for i,c in enumerate(centers):
+            ax.scatter(c, 0, marker='$%d$' % i, s=50, alpha=1, edgecolor='k')
+        plt.tick_params(labelleft=False, left=False)
+    elif n_features == 2:
+        ax.scatter(X[:,0], X[:,1], marker='.', s=30, lw=0, alpha=0.7, c=colors, edgecolor='k')
+        ax.scatter(centers[:,0], centers[:,1], marker='o', s=200, alpha=1, c="white", edgecolor='k')
+        for i,c in enumerate(centers):
+            ax.scatter(c[0], c[1], marker='$%d$' % i, s=50, alpha=1, edgecolor='k')
+    elif n_features==3:
+        ax.scatter(X[:,0], X[:,1], X[:,2], marker='.', s=60, lw=0, alpha=0.7, c=colors, edgecolor='k')
+        ax.scatter(centers[:,0], centers[:,1], centers[:,2], marker='o', s=200, alpha=1, c="white", edgecolor='k')
+        for i,c in enumerate(centers):
+            ax.scatter(c[0], c[1], c[2], marker='$%d$' % i, s=50, alpha=1, edgecolor='k')
+    else:
+        raise ValueError(f"`X.shape[1]` should be smaller than or equal to 3, but got {n_features}")
     if set_style:
         ax.set_title("The visualization of the clustered data.")
         ax.set_xlabel("Feature space for the 1st feature")
-        ax.set_ylabel("Feature space for the 2nd feature")
+        if n_features>=2: ax.set_ylabel("Feature space for the 2nd feature")
+        if n_features==3: ax.set_zlabel("Feature space for the 3rd feature")
     return ax

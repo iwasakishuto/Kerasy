@@ -5,7 +5,8 @@
 ## How to Compile
 
 ```sh
-$ python setup.py build_ext --inplace
+$ pip install setuptools>=30.3.0
+$ python setup.py
 ```
 
 ## How to use Cython on Jupyter Notebook
@@ -42,7 +43,7 @@ def pairwise_euclidean_distances(
     cdef floating* x_p, y_p
     cdef Py_ssize_t idx
     distances = np.empty(n_samples, dtype=dtype)
-    
+
     for idx in range(n_samples):
         distances[idx] = euclidean_distance(X_p+idx*n_features, Y_p+idx*n_features, n_features)
     return distances

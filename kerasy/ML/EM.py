@@ -51,7 +51,7 @@ class BaseEMmodel():
             flush_progress_bar(it, max_iter, metrics={"Log Likelihood": ll}, verbose=verbose)
             if it>0 and "Any Break Condition": break
         if memorize: self.memorize_param(responsibilities)
-        if verbose>=1: print()
+        if verbose>0: print()
 
     def predict(self, X):
         raise NotImplementedError()
@@ -85,7 +85,7 @@ class KMeans(BaseEMmodel):
             if it>0 and not np.any(pidx!=idx): break
             pidx=idx
         if memorize: self.memorize_param(idx)
-        if verbose: print()
+        if verbose>0: print()
 
     def memorize_param(self, idx):
         self.history.append([
@@ -167,7 +167,7 @@ class HamerlyKMeans(KMeans):
             flush_progress_bar(it, max_iter, metrics={"changed": len(changed)}, verbose=verbose)
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
-        if verbose: print()
+        if verbose>0: print()
 
     def SparseEstep(self, X, idx):
         """ Hamerly' Proposition
@@ -261,7 +261,7 @@ class ElkanKMeans(KMeans):
             flush_progress_bar(it, max_iter, metrics={"changed": changed}, verbose=verbose)
             if memorize: self.memorize_param(idx)
         if memorize: self.memorize_param(idx)
-        if verbose: print()
+        if verbose>0: print()
 
     def SparseEstep(self, X, idx):
         changed = 0

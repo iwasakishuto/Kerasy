@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-import scipy.sparse as sp
+# import scipy.sparse as sp
 import scipy.stats as stats
 
 from ..utils import findLowerUpper
@@ -76,8 +76,8 @@ class KMeans(BaseEMmodel):
             flush_progress_bar(
                 it, max_iter, verbose=verbose, barname=self.__class__.__name__,
                 metrics={
-                    "inertia" : f"{inertia:.3f}",
-                    "center shift": f"{center_shift_total:.3f}",
+                    "average inertia" : f"{inertia/n_samples:.3f}",
+                    "center shift total": f"{center_shift_total:.3f}",
                 }
             )
             self.centroids = new_centroids
@@ -97,18 +97,12 @@ class KMeans(BaseEMmodel):
         if distances is None:
             # shape=(0,) means that don't store the distances.
             distances = np.zeros(shape=(0,), dtype=X.dtype)
-        if sp.issparse(X):
-            inertia = c_kmeans._kmeans_Estep_sparse(X, self.centroids, labels, distances)
-        else:
-            inertia = c_kmeans._kmeans_Estep_dense(X, self.centroids, labels, distances)
+        inertia = c_kmeans._kmeans_Estep(X, self.centroids, labels, distances)
         return labels, inertia
 
     def Mstep(self, X, labels, sample_weight=None, distances=None):
         sample_weight = _check_sample_weight(sample_weight, X)
-        if sp.issparse(X):
-            centers = c_kmeans._kmeans_Mstep_sparse(X, sample_weight, labels, self.n_clusters, distances=distances)
-        else:
-            centers = c_kmeans._kmeans_Mstep_dense(X, sample_weight, labels, self.n_clusters, distances=distances)
+        centers = c_kmeans._kmeans_Mstep(X, sample_weight, labels, self.n_clusters, distances=distances)
         return centers
 
     def silhouette(self, X, axes=None, set_style=True):
@@ -129,26 +123,26 @@ class ElkanKMeans(KMeans):
         super().__init__(n_clusters=n_clusters, init=init, random_state=random_state, metrics=metrics)
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
+        self.centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
         sample_weight = _check_sample_weight(sample_weight, X)
-        self.centroids, labels = c_kmeans.k_means_elkan(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
+        labels = c_kmeans.k_means_elkan(X, sample_weight, self.n_clusters, self.centroids, tol=tol, max_iter=max_iter, verbose=verbose)
 
 class MixedGaussian(BaseEMmodel):
-    def __init__(self, n_clusters=8, random_state=None):
-        super().__init__(K=K, random_state=random_state)
+    def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):
+        super().__init__(n_clusters=n_clusters, init=init, random_state=random_state, metrics=metrics)
         self.centroids=None
         self.S=None
         self.pi=None
 
-    def fit(self, X, max_iter=100, memorize=False, tol=1e-5, initializer="uniform", verbose=1):
-        # Initialization.
-        self.train_initialize(X, initializer=initializer) # Initialize the mean value `self.centroids` within data space.
+    def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
+        self.centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed) # Initialize the mean value `self.centroids` within data space.
         self.S  = [1*np.eye(2) for k in range(self.n_clusters)] # Initialize with Diagonal matrix
         self.pi = np.ones(self.n_clusters)/self.n_clusters # Initialize with Uniform.
+        sample_weight = _check_sample_weight(sample_weight, X)
         # EM algorithm.
         for it in range(max_iter):
             gamma = self.Estep(X)
-            if memorize: self._memorize_param(gamma)
+            if memorize: self._memorize_param(np.argmax(gamma, axis=1), self.centroids, self.S, self.pi)
             self.Mstep(X, gamma)
             ll = self.loglikelihood(X)
             flush_progress_bar(it, max_iter, metrics={"Log Likelihood": ll}, verbose=verbose)
@@ -156,17 +150,12 @@ class MixedGaussian(BaseEMmodel):
             if it>0 and np.mean(np.linalg.norm(mus-pmus)) < tol: break
             pmus = mus
         if memorize: self._memorize_param(gamma)
-        print()
-
-    def memorize_param(self, gamma):
-        self.history.append([
-            np.argmax(gamma, axis=1),
-            (np.copy(self.centroids), np.copy(self.S), np.copy(self.pi))
-        ])
+        if verbose>0: print()
 
     def predict(self, X):
         gamma = self.Estep(X, normalized=False)
-        return gamma
+        labels = np.argmax(gamma, axis=1)
+        return labels
 
     def Estep(self, X, normalized=True):
         N,_ = X.shape

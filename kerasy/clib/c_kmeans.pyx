@@ -24,7 +24,7 @@ cdef floating euclidean_distance(floating* a, floating* b, int n_features) nogil
         result += diff * diff
     return sqrt(result)
 
-cdef update_labels_and_distances(
+cdef update_for_elkan(
         floating* X, floating* centers, floating[:, :] half_cent2cent,
         int[:] labels, floating[:, :] lower_bounds, floating[:] upper_bounds,
         Py_ssize_t n_samples, int n_features, int n_clusters):
@@ -146,7 +146,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
                   np.ndarray[floating, ndim=1, mode='c'] sample_weight,
                   int n_clusters,
                   np.ndarray[floating, ndim=2, mode='c'] centers,
-                  float tol=1e-4, int max_iter=300, verbose=False):
+                  float tol=1e-4, int max_iter=300, verbose=1):
     """Run Elkan's k-means.
     @params X             : The input data. shape=(n_samples, n_features)
     @params sample_weight : The weights for each observation in X. shape=(n_samples,)
@@ -178,9 +178,8 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
     cdef int[:] labels = labels_
 
     # Get the initial set of upper bounds and lower bounds for each sample.
-    update_labels_and_distances(X_p, centers_p, half_cent2cent,
-                                    labels, lower_bounds, upper_bounds,
-                                    n_samples, n_features, n_clusters)
+    update_for_elkan(X_p, centers_p, half_cent2cent, labels, lower_bounds,
+                     upper_bounds, n_samples, n_features, n_clusters)
     for it in range(max_iter):
         # START) Elkan's Estep
         # 1) For all clusters c and c', compute d(c,c').
@@ -223,7 +222,7 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
 
         # Update lower bounds and upper bounds.
         lower_bounds = np.maximum(lower_bounds - center_shift, 0)
-        upper_bounds = upper_bounds + center_shift[labels_]
+        upper_bounds += center_shift[labels_]
 
         # Reassign centers
         centers = new_centers
@@ -243,17 +242,16 @@ def k_means_elkan(np.ndarray[floating, ndim=2, mode='c'] X,
         half_cent2cent = pairwise_euclidean_distances(centers) / 2.
 
     if center_shift_total != 0:
-        update_labels_and_distances(X_p, centers_p, half_cent2cent,
-                                        labels, lower_bounds, upper_bounds,
-                                        n_samples, n_features, n_clusters)
-
+        update_for_elkan(X_p, centers_p, half_cent2cent, labels, lower_bounds,
+                         upper_bounds, n_samples, n_features, n_clusters)
+    if verbose>0: print()
     return centers, labels_
 
 def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
-                   np.ndarray[floating, ndim=1, mode='c'] sample_weight,
-                   int n_clusters,
-                   np.ndarray[floating, ndim=2, mode='c'] centers,
-                   float tol=1e-4, int max_iter=300, verbose=False):
+                    np.ndarray[floating, ndim=1, mode='c'] sample_weight,
+                    int n_clusters,
+                    np.ndarray[floating, ndim=2, mode='c'] centers,
+                    float tol=1e-4, int max_iter=300, verbose=1):
     """Run Hamerly's k-means.
     @params X             : The input data. shape=(n_samples, n_features)
     @params sample_weight : The weights for each observation in X. shape=(n_samples,)
@@ -264,7 +262,6 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
     @params verbose       : Whether to be verbose.
     """
     dtype = np.float32 if floating is float else np.float64
-
     # Initialization.
     cdef np.ndarray[floating, ndim=2, mode='c'] new_centers
     cdef floating* centers_p = <floating*>centers.data
@@ -276,17 +273,14 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
     cdef floating ub, rhs, dist
     cdef floating[:, :] half_cent2cent = pairwise_euclidean_distances(centers) / 2.
     cdef floating[:] nearest_center_half_dist
-    cdef floating[:] lower_bounds = np.partition(half_cent2cent, kth=1, axis=0)[1]
+    cdef floating[:] lower_bounds = np.partition(pairwise_euclidean_distances(X, centers), kth=1, axis=1)[:,1]
     upper_bounds_ = np.empty(n_samples, dtype=dtype)
     cdef floating[:] upper_bounds = upper_bounds_
-    cdef np.uint8_t[:] is_tight = np.ones(n_samples, dtype=np.uint8)
     labels_ = np.empty(n_samples, dtype=np.int32)
     cdef int[:] labels = labels_
+    # Initialize upper bounds
+    cdef float inertia = _kmeans_Estep(X, centers, labels_, upper_bounds_)
 
-    # Get the initial set of upper bounds and lower bounds for each sample.
-    update_labels_and_distances(X_p, centers_p, half_cent2cent,
-                                    labels, lower_bounds, upper_bounds,
-                                    n_samples, n_features, n_clusters)
     for it in range(max_iter):
         # START) Hamerly's Estep
         # nearest_center_half_dist[k] means the distance from center k to nearest center j(≠k)
@@ -318,6 +312,12 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
         center_shift = np.sqrt(np.sum((centers-new_centers)**2, axis=1))
         center_shift_total = np.sum(center_shift**2)
 
+        # Update lower bounds and upper bounds.
+        nd,st = np.partition(center_shift, kth=-2)[-2:]
+        upper_bounds += center_shift[labels_]
+        center_shift_most_other = np.where(center_shift==st, nd, st)
+        lower_bounds = np.maximum(lower_bounds - center_shift_most_other, 0)
+
         # Reassign centers
         centers = new_centers
         centers_p = <floating*>new_centers.data
@@ -335,15 +335,5 @@ def k_means_hamerly(np.ndarray[floating, ndim=2, mode='c'] X,
 
         half_cent2cent = pairwise_euclidean_distances(centers) / 2.
 
-        # Update lower bounds and upper bounds.
-        upper_bounds = upper_bounds + center_shift[labels_]
-        center_shift[labels_] = 0
-        lower_bounds = np.maximum(lower_bounds - np.max(center_shift, axis=1))
-
-
-    if center_shift_total != 0:
-        update_labels_and_distances(X_p, centers_p, half_cent2cent,
-                                        labels, lower_bounds, upper_bounds,
-                                        n_samples, n_features, n_clusters)
-
-   return labels_
+    if verbose>0: print()
+    return centers, labels_

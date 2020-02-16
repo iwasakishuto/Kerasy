@@ -32,7 +32,7 @@ cdef floating euclidean_distance(floating* a, floating* b, int n_features) nogil
         result += diff * diff
     return sqrt(result)
 
-def pairwise_euclidean_distances(
+def paired_euclidean_distances(
         np.ndarray[floating, ndim=2, mode='c'] X,
         np.ndarray[floating, ndim=2, mode='c'] Y):
     dtype = np.float32 if floating is float else np.float64
@@ -54,6 +54,6 @@ import numpy as np
 
 X = np.arange(1,11).reshape(-1,1).astype(float)
 Y = np.arange(1,11)[::-1].reshape(-1,1).astype(float)
-pairwise_euclidean_distances(X,Y)
+paired_euclidean_distances(X,Y)
 >>> array([9., 7., 5., 3., 1., 1., 3., 5., 7., 9.])
 ```

@@ -22,7 +22,7 @@ if __name__ == "__main__":
     for fn in p.glob("*.pyx"):
         fn = str(fn)
         print(fn)
-        name = fn.rstrip(".pyx")
+        name = fn.split(".")[0]
         extentions.append(
             Extension(
                 name=name,

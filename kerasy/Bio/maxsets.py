@@ -25,12 +25,43 @@ class MSS():
         else:
             return sL,offset+n_memory
 
+    def crun(self,R,limit,display=True,verbose=1,width=60):
+        try:
+            from ..clib import c_maxsets
+        except ImportError:
+            print("There is no c-extensions, so we run the `MSS.run`, which runs only with python")
+            self.run(R, limit, display=display, verbose=verbose, width=width)
+
+        if verbose>0: print("preparing for DP...")
+        R = np.asarray(R, dtype=float)
+        n_sequence = len(R)
+        n_memory   = n_sequence+1
+        if limit==1:
+            # There is no problem with passing the following function, but this is faster.
+            isin_sets = np.where(R>=0, 1, 0)
+            score = np.sum(np.where(R>=0, R, 0))
+        else:
+            S, T = c_maxsets.forward(R, limit, verbose=verbose)
+            score, tp_init = self.max_argmax(*S[:,-1], offset=n_sequence, n_memory=n_memory)
+            isin_sets = c_maxsets.traceback(T, tp_init)
+
+        if verbose>0: print("memorize the score as `self.score`...")
+        self.score = score
+        if verbose>0: print("memorize the maximum segmet sets as `self.isin_sets`...")
+        self.isin_sets = isin_sets
+
+        if display:
+            self.display(isin_sets=isin_sets, score=score, width=width)
+        else:
+            return score
+
     def run(self,R,limit,display=True,verbose=1,width=60):
         """
         @params r: Real numbers. 1-dimentional score sequence
         @params L: Minimum segment length. (Constraint)
         @return score:
         """
+        if verbose>0: print("preparing for DP...")
         R = np.asarray(R, dtype=float)
         n_sequence = len(R)
         n_memory   = n_sequence+1
@@ -43,7 +74,9 @@ class MSS():
             score,tp_init = self.max_argmax(*S[:,-1], offset=n_sequence, n_memory=n_memory)
             isin_sets = self.TraceBack(T, tp_init)
 
+        if verbose>0: print("memorize the score as `self.score`...")
         self.score = score
+        if verbose>0: print("memorize the maximum segmet sets as `self.isin_sets`...")
         self.isin_sets = isin_sets
 
         if display:

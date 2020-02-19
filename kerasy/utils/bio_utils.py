@@ -44,7 +44,7 @@ def arangeFor_printAlignment(sequence, idxes, blank="-"):
     aligned_seq = "".join(blank if mask else sequence[idx] for mask,idx in zip(masks, idxes))
     return aligned_seq
 
-def printAlignment(sequences, indexes, score, scorename="Alignment score", seqname=None, model="", width=60, blank="-"):
+def printAlignment(sequences, indexes, score, scorename="Alignment score", add_info="", seqname=None, model="", width=60, blank="-"):
     """print Alignment Result.
     @params sequences: (list) Raw sequences.
     @params idxes    : (list) indexes. 0-origin indexes. -1 means the 'deletion' at the header.
@@ -66,7 +66,7 @@ def printAlignment(sequences, indexes, score, scorename="Alignment score", seqna
 
     if model: print(f"Model: {priColor.color(model, color='ACCENT')}")
     score = score if isinstance(score, int) else f"{score:.3f}"
-    print(f"{scorename}: {priColor.color(score, color='RED')}\n")
+    print(f"{scorename}: {priColor.color(score, color='RED')}\n{add_info}")
     print("=" * (9+2*digit+width))
     print(
         "\n\n".join([

@@ -6,79 +6,105 @@ from ..utils import printAlignment
 from ..utils import flush_progress_bar
 
 class MSS():
-    """ Maximum Segment Sum
-    ~~~~~ Vars.
-    - Score (shape=(2,N+1))
-        - S[0,:] memorizes S^0.
-        - S[1,:] memorizes S^L.
-        - S[:,0] memorizes dummy variables (Initialization)
-        - S[:,i+1] memorizes the maximum score from r[0] to r[i]
-    - TraceBack (shape=(L+1,N)): MaxSegmentSet includes r[i] if T[i]==1 else doesn't include.
-        - T[k] memorizes the set of S^0(n-L+k).
-        - T[L] memorizes the set of S^Ln-1.
-    """
+    """ Maximum Segment Sum """
     def __init__(self):
         self.score = None # shape=(2,N) Memorize data shape.
         self.isin_sets = None # shape=(2,N) Memorize data shape.
 
     @staticmethod
-    def maxargmax(s0,sL):
-        """ Finding maximum value from numbers including inf """
-        return (s0,0) if s0>=sL else (sL,1)
+    def max_argmax(s0, sL, offset=0, n_memory=1, limit=1):
+        """ Return Score and TraceBack Pointer Simultaneously
+        @params s0,sL    : score of S^0_n and S^L_n.
+        @params n        : index.
+        @params limit    : minimum length of segment sets.
+        @params n_memory : The length of memory.
+        """
+        if s0>=sL:
+            # if we think about s0, we sets limit=1.
+            return s0,offset+1-limit
+        else:
+            return sL,offset+n_memory
 
-    def run(self,r,L,display=True, verbose=1, width=60):
+    def TraceBack(self, T, tp):
+        n_memory  = len(T)//2
+        isin_sets = np.zeros(n_memory-1)
+        idx = tp%n_memory-1
+        if tp>=n_memory:
+            isin_sets[-1] = 1
+        while idx!=-1:
+            new_tp = T[tp]
+            new_idx = new_tp%n_memory-1
+
+            if idx-new_idx != 1:
+                # When Sn = ^0_{new_idx} and SL^{idx} = S^0_{new_idx} + sum(r[])
+                isin_sets[new_idx+1:idx] = 1
+            elif new_tp >= n_memory:
+                # When Sn = S^Ln
+                isin_sets[new_idx] = 1
+
+            idx = new_idx
+            tp = new_tp
+        return isin_sets
+
+    def run(self,R,limit,display=True,verbose=1,width=60):
         """
         @params r: Real numbers. 1-dimentional score sequence
         @params L: Minimum segment length. (Constraint)
         @return score:
         """
-        r = np.asarray(r)
-        N = len(r)
-
-        if L==1:
+        R = np.asarray(R, dtype=float)
+        if limit==1:
             # There is no problem with passing the following function, but this is faster.
-            isin_sets = np.where(r>=0, 1, 0)
-            score = sum(np.where(np.array(r)>0,r,0))
+            isin_sets = np.where(R>=0, 1, 0)
+            score = sum(np.where(R>=0, R, 0))
         else:
-            # Initialization
-            S = np.zeros(shape=(2,N+1), dtype=float) # Score.
-            S[1][0] = -np.inf
-            T = np.zeros(shape=(L+1,N), dtype=int) # TraceBack.
+            n_sequence = len(R)
+            n_memory   = n_sequence+1
+            S, T = self.forward(R, limit, verbose=verbose)
+            score,tp_init = self.max_argmax(*S[:,-1], offset=n_sequence, n_memory=n_memory)
+            isin_sets = self.TraceBack(T, tp_init)
 
-            # Reccursion
-            for n in range(N):
-                tmpT = T[1:-1]
-                """ Sn^0 """
-                score,idx = self.maxargmax(*S[:,n])
-                S[0,n+1]  = score
-                updateS0T = T[(L-1)+idx,:]
-                """ Sn^L """
-                score,idx = self.maxargmax(S[-1,n], S[0,n-L+1]+np.sum(r[n-L+1:n]) if n-L+1>=0 else -np.inf)
-                S[1,n+1]  = score + r[n]
-                updateSLT = np.append(T[0,:n-L+1],[1 for _ in range(L)]+[0 for _ in range(N-n-1)]) if idx else T[-1,:]
-                """ Update Trace Back """
-                T = np.r_[
-                    tmpT,
-                    updateS0T.reshape(1,-1),
-                    updateSLT.reshape(1,-1)
-                ]
-                T[-1,n] = 1
-                flush_progress_bar(n,N,barname="DP",metrics={"Maximum segment score": max(S[:,n+1])},verbose=verbose)
-            if verbose>=1: print()
-            score,idx = self.maxargmax(*S[:,-1])
-            isin_sets = T[-2+idx,:]
-            # Memorize.
-            self.score = S[:,1:]
-            self.isin_sets = T[-2:,:]
+        self.score = score
+        self.isin_sets = isin_sets
+        self.T = T
+        self.S = S
 
         if display:
-            printAlignment(
-                sequences=["".join(np.where(isin_sets==1, "-", "*"))],
-                indexes=[np.arange(N)],
-                score=score,
-                seqname=["S"],
-                width=width,
-                model=self.__class__.__name__
-            )
+            self.display(isin_sets=isin_sets, score=score, width=width)
         else:
             return score
+
+    def display(self, isin_sets=None, score=None, width=60):
+        if isin_sets is None:
+            isin_sets = self.isin_sets
+            score = self.score
+        printAlignment(
+            sequences=["".join(np.where(isin_sets==1, "*", "-"))],
+            indexes=[np.arange(len(isin_sets))],
+            score=score,
+            add_info="('*' means in sets)",
+            scorename="Maximum Sets Score",
+            seqname=["R"],
+            model=self.__class__.__name__,
+            width=width,
+        )
+
+    def forward(self, R, limit, verbose=1):
+        n_sequence = len(R)
+        n_memory   = n_sequence+1
+        # Initialization.
+        S = np.empty(shape=(2,n_memory), dtype=np.float)
+        T = np.zeros(shape=(2*n_memory), dtype=np.int32)
+        # Reccursion
+        for n in range(limit+1):
+            S[0,n] = 0
+            S[1,n] = -np.inf
+            flush_progress_bar(n, n_memory, barname="forward DP", metrics={"Maximum segment score": max(S[:,n])}, verbose=verbose)
+
+        for n in range(limit+1, n_sequence+1):
+            S[0,n], T[n]          = self.max_argmax(*S[:,n-1], offset=n-1, n_memory=n_memory, limit=1)
+            S[1,n], T[n+n_memory] = self.max_argmax(S[1,n-1], S[0,n-1-limit]+np.sum(R[n-limit:n-1]), offset=n-1, n_memory=n_memory, limit=limit)
+            flush_progress_bar(n, n_memory, barname="forward DP", metrics={"Maximum segment score": max(S[:,n])}, verbose=verbose)
+
+        if verbose>=1: print()
+        return S,T

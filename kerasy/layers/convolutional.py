@@ -88,19 +88,19 @@ class Conv2D(Layer):
         #=== generator ===
         for i in range(self.OH//self.sh):
             for j in range(self.OW//self.sw):
-                clipedXin = Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :]
+                clipedXin = Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]
                 yield clipedXin,i,j
 
+    # old version: https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
     def forward(self, input):
         """ @param input: (ndarray) 3-D array. shape=(H,W,F) """
         Xin  = self._paddInput(input)
-        a    = np.zeros(shape=(self.OH, self.OW, self.OF))
-        for c in range(self.OF):
-            for clip_image,i,j in self._generator(Xin):
-                """ 'self.kernel[:,:,:,c]' and 'clip_image' shapes equal in (kh,kw,F) """
-                a[i,j,c] = np.sum(clip_image*self.kernel[:,:,:,c])
-        a     += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
-        self.a = a # Memorize. (output layer. shape=(OH,OW,OF))
+        a    = np.empty(shape=(self.OH, self.OW, self.OF))
+        for clip_image,i,j in self._generator(Xin):
+            """ 'self.kernel[:,:,:,c]' and 'clip_image' shapes equal in (kh,kw,F) """
+            a[i,j,:] = np.sum(clip_image*self.kernel, axis=(0,1,2))
+        a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
+        self.a = a     # Memorize. (output layer. shape=(OH,OW,OF))
         Xout = self.h.forward(a)
         return Xout
 

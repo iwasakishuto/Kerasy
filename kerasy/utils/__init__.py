@@ -26,6 +26,8 @@ from .generic_utils import priColor
 from .generic_utils import handleKeyError
 from .generic_utils import urlDecorate
 from .generic_utils import measure_complexity
+from .generic_utils import has_all_attrs
+from .generic_utils import has_not_attrs
 
 from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors
@@ -48,6 +50,8 @@ from .np_utils import CategoricalEncoder
 from .np_utils import findLowerUpper
 from .np_utils import inverse_arr
 from .np_utils import _check_sample_weight
+from .np_utils import normalize
+from .np_utils import log_normalize
 
 from .param_utils import Params
 

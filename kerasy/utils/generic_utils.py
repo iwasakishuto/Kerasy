@@ -107,3 +107,9 @@ def measure_complexity(func, *args, repetitions_=10, **kwargs):
         return times/repetitions_
     else:
         return (times/repetitions_, metrics)
+
+def has_not_attrs(obj, *names):
+    return [name for name in names if not hasattr(obj, name)]
+
+def has_all_attrs(obj, *names):
+    return sum([1 for name in names if not hasattr(obj, name)])==0

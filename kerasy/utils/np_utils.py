@@ -1,5 +1,6 @@
 """Numpy-related utilities."""
 import numpy as np
+from scipy.special import logsumexp
 
 class CategoricalEncoder():
     def __init__(self):
@@ -70,3 +71,24 @@ def _check_sample_weight(sample_weight, X, dtype=np.float64):
         if sample_weight.shape != (n_samples,):
             raise ValueError(f"sample_weight.shape == {sample_weight.shape}, expected {(n_samples,)}!")
     return sample_weight
+
+def normalize(arr, axis=None):
+    """ Inplace Method
+    Normalizes the input array so that it sums to 1 along with `axis`.
+    @params arr : Non-normalized Input array.
+    @params axis: Dimension along which normalization is performed.
+    """
+    if axis is None:
+        arr /= arr.sum()
+    else:
+        arr /= np.expand_dims(arr.sum(axis), axis)
+
+def log_normalize(arr, axis=None):
+    """ Inplace Method
+    Normalizes the input array so that ``sum(exp(a)) == 1``.
+    @params arr : Non-normalized Input array.
+    @params axis: Dimension along which normalization is performed.
+    """
+    with np.errstate(under="ignore"):
+        a_lse = logsumexp(a, axis, keepdims=True)
+    a -= a_lse

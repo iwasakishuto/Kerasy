@@ -8,7 +8,7 @@ from fractions import Fraction
 
 UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
-class AdditionalTypeSupportJSONEncoder(json.JSONEncoder):
+class KerasyJSONEncoder(json.JSONEncoder):
     """ Support the additional type for saving to JSON file. """
     def default(self, obj):
         #=== Numpy object ===
@@ -22,37 +22,58 @@ class AdditionalTypeSupportJSONEncoder(json.JSONEncoder):
         elif isinstance(obj, datetime.datetime):
             return objisoformat()
         else:
-            return super(npEncoder, self).default(obj)
+            # Same as `super(KerasyJSONEncoder, self).default(obj)`
+            return super().default(obj)
 
 class Params():
+    """ Each class that inherits from this class describes the parameters to display.
+    ex)
+    ```
+    class Hoge(Params):
+        def __init__(self, *args, **kwargs):
+            super().__init__()
+            self.disp_params = ["paramsA", "paramsB"]
+            self.paramsA = 1
+            self.paramsB = "1"
+            self.paramsC = [1]
+    ```
+    > hoge = Hoge()
+    > hoge.params()
+    |Parameter|Value|
+    -----------------
+    |paramsA  |    1|
+    |paramsB  |    1|
+    """
     def __init__(self):
         self.disp_params = []
 
     def format_params(self, verbose=1, list_params=[], fraction_params=[], message=""):
         # Additional Method for arrangin parameters for suiting to the respective model.
+        # If you want to add some other methods, please add like follows.
         message = self.fraction2float(fraction_params=fraction_params, message=message, retmessage=True)
         message = self.list2np(list_params=list_params, message=message, retmessage=True)
         if verbose>0:
             print(message)
 
-    def load_params(self, path=None, verbose=1, list_params=["disp_params"], fraction_params=[], **kwargs):
+    def load_params(self, path=None, verbose=1, list_params=[], fraction_params=[], **kwargs):
         """Load parameters from json file.
-        @params path      : JSON file path.
-        @params verbose   : Display message if verbose > 0
-        @params listparams: If some params want to remain list instance, please specify.
+        @params path            : JSON file path.
+        @params list_params     : If some params want to remain list instance, please specify.
+        @params fraction_params : If some params are writen as fraction, and want to be used as float, please specify.
         """
+        list_params.append("disp_params")
         if path is None:
             path = os.path.join(UTILS_DIR_PATH, "default_params", f"{self.__class__.__name__}.json")
         message = f"Loading Parameters from '{path}'..."
         with open(path, 'r') as f:
-            params = json.load(f)
+            params = json.load(f, cls=KerasyJSONEncoder)
             self.__dict__.update(params)
         self.format_params(verbose=verbose, list_params=list_params, fraction_params=fraction_params, message=message)
 
     def save_params(self, path):
         """ Saving parameters (=`self.__dict__`) """
         with open(path, 'w') as f:
-            json.dump(self.__dict__, f, indent=2, cls=SupportEncoder)
+            json.dump(self.__dict__, f, indent=2, cls=KerasyJSONEncoder)
 
     def fraction2float(self, fraction_params=[], message="", retmessage=False):
         """ Convert Fraction to Float. """

@@ -9,6 +9,25 @@ from ..utils import Params
 from ..utils import flush_progress_bar
 from ..utils import has_not_attrs
 
+def iter_from_variable_len_samples(X, lengths=None):
+    """ yield starts and ends indexes of `X` per variable sample.
+    Each sample should have the `n_features` features.
+    np.sum(`lengths`) must be equal to `n_samples`
+    =============================================================
+    @params X       : Multiple connected samples. shape=(n_samples, n_features)
+    @params lengths : int array. shape=(n_sequences)
+    """
+    if lengths is None:
+        yield 0, len(X)
+    else:
+        n_samples = X.shape[0]
+        end = np.cumsum(lengths).astype(np.int32)
+        start = end - lengths
+        if end[-1] > n_samples:
+            raise ValueError("more than {:d} samples in lengths array {!s}".format(n_samples, lengths))
+        for i in range(len(lengths)):
+            yield start[i], end[i]
+
 class BaseHMM(Params):
     """ Hidden Markov Model.
     @attr n_hstates : (int) Number of hidden states.
@@ -77,7 +96,11 @@ class MultinomialHMM(BaseHMM):
     def __init__(self, n_hstates=3, init="random", random_state=None):
         super().__init__(n_hstates=n_hstates, init=init, random_state=random_state)
 
-    def fit(self, X, epochs=1, verbose=1, rtol=1e-7):
+    def fit(self, X, length=None, epochs=1, verbose=1, rtol=1e-7):
+        """
+        @params X       :
+        @params lengths :
+        """
         pMLL = 0 # post Mean Log Likelihood
         N = len(X)
         for epoch in range(epochs):

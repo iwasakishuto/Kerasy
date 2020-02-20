@@ -3,11 +3,14 @@ from __future__ import absolute_import
 
 import os
 import numpy as np
+from scipy.special import logsumexp
 import warnings
 
 from ..utils import Params
 from ..utils import flush_progress_bar
 from ..utils import has_not_attrs
+from ..utils import normalize, log_normalize
+from ..clib import c_hmm
 
 def iter_from_variable_len_samples(X, lengths=None):
     """ yield starts and ends indexes of `X` per variable sample.
@@ -38,8 +41,9 @@ class BaseHMM(Params):
     """
     def __init__(self, n_hstates=3, init="random", random_state=None):
         """
-        @params n_hstates : (int) Number of hidden states.
-        @params init      : (str) `path`, 'random'
+        @params n_hstates    : (int) Number of hidden states.
+        @params init         : (str) `path`, 'random'
+        @params random_state : (int) random state for initialization.
         """
         super().__init__()
         self.n_hstates = n_hstates
@@ -48,10 +52,7 @@ class BaseHMM(Params):
         self.history = []
 
     def _check_and_get_n_states(self, X):
-        """
-        Check if ``X`` is a sample from a Multinomial distribution, i.e. an
-        array of non-negative integers.
-        """
+        """  """
         if not np.issubdtype(X.dtype, np.integer):
             raise ValueError("Symbols should be integers")
         if X.min() < 0:
@@ -70,12 +71,12 @@ class BaseHMM(Params):
         self.n_states = self._check_and_get_n_states(X)
         if init=="random":
             rnd = np.random.RandomState(self.seed)
-            initial = rnd.rand(n_hstates)
-            self.initial = initial/np.sum(initial)
-            transit = rnd.rand(self.n_hstates, self.n_hstates) + np.diag(np.ones(shape=self.n_hstates)*0.3)
-            self.transit = transit/np.sum(transit, axis=1)[:,np.newaxis]
-            emission = rnd.rand(self.n_hstates, self.n_states)
-            self.emission = emission/np.sum(emission, axis=1)[:,np.newaxis]
+            self.initial = rnd.rand(n_hstates)
+            normalize(self.initial)
+            self.transit = rnd.rand(self.n_hstates, self.n_hstates) + np.diag(np.ones(shape=self.n_hstates)*0.3)
+            normalize(self.transit, axis=1)
+            self.emission = rnd.rand(self.n_hstates, self.n_states)
+            normalize(self.emission)
         elif os.path.exists(init):
             self.load_params(init)
             remain_attrs = has_not_attrs(self, "initial", "transit", "emission")
@@ -85,11 +86,89 @@ class BaseHMM(Params):
         else:
             raise ValueError(f"the `init` parameter should be 'random', or 'path/to/json', but got {init})
 
+    def score(self, X, length=None):
+        """ Compute the log likelihood under the model parameters.
+        @params X       : Multiple connected samples. shape=(n_samples, n_features)
+        @params lengths : int array. shape=(n_sequences)
+        """
+        ll = 0 # Log Likelihood.
+        for i, j in iter_from_variable_len_samples(X, lengths):
+            framelogprob = self._compute_log_likelihood(X[i:j])
+            logprobij, _fwdlattice = self._do_forward_pass(framelogprob)
+            logprob += logprobij
+        return logprob
+
     def predict(self, X):
         pass
 
     def sample(self, n_samples=1, random_state=None):
         pass
+
+    def fit(self, X, lengths=None, max_iter=10, tol=1e-4, verbose=1):
+        """ Train the model parameters.
+        @params X       : Multiple connected samples. shape=(n_samples, n_features)
+        @params lengths : int array. shape=(n_sequences)
+        """
+        self._init_params(X, self.init)
+        for it in range(max_iter):
+            stats = self._initialize_sufficient_statistics()
+            curr_logprob = 0
+            for i, j in iter_from_X_lengths(X, lengths):
+                framelogprob = self._compute_log_likelihood(X[i:j])
+                logprob, fwdlattice = self._do_forward_pass(framelogprob)
+                curr_logprob += logprob
+                bwdlattice = self._do_backward_pass(framelogprob)
+                posteriors = self._compute_posteriors(fwdlattice, bwdlattice)
+                self._accumulate_sufficient_statistics(stats, X[i:j], framelogprob, posteriors, fwdlattice, bwdlattice)
+
+            # XXX must be before convergence check, because otherwise
+            #     there won't be any updates for the case ``n_iter=1``.
+            self._do_mstep(stats)
+            self.monitor_.report(curr_logprob)
+            if self.monitor_.converged:
+                break
+
+        if (self.transmat_.sum(axis=1) == 0).any():
+            _log.warning("Some rows of transmat_ have zero sum because no "
+                         "transition from the state was ever observed.")
+
+        return self
+
+    def _do_viterbi_pass(self, framelogprob):
+        n_samples, n_components = framelogprob.shape
+        state_sequence, logprob = _hmmc._viterbi(
+            n_samples, n_components, log_mask_zero(self.startprob_),
+            log_mask_zero(self.transmat_), framelogprob)
+        return logprob, state_sequence
+
+    def _do_forward_pass(self, framelogprob):
+        n_samples, n_components = framelogprob.shape
+        fwdlattice = np.zeros((n_samples, n_components))
+        _hmmc._forward(n_samples, n_components,
+                       log_mask_zero(self.startprob_),
+                       log_mask_zero(self.transmat_),
+                       framelogprob, fwdlattice)
+        with np.errstate(under="ignore"):
+            return logsumexp(fwdlattice[-1]), fwdlattice
+
+    def _do_backward_pass(self, framelogprob):
+        n_samples, n_components = framelogprob.shape
+        bwdlattice = np.zeros((n_samples, n_components))
+        _hmmc._backward(n_samples, n_components,
+                        log_mask_zero(self.startprob_),
+                        log_mask_zero(self.transmat_),
+                        framelogprob, bwdlattice)
+        return bwdlattice
+
+    def _compute_posteriors(self, fwdlattice, bwdlattice):
+        # gamma is guaranteed to be correctly normalized by logprob at
+        # all frames, unless we do approximate inference using pruning.
+        # So, we will normalize each frame explicitly in case we
+        # pruned too aggressively.
+        log_gamma = fwdlattice + bwdlattice
+        log_normalize(log_gamma, axis=1)
+        with np.errstate(under="ignore"):
+            return np.exp(log_gamma)
 
 class MultinomialHMM(BaseHMM):
     """ Hidden Markov Model with multinomial (discrete) emissions """

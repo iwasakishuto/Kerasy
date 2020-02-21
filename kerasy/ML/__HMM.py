@@ -36,7 +36,7 @@ class BaseHMM(Params):
     @attr n_hstates : (int) Number of hidden states.
     @attr n_states  : (int) Number of possible symbols emitted by the model.
     @attr initial   : Initial hidden states probabilities. shape=(n_hstates)
-    @attr transit  : transition probabilities between hidden states. shape=(n_hstates, n_hstates)
+    @attr transit   : transition probabilities between hidden states. shape=(n_hstates, n_hstates)
     @attr emission  : The emission probability per each hidden states. shape=(n_hstates, n_states)
     """
     def __init__(self, n_hstates=3, init="random", random_state=None):
@@ -104,30 +104,66 @@ class BaseHMM(Params):
     def sample(self, n_samples=1, random_state=None):
         pass
 
+    def _Estep_log_forward(self, log_cond_prob):
+        """ Log-scaled forward algorithm.
+        @params log_cond_prob : Log conditional probabilities. p(x_n,z_n) shape=(n_samples, n_hstates)
+        @return log_prob      : Log scaled probability. p(X)
+        @return log_alpha     : Log scaled alpha. shape=(n_samples, n_hstates)
+        """
+        log_alpha = c_hmm._log_forward(
+            log_mask_zero(self.initial),
+            log_mask_zero(self.transit),
+            log_cond_prob
+        )
+        with np.errstate(under="ignore"):
+            # (PRML 13.42) p(X) = sum_{z_N}(alpha(z_N))
+            log_prob = logsumexp(log_alpha[-1])
+            return log_prob, log_alpha
+
+    def _Estep_log_backward(self, log_cond_prob):
+        """ Log-scaled backward algorithm.
+        @params log_cond_prob : Log conditional probabilities. p(x_n,z_n) shape=(n_samples, n_hstates)
+        @return log_beta      : Log scaled beta. shape=(n_samples, n_hstates)
+        """
+        log_beta = c_hmm._log_backward(
+            log_mask_zero(self.initial),
+            log_mask_zero(self.transit),
+            log_cond_prob
+        )
+        return log_beta
+
+    def _compute_posteriors(self, log_alpha, log_beta):
+        """ Compute log-scaled gamma(z_n) = p(z_n|X) = p(X|z_n)*p(z_n) / p(X) """
+        # (PRML 13.33) gamma(z_n) = alpha(z_n)*beta(z_n) / p(X)
+        log_gamma = log_alpha + log_beta
+        log_normalize(log_gamma, axos=1)
+        with np.errstate(under="ifnore"):
+            return np.exp(log_gamma)
+
     def fit(self, X, lengths=None, max_iter=10, tol=1e-4, verbose=1):
-        """ Train the model parameters.
+        """ Baum-Welch Algorithm
         @params X       : Multiple connected samples. shape=(n_samples, n_features)
         @params lengths : int array. shape=(n_sequences)
         """
         self._init_params(X, self.init)
+        self._check_params_validity()
         for it in range(max_iter):
-            stats = self._initialize_sufficient_statistics()
-            curr_logprob = 0
-            for i, j in iter_from_X_lengths(X, lengths):
-                framelogprob = self._compute_log_likelihood(X[i:j])
-                logprob, fwdlattice = self._do_forward_pass(framelogprob)
-                curr_logprob += logprob
-                bwdlattice = self._do_backward_pass(framelogprob)
-                posteriors = self._compute_posteriors(fwdlattice, bwdlattice)
-                self._accumulate_sufficient_statistics(stats, X[i:j], framelogprob, posteriors, fwdlattice, bwdlattice)
+            current_log_cond_prob = 0.
+            for i,j in iter_from_X_lengths(X, lengths):
+                # log conditional probability (start with ith)
+                log_cond_prob_swi = self._compute_log_likelihood(X[i:j])
+                log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_swi)
+                current_log_cond_prob += log_prob
+                log_beta = self._Estep_log_backward(log_cond_prob_swi)
+                posteriors = self._compute_posteriors(log_alpha, bwdlattice)
+                # TODO: Update parameters.
+                # self._accumulate_sufficient_statistics(stats, X[i:j], log_cond_prob_swi, posteriors, log_alpha, log_beta)
 
             # XXX must be before convergence check, because otherwise
             #     there won't be any updates for the case ``n_iter=1``.
             self._do_mstep(stats)
-            self.monitor_.report(curr_logprob)
-            if self.monitor_.converged:
+            if "CONDITION":
                 break
-
         if (self.transmat_.sum(axis=1) == 0).any():
             _log.warning("Some rows of transmat_ have zero sum because no "
                          "transition from the state was ever observed.")

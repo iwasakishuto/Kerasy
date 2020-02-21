@@ -97,7 +97,7 @@ class Conv2D(Layer):
         Xin  = self._paddInput(input)
         a    = np.empty(shape=(self.OH, self.OW, self.OF))
         for clip_image,i,j in self._generator(Xin):
-            """ 'self.kernel[:,:,:,c]' and 'clip_image' shapes equal in (kh,kw,F) """
+            """ 'self.kernel' and np.expand_dims('clip_image', axis=-1) shapes equal to ( kh,kw,F,OF(None) ) """
             a[i,j,:] = np.sum(clip_image*self.kernel, axis=(0,1,2))
         a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
         self.a = a     # Memorize. (output layer. shape=(OH,OW,OF))

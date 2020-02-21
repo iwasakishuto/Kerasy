@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import datetime
+import numpy as np
 from six.moves.urllib.request import urlretrieve
 
 from collections import defaultdict
@@ -113,3 +114,13 @@ def has_not_attrs(obj, *names):
 
 def has_all_attrs(obj, *names):
     return sum([1 for name in names if not hasattr(obj, name)])==0
+
+def handle_random_state(seed):
+    """ Turn `np.random.RandomState` """
+    if seed is None:
+        return np.random.mtrand._rand
+    if isinstance(seed, np.random.RandomState):
+        return seed
+    if isinstance(seed, int):
+        return np.random.RandomState(seed)
+    raise ValueError(f"Could not conver {seed} to numpy.random.RandomState instance.")

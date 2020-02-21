@@ -8,9 +8,13 @@ import warnings
 
 from ..utils import Params
 from ..utils import flush_progress_bar
+from ..utils import handleKeyError
+from ..utils import handle_random_state
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize
 from ..clib import c_hmm
+
+DECODER_ALGORITHMS = ["map", "viterbi"]
 
 def iter_from_variable_len_samples(X, lengths=None):
     """ yield starts and ends indexes of `X` per variable sample.
@@ -39,7 +43,7 @@ class BaseHMM(Params):
     @attr transit   : transition probabilities between hidden states. shape=(n_hstates, n_hstates)
     @attr emission  : The emission probability per each hidden states. shape=(n_hstates, n_states)
     """
-    def __init__(self, n_hstates=3, init="random", random_state=None):
+    def __init__(self, n_hstates=3, init="random", algorithm="viterbi", random_state=None):
         """
         @params n_hstates    : (int) Number of hidden states.
         @params init         : (str) `path`, 'random'
@@ -48,6 +52,7 @@ class BaseHMM(Params):
         super().__init__()
         self.n_hstates = n_hstates
         self.init = init
+        self.algorithm = algorithm
         self.seed = random_state
         self.history = []
 
@@ -86,23 +91,152 @@ class BaseHMM(Params):
         else:
             raise ValueError(f"the `init` parameter should be 'random', or 'path/to/json', but got {init})
 
+    def _compute_log_likelihood(self, X):
+        """ Computes per-component log probability under the model.
+        @params X             : Multiple connected samples. shape=(n_samples, n_features)
+        @params log_cond_prob : Log conditional probabilities. shape=(n_samples, n_hstates)
+        """
+        raise NotImplementedError("This class is Abstract")
+
+    def _mstep(self):
+        raise NotImplementedError("This class is Abstract.")
+
+    def fit(self, X, lengths=None, max_iter=10, tol=1e-4, verbose=1):
+        """ Baum-Welch Algorithm
+        @params X       : Multiple connected samples. shape=(n_samples, n_features)
+        @params lengths : int array. shape=(n_sequences)
+        """
+        self._init_params(X, self.init)
+        self._check_params_validity()
+        for it in range(max_iter):
+            current_log_prob = 0.
+            for i,j in iter_from_X_lengths(X, lengths):
+                # log conditional probability (start with ith)
+                log_cond_prob_ij = self._compute_log_likelihood(X[i:j])
+                log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_ij)
+                current_log_prob += log_prob
+                log_beta = self._Estep_log_backward(log_cond_prob_ij)
+                posteriors = self._compute_posteriors(log_alpha, bwdlattice)
+                # TODO: Update parameters.
+                # self._accumulate_sufficient_statistics(stats, X[i:j], log_cond_prob_ij, posteriors, log_alpha, log_beta)
+            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
+            self._mstep()
+            if "CONDITION":
+                break
+        return
+
+    def score_samples(self, X, length=None):
+        """ Compute the posterior probability for each hidden state.
+        @params X       : Multiple connected samples. shape=(n_samples, n_features)
+        @params lengths : int array. shape=(n_sequences)
+        """
+        self._check_params_validity()
+        n_samples = X.shape
+        log_prob = 0.
+        posterior_prob = np.empty(shape=(n_samples, self.n_hstates))
+        for i,j in iter_from_X_lengths(X, lengths):
+            log_cond_prob_ij = self._compute_log_likelihood(X[i:j])
+            log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_ij)
+            log_prob += log_prob_ij
+
+            log_beta = self._Estep_log_backward(log_cond_prob_ij)
+            posterior_prob[i:j] = self._compute_posteriors(log_alpha, log_beta)
+        return log_prob, posterior_prob
+
     def score(self, X, length=None):
         """ Compute the log likelihood under the model parameters.
         @params X       : Multiple connected samples. shape=(n_samples, n_features)
         @params lengths : int array. shape=(n_sequences)
         """
-        ll = 0 # Log Likelihood.
+        self._check_params_validity()
+        log_prob = 0.
+        for i,j in iter_from_X_lengths(X, lengths):
+            log_cond_prob_ij = self._compute_log_likelihood(X[i:j])
+            log_prob_ij, _ = self._Estep_log_forward(log_cond_prob_ij)
+            log_prob += log_prob_ij
+        return log_prob
+
+    def _decode_viterbi(self, X):
+        """ Decode by viterbi algorithm. """
+        log_cond_prob = self._compute_log_likelihood(X)
+        # logprob, ml_hstates = self._viterbi(log_cond_prob)
+        return self._viterbi(log_cond_prob)
+
+    def _decode_map(self, X):
+        """ Decode by MAP(Maximum A Posteriori) estimation """
+        _, posterior_prob = self.score_samples(X)
+        log_prob = np.max(posterior_prob, axis=1).sum()
+        ml_hstates = np.argmax(posteriors, axis=1)
+        return logprob, ml_hstates
+
+    def decode(self, X, lengths=None, algorithm=None):
+        """ Find the maximum likelihood hidden state sequences. """
+        self.check()
+        # The value of the preceding variable takes precedence.
+        # Therefore, this code is same as the followings.
+        # `algorithm = self.algorithm if algorithm is None else algoritm`
+        algorithm = (algorithm or self.algorithm).lower()
+        if algorithm not in ["viterbi", ]:
+            handleKeyError(DECODER_ALGORITHMS, algorithm=algorithm)
+        decode_func = {
+            "viterbi": self._decode_viterbi,
+            "map": self._decode_map
+        }[algorithm]
+
+        n_samples = X.shape[0]
+        log_prob = 0
+        ml_hstates = np.empty(n_samples, dtype=int)
         for i, j in iter_from_variable_len_samples(X, lengths):
-            framelogprob = self._compute_log_likelihood(X[i:j])
-            logprobij, _fwdlattice = self._do_forward_pass(framelogprob)
-            logprob += logprobij
-        return logprob
+            log_prob_ij, ml_hstates_ij = decode_func(X[i:j])
+            log_prob += log_prob_ij
+            state_sequence[i:j] = ml_hstates_ij
+        return log_prob, ml_hstates
 
-    def predict(self, X):
-        pass
+    def predict(self, X, lengths=None, algorithm=None):
+        """ Find Maximum likelihood hidden state sequences. """
+        _, ml_hstates = self.decode(X, lengths, algorithm=algorithm)
+        return ml_hstates
 
-    def sample(self, n_samples=1, random_state=None):
-        pass
+    def predict_proba(self, X, lengths=None):
+        """ Compute the posterior probability for each hidden state. """
+        _, posterior_prob = self.score_samples(X, lengths)
+        return posterior_prob
+
+    def sample(self, n_samples=1, random_state=None, verbose=1):
+        """Generate random samples from the model.
+        @params n_samples    : (int) Number of samples to generate.
+        @params random_state : (int) seed.
+        """
+        self._check_params_validity()
+        rnd = handle_random_state(self.seed if random_state is None else random_state)
+
+        transit = self.transit
+        hidden_states = np.arange(self.n_hstates)
+
+        # Initialization.
+        h_state_sequences = np.empty(shape=n_samples, dtype=int)
+        h_state_sequences[0] = h_state = self.initial.argmax()
+        samples = [self._generate_sample(h_state, random_state=rnd)]
+        flush_progress_bar(0, n_samples, metrics={"hidden state": h_state})
+        for n in range(1, n_samples):
+            h_state_sequences[n] = h_state = rnd.choice(a=hidden_states, p=transit[h_state])
+            samples.append(self._generate_sample(h_state, random_state=rnd))
+            flush_progress_bar(n, n_samples, metrics={"hidden state": h_state})
+
+        return np.atleast_2d(samples), np.asarray(h_state_sequences, dtype=int)
+
+    def _viterbi(self, log_cond_prob):
+        """ viterbi algorithm.
+        @params log_cond_prob    : Log conditional probabilities. shape=(n_samples, n_hstates)
+        @return log_prob         : Log scaled probability if the states were emitted from `ml_hstates`.
+        @return ml_hstates       : Maximum likelihood hidden state sequences. shape=(n_samples)
+        """
+        ml_hstates, log_prob = c_hmm._log_forward(
+            log_mask_zero(self.initial),
+            log_mask_zero(self.transit),
+            log_cond_prob
+        )
+        return logprob, ml_hstates
 
     def _Estep_log_forward(self, log_cond_prob):
         """ Log-scaled forward algorithm.
@@ -138,72 +272,6 @@ class BaseHMM(Params):
         log_gamma = log_alpha + log_beta
         log_normalize(log_gamma, axos=1)
         with np.errstate(under="ifnore"):
-            return np.exp(log_gamma)
-
-    def fit(self, X, lengths=None, max_iter=10, tol=1e-4, verbose=1):
-        """ Baum-Welch Algorithm
-        @params X       : Multiple connected samples. shape=(n_samples, n_features)
-        @params lengths : int array. shape=(n_sequences)
-        """
-        self._init_params(X, self.init)
-        self._check_params_validity()
-        for it in range(max_iter):
-            current_log_cond_prob = 0.
-            for i,j in iter_from_X_lengths(X, lengths):
-                # log conditional probability (start with ith)
-                log_cond_prob_swi = self._compute_log_likelihood(X[i:j])
-                log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_swi)
-                current_log_cond_prob += log_prob
-                log_beta = self._Estep_log_backward(log_cond_prob_swi)
-                posteriors = self._compute_posteriors(log_alpha, bwdlattice)
-                # TODO: Update parameters.
-                # self._accumulate_sufficient_statistics(stats, X[i:j], log_cond_prob_swi, posteriors, log_alpha, log_beta)
-
-            # XXX must be before convergence check, because otherwise
-            #     there won't be any updates for the case ``n_iter=1``.
-            self._do_mstep(stats)
-            if "CONDITION":
-                break
-        if (self.transmat_.sum(axis=1) == 0).any():
-            _log.warning("Some rows of transmat_ have zero sum because no "
-                         "transition from the state was ever observed.")
-
-        return self
-
-    def _do_viterbi_pass(self, framelogprob):
-        n_samples, n_components = framelogprob.shape
-        state_sequence, logprob = _hmmc._viterbi(
-            n_samples, n_components, log_mask_zero(self.startprob_),
-            log_mask_zero(self.transmat_), framelogprob)
-        return logprob, state_sequence
-
-    def _do_forward_pass(self, framelogprob):
-        n_samples, n_components = framelogprob.shape
-        fwdlattice = np.zeros((n_samples, n_components))
-        _hmmc._forward(n_samples, n_components,
-                       log_mask_zero(self.startprob_),
-                       log_mask_zero(self.transmat_),
-                       framelogprob, fwdlattice)
-        with np.errstate(under="ignore"):
-            return logsumexp(fwdlattice[-1]), fwdlattice
-
-    def _do_backward_pass(self, framelogprob):
-        n_samples, n_components = framelogprob.shape
-        bwdlattice = np.zeros((n_samples, n_components))
-        _hmmc._backward(n_samples, n_components,
-                        log_mask_zero(self.startprob_),
-                        log_mask_zero(self.transmat_),
-                        framelogprob, bwdlattice)
-        return bwdlattice
-
-    def _compute_posteriors(self, fwdlattice, bwdlattice):
-        # gamma is guaranteed to be correctly normalized by logprob at
-        # all frames, unless we do approximate inference using pruning.
-        # So, we will normalize each frame explicitly in case we
-        # pruned too aggressively.
-        log_gamma = fwdlattice + bwdlattice
-        log_normalize(log_gamma, axis=1)
-        with np.errstate(under="ignore"):
             return np.exp(log_gamma)
 
 class MultinomialHMM(BaseHMM):

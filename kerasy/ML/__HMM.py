@@ -12,28 +12,10 @@ from ..utils import handleKeyError
 from ..utils import handle_random_state
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize
+from ..utils import iter_from_variable_len_samples
 from ..clib import c_hmm
 
 DECODER_ALGORITHMS = ["map", "viterbi"]
-
-def iter_from_variable_len_samples(X, lengths=None):
-    """ yield starts and ends indexes of `X` per variable sample.
-    Each sample should have the `n_features` features.
-    np.sum(`lengths`) must be equal to `n_samples`
-    =============================================================
-    @params X       : Multiple connected samples. shape=(n_samples, n_features)
-    @params lengths : int array. shape=(n_sequences)
-    """
-    if lengths is None:
-        yield 0, len(X)
-    else:
-        n_samples = X.shape[0]
-        end = np.cumsum(lengths).astype(np.int32)
-        start = end - lengths
-        if end[-1] > n_samples:
-            raise ValueError("more than {:d} samples in lengths array {!s}".format(n_samples, lengths))
-        for i in range(len(lengths)):
-            yield start[i], end[i]
 
 class BaseHMM(Params):
     """ Hidden Markov Model.
@@ -87,7 +69,7 @@ class BaseHMM(Params):
         self.model_params = ["initial", "transit"]
 
     # @overrided
-    def _check_params_validity():
+    def _check_params_validity(self):
         """ Validates model parameters.
         This method checks `self.initial` and `self.transit` only, and
         each sub class must override this method, as followings:
@@ -264,7 +246,7 @@ class BaseHMM(Params):
                 posterior_prob = self._compute_posteriors(log_alpha, log_beta)
                 self._update_statistics(statistics, X[i:j], log_cond_prob_ij, posterior_prob, log_alpha, log_beta)
 
-            self._mstep(statistics)
+            self._Mstep(statistics)
             flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
             if it>0 and prev_log_prob - current_log_prob < tol:
                 break
@@ -438,17 +420,45 @@ class MultinomialHMM(BaseHMM):
         self.disp_params.extend([])
         self.model_params.extend(["emission"])
 
-    def _check_and_get_n_states(self, X):
-        """  """
+    def _check_params_validity(self):
+        super()._check_params_validity()
+        self.emission = emission = np.asarray(self.emission)
+        if emission.shape != (self.n_hstates, self.n_states):
+            raise ValueError(f"self.emission must have shape (n_hstates, n_states)",
+                             f"({emission.shape} != {n_hstates, n_states})"
+        if not np.allclose(emission.sum(axis=1), 1.0):
+            raise ValueError(f"self.emission must sum to 1.0 (but got {emission.sum(axis=1)})")
+
+    def _check_and_get_nstates(self, X):
+        """ Check if ``X`` is a sample from a Multinomial distribution and get `n_states`. """
         if not np.issubdtype(X.dtype, np.integer):
             raise ValueError("Symbols should be integers")
         if X.min() < 0:
             raise ValueError("Symbols should be nonnegative")
-        if hasattr(self, "n_states"):
-            if self.n_states-1 < X.max():
-                raise ValueError(
-                    "Largest symbol is {} but the model only emits "
-                    "symbols up to {}"
-                    .format(X.max(), self.n_states-1))
-        n_states = X.max()+1
-        return n_states
+        return X.max() + 1
+
+    def _init_params(self, X, init):
+        self.n_states = self._check_and_get_nstates(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.emission = self.rnd.rand(self.n_hstates, self.n_states)
+            normalize(self.emission, axis=1)
+
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+        statistics['observation'] = np.zeros((self.n_hstates, self.n_states))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if 'e' in self.up_params:
+            for n,symbol in enumerate(np.concatenate(X)):
+                statistics['observation'][:, symbol] += posterior_prob[n]
+
+    def _Mstep(statistics):
+        super()._do_mstep(statistics)
+
+        if 'e' in self.up_params:
+            self.emission = statistics['obs'] / statistics['obs'].sum(axis=1)[:, np.newaxis]

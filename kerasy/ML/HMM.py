@@ -1,35 +1,4 @@
 #coding: utf-8
-"""[Hidden Markov Model]
-When implementing a hidden Markov model with a new emission probability,
-you need to define the following methods:
-
-- Method which needs to be implemented.
-    - _get_params_size(self)
-    - _generate_sample(self, hstate, random_state=None)
-    - _compute_log_likelihood(self, X)
-    - _check_input_and_get_HOGEHOGE(self, X)
-- Method which needs to be overrided.
-    - _check_params_validity(self)
-    - _init_params(self, X, init)
-    - _init_statistics(self)
-    - _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
-    - _Mstep(statistics):
-
-If you need a new instance variable `HOGEHOGE`, use the following method.
-
-```
-def _check_input_and_get_HOGEHOGE():
-    ...
-    return HOGEHOGE
-
-def _init_params(self, X, init):
-    self.HOGEHOGE = self._check_input_and_get_HOGEHOGE(X)
-    super()._init_params(X, init)
-
-    if isinstance(init, str) and init=="random":
-        self.PIYO = self.rnd.rand(...
-```
-"""
 import os
 import string
 import numpy as np
@@ -43,8 +12,11 @@ from ..utils import handleKeyError
 from ..utils import handle_random_state
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize, log_mask_zero
+from ..utils import reshape_covariances, log_multivariate_normal_density
 from ..utils import iter_from_variable_len_samples
 from ..clib import c_hmm
+
+from EM import KMeans
 
 DECODER_ALGORITHMS = ["viterbi", "map",]
 DECODER_FUNC_NAMES = ["_decode_viterbi", "_decode_map"]
@@ -61,33 +33,72 @@ class BaseHMM(Params):
 
     ~~~ Depending on the model Class
 
-    - Discrete Multinomial HMM (ite)
-        - @attr n_features : (int) Number of possible symbols emitted by the model.
-        - @attr emission   : The emission probability per each hidden states. shape=(n_hstates, n_states)
-        - @attr n_states   : (int) Number of possible symbols emitted by the model.
+    * Discrete Multinomial HMM (ite)
+        + @attr n_features : (int) Number of possible symbols emitted by the model.
+        + @attr emission   : The emission probability per each hidden states. shape=(n_hstates, n_states)
+        + @attr n_states   : (int) Number of possible symbols emitted by the model.
 
-    - Gaussian Mixture HMM (itwmc)
-        - @attr n_features : (int) Dimensionality of the Gaussian emissions.
-        - @attr n_mix      : (int) Number of states in the GMM.
-        - @attr weights    : Mixture weights for each state. shape=(n_hstates, n_mix)
-        - @attr means      : Mean parameters for each mixture component in each state. shape=(n_hstates, n_mix)
-        - @attr covars     : Covariance parameters for each mixture components in each state.
+    ~~~~~~
+    @attr covariance_type  : (str) The type of covariance parameters to use.
+        | "spherical" | single variance value that applies to all features.     |
+        | "diag"      | diagonal covariance matrix.                             |
+        | "full"      | full (i.e. unrestricted) covariance matrix.             |
+        | "tied"      | All hidden states use "the same" full covariance matrix.|
+    ~~~~~~
+
+    * Gaussian Mixture HMM (itwmc)
+        + @attr n_features : (int) Dimensionality of the Gaussian emissions.
+        + @attr n_mix      : (int) Number of states in the GMM.
+        + @attr weights    : Mixture weights for each state. shape=(n_hstates, n_mix)
+        + @attr means      : Mean parameters for each mixture component in each state. shape=(n_hstates, n_mix)
+        + @attr covars     : Covariance parameters for each mixture components in each state.
                              The shape depends on `covariance_type`
                                  - shape=(n_hstates, n_mix)                         if "spherical"
                                  - shape=(n_hstates, n_mix, n_features)             if "diag"
                                  - shape=(n_hstates, n_mix, n_features, n_features) if "full"
                                  - shape=(n_hstates, n_features, n_features)        if "tied"
 
-    - Gaussian HMM (itmc)
-        - @attr n_features : (int) Dimensionality of the Gaussian emissions.
-        - @attr means      : Mean parameters for each state. shape=(n_hstates, n_features)
-        - @attr covars     : Covariance parameters for each state.
+    * Gaussian HMM (itmc)
+        + @attr n_features : (int) Dimensionality of the Gaussian emissions.
+        + @attr means      : Mean parameters for each state. shape=(n_hstates, n_features)
+        + @attr covars     : Covariance parameters for each state.
                              The shape depends on `covariance_type`
                                  - shape=(n_hstates)                         if "spherical"
                                  - shape=(n_hstates, n_features)             if "diag"
                                  - shape=(n_hstates, n_features, n_features) if "full"
                                  - shape=(n_features, n_features)            if "tied"
 
+    ============================================================================
+
+    When implementing a hidden Markov model with a new emission probability,
+    you need to define the following methods:
+
+    - Method which needs to be implemented.
+        - _get_params_size(self)
+        - _generate_sample(self, hstate, random_state=None)
+        - _compute_log_likelihood(self, X)
+        - _check_input_and_get_HOGEHOGE(self, X)
+    - Method which needs to be overrided.
+        - _check_params_validity(self)
+        - _init_params(self, X, init)
+        - _init_statistics(self)
+        - _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+        - _Mstep(statistics):
+
+    If you need a new instance variable `HOGEHOGE`, use the following method.
+
+    ```
+    def _check_input_and_get_HOGEHOGE():
+        ...
+        return HOGEHOGE
+
+    def _init_params(self, X, init):
+        self.HOGEHOGE = self._check_input_and_get_HOGEHOGE(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.PIYO = self.rnd.rand(...
+    ```
     """
     def __init__(self, n_hstates=3, init="random", algorithm="viterbi",
                  up_params=string.ascii_letters, random_state=None):
@@ -214,6 +225,7 @@ class BaseHMM(Params):
         """
         statistics['n_sample'] += 1
         if 'i' in self.up_params:
+            # (PRML 13.18) pi_k = gamma(z_{ik}) / sum_j(gamma(z_{ij}))
             statistics['initial'] += posterior_prob[0]
         if 't' in self.up_params:
             n_samples, n_components = log_cond_prob.shape
@@ -222,7 +234,7 @@ class BaseHMM(Params):
                     log_alpha, log_beta, log_mask_zero(self.transit), log_cond_prob
                 )
                 with np.errstate(under="ignore"):
-                    statistics['transit'] += np.exp(log_xi_sum)
+                    statistics['xi'] += np.exp(log_xi_sum)
 
     # @abstractmethod
     def _get_params_size(self):
@@ -255,7 +267,8 @@ class BaseHMM(Params):
             self.initial = np.where(statistics['initial']==0, 0, statistics['initial'])
             normalize(self.initial)
         if 't' in self.up_params:
-            self.transit = np.where(statistics['transit']==0, 0, statistics['transit'])
+            # (PRML 13.19) A_jk =
+            self.transit = np.where(statistics['xi']==0, 0, statistics['xi'])
             normalize(self.transit, axis=1)
 
     def fit(self, X, lengths=None, max_iter=10, tol=1e-4, verbose=1):
@@ -332,8 +345,8 @@ class BaseHMM(Params):
         """ Decode by MAP(Maximum A Posteriori) estimation """
         _, posterior_prob = self.score_samples(X)
         log_prob = np.max(posterior_prob, axis=1).sum()
-        ml_hstates = np.argmax(posteriors, axis=1)
-        return logprob, ml_hstates
+        ml_hstates = np.argmax(posterior_prob, axis=1)
+        return log_prob, ml_hstates
 
     def decode(self, X, lengths=None, algorithm=None):
         """ Find the maximum likelihood hidden state sequences. """
@@ -448,9 +461,8 @@ class MultinomialHMM(BaseHMM):
     def __init__(self, n_hstates=3, init="random", algorithm="viterbi",
                  up_params="ite", random_state=None):
         super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
-                         up_params=up_params,
-                         random_state=random_state)
-        self.disp_params.extend([])
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["n_states"])
         self.model_params.extend(["emission"])
 
     def _get_params_size(self):
@@ -504,6 +516,7 @@ class MultinomialHMM(BaseHMM):
 
         if 'e' in self.up_params:
             for n,symbol in enumerate(np.concatenate(X)):
+                # (PRML 13.23) sum_n(gamma(z_{nk})*x_{ni}) / sum_n(gamma(z_{nk}))
                 statistics['observation'][:, symbol] += posterior_prob[n]
 
     def _Mstep(self, statistics):
@@ -511,3 +524,136 @@ class MultinomialHMM(BaseHMM):
 
         if 'e' in self.up_params:
             self.emission = statistics['observation'] / statistics['observation'].sum(axis=1)[:, np.newaxis]
+
+class GaussianHMM(BaseHMM):
+    def __init__(self, n_hstates=3, covariance_type="diag", min_covariance=1e-3, init="random", algorithm="viterbi",
+                 up_params="itmc", random_state=None):
+        super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["n_features"])
+        self.model_params.extend(["means", "covariance"])
+        self.covariance_type = covariance_type
+        self.min_covariance = min_covariance
+
+    @property
+    def covariances():
+        return reshape_covariances(
+            self._covariances, self.covariance_type, self.n_hstates, self.n_features
+        )
+
+    def _get_params_size(self):
+        nh = self.n_hstates
+        nf = self.n_features
+        return {
+            "i": nh - 1,
+            "t": nh * (nh - 1),
+            "m": nh * nf,
+            "c": {
+                "spherical": nc,
+                "diag": nh * nf,
+                "full": nh * nf * (nf + 1) // 2,
+                "tied": nf * (nf + 1) // 2,
+            }[self.covariance_type],
+        }
+
+    def _generate_sample(self, hstate, random_state=None):
+        rnd = handle_random_state(random_state)
+        return rnd.multivariate_normal(
+            self.means[hstate], self._covariances[hstate]
+        )
+
+    # @NotImplemented
+    def _compute_log_likelihood(self, X):
+        return "HOGEHOGE"
+
+    def _check_params_validity(self):
+        super()._check_params_validity()
+
+        self.means = means = np.asarray(self.means)
+        if means.shape != (self.n_hstates, self.n_features):
+            raise ValueError(f"self.means must have length n_hstates, ({initial.shape[0]} != {self.n_hstates})")
+
+        self._covariances = covariance = no.asarray(self._covariances)
+        expected_shape = {
+            "spherical" : (self.n_hstates),
+            "diag"      : (self.n_hstates, self.n_features),
+            "full"      : (self.n_hstates, self.n_features, self.n_features),
+            "tied"      : (self.n_features, self.n_features),
+        }[self.covariance_type]
+        if covariance.shape != expected_shape:
+            raise ValueError(f"if covariance type is {self.covariance_type}, self._covariances must have shape ",
+                             f"{expected_shape}, but got {covariance.shape}")
+
+    def _check_input_and_get_nfeatures(self, X):
+        _, n_features = X.shape
+        if hasattr(self, "n_features") and self.n_features != n_features:
+            raise ValueError(f"Unexpected number of dimensions, got {n_features} but expected {self.n_features}")
+        return n_features
+
+    # @NotImplemented
+    def _init_params(self, X, init):
+        self.n_features = self._check_input_and_get_nfeatures(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            kmeans = KMeans(n_clusters=self.n_hstates, init="k++", random_state=self.rnd)
+            kmeans.fit(X, verbose=-1)
+            self.means = kmeans.centroids
+
+            cv = np.cov(X.T) + self.min_covariance * np.eye(self.n_features)
+            self._covariances = "HOGEHOGE"
+
+    # @NotImplemented
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+
+        statistics['posterior'] = np.zeros(self.n_hstates)
+        statistics['observation'] = np.zeros(shape=(self.n_hstates, self.n_features))
+        statistics['observation_squared'] = np.zeros(shape=(self.n_hstates, self.n_features))
+        if self.covariance_type in ('tied', 'full'):
+            statistics['posterior @ observation @ observation.T'] = np.zeros(shape=(self.n_hstates, self.n_features, self.n_features))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if sum(self.up_params.count(p) for p in ['m', 'c']) > 1:
+            statistics['posterior'] += posterior_prob.sum(axis=0)
+            statistics['observation'] += np.dot(posterior_prob.T, X)
+
+        if 'c' in self.up_params:
+            if self.covariance_type in ('spherical', 'diag'):
+                statistics['observation_squared'] += np.dot(posterior_prob.T, X**2)
+            elif self.covariance_type in ('tied', 'full'):
+                statistics['posterior @ observation @ observation.T'] += np.einsum('ij,ik,il->jkl', posterior_prob, X, X)
+
+    # @NotImplemented
+    def _Mstep(self, statistics):
+        super()._do_mstep(statistics)
+
+"""
+class KerasyHMM(BaseHMM):
+    def __init__(self, n_hstates=3, kerasy="kerasy", init="random",
+                 algorithm="viterbi", up_params="kerasy", random_state=None):
+        super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend([])
+        self.model_params.extend(["kerasy"])
+        self.kerasy = kerasy
+
+    def _get_params_size(self):
+    def _generate_sample(self, hstate, random_state=None):
+    def _compute_log_likelihood(self, X):
+    def _check_params_validity(self):
+    def _check_input_and_get_kerasy_params(self, X):
+        return kerasy_params
+    def _init_params(self, X, init):
+        self.kerasy_params = self._check_input_and_get_kerasy_params(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.kerasy_model_params = self.rnd.rand(...
+    def _init_statistics(self):
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+    def _Mstep(self, statistics):
+"""

@@ -6,6 +6,7 @@ import scipy.stats as stats
 from ..utils import findLowerUpper
 from ..utils import _check_sample_weight
 from ..utils import flush_progress_bar
+from ..utils import handle_random_state
 from ..utils import paired_euclidean_distances
 from ..utils import silhouette_plot
 from ..clib import c_kmeans
@@ -13,7 +14,7 @@ from ..clib import c_kmeans
 class BaseEMmodel():
     def __init__(self, n_clusters=8, init="k++", random_state=None, metrics="euclid"):
         self.n_clusters=n_clusters
-        self.seed=random_state
+        self.rnd=handle_random_state(random_state)
         self.init=init
         self.history=[]
         self.metrics=metrics
@@ -36,17 +37,17 @@ class BaseEMmodel():
                     f"but init.shape=({n_cluster}, {D_}), and n_clusters={self.n_clusters}, n_features={D}")
             centers = init
         elif isinstance(init, str):
-            np.random.seed(self.seed)
+            rnd = handle_random_state(self.rnd if random_state is None else random_state)
             if init == "random":
                 Xmin,Xmax = findLowerUpper(X, margin=0, N=None)
-                centers = np.random.uniform(low=Xmin, high=Xmax, size=(self.n_clusters, D))
+                centers = rnd.uniform(low=Xmin, high=Xmax, size=(self.n_clusters, D))
             elif init == 'k++':
                 data_idx = np.arange(N)
-                idx = np.random.choice(data_idx)
+                idx = rnd.choice(data_idx)
                 centers = X[idx, None]
                 for k in range(1,self.n_clusters):
                     min_distance = np.asarray([np.min([paired_euclidean_distances(x,c) for c in centers]) for x in X])
-                    idx = np.random.choice(data_idx, p=min_distance/np.sum(min_distance))
+                    idx = rnd.choice(data_idx, p=min_distance/np.sum(min_distance))
                     centers = np.r_[centers, X[idx,None]]
             else:
                 handleKeyError(["random", "k++"], initializer=initializer)

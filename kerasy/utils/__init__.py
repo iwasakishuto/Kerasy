@@ -58,6 +58,8 @@ from .np_utils import _check_sample_weight
 from .np_utils import normalize
 from .np_utils import log_normalize
 from .np_utils import log_mask_zero
+from .np_utils import reshape_covariances
+from .np_utils import log_multivariate_normal_density
 
 from .param_utils import Params
 

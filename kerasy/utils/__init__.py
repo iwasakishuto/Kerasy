@@ -5,6 +5,7 @@ from . import deep_utils
 from . import generic_utils
 from . import metric_utils
 from . import model_select_utils
+from . import monitor_utils
 from . import np_utils
 from . import param_utils
 from . import prepro_utils
@@ -46,6 +47,9 @@ from .metric_utils import pairwise_distances
 from .metric_utils import pairwise_euclidean_distances
 
 from .model_select_utils import cross_validation
+
+from .monitor_utils import ConvergenceMonitor
+from .monitor_utils import ThresholdMonitor
 
 from .np_utils import CategoricalEncoder
 from .np_utils import findLowerUpper

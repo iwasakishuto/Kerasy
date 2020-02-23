@@ -75,6 +75,7 @@ from .toydata_utils import generateSeq
 
 from .training_utils import make_batches
 from .training_utils import train_test_split
+from .training_utils import iter_from_variable_len_samples
 
 from .vis_utils import measureCanvas
 from .vis_utils import galleryplot

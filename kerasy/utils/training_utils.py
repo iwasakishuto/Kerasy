@@ -93,14 +93,14 @@ def train_test_split(*arrays, **options):
     shuffle      = options.pop('shuffle', True)
     if options:
         raise TypeError(f"Invalid parameters passed: {str(options)}")
-    
+
     num_samples = np.asarray(arrays[0]).shape[0]
     n_train, n_test = _validate_shuffle_split(num_samples, test_size, train_size, default_test_size=0.3)
-    
+
     train_idxes = np.random.RandomState(random_state).choice(np.arange(num_samples), n_train, replace=False)
     test_idexs = np.ones(shape=num_samples, dtype=bool)
     test_idexs[train_idxes] = False
-    
+
     return list((a[train_idxes],a[test_idexs]) for a in arrays)
 
 def make_batches(size, batch_size):
@@ -111,3 +111,22 @@ def make_batches(size, batch_size):
     """
     num_batches = (size-1)//batch_size + 1
     return [(i*batch_size, min(size, (i+1)*batch_size)) for i in range(num_batches)]
+
+def iter_from_variable_len_samples(X, lengths=None):
+    """ yield starts and ends indexes of `X` per variable sample.
+    Each sample should have the `n_features` features.
+    np.sum(`lengths`) must be equal to `n_samples`
+    =============================================================
+    @params X       : Multiple connected samples. shape=(n_samples, n_features)
+    @params lengths : int array. shape=(n_sequences)
+    """
+    if lengths is None:
+        yield 0, len(X)
+    else:
+        n_samples = X.shape[0]
+        end = np.cumsum(lengths).astype(np.int32)
+        start = end - lengths
+        if end[-1] > n_samples:
+            raise ValueError("more than {:d} samples in lengths array {!s}".format(n_samples, lengths))
+        for i in range(len(lengths)):
+            yield start[i], end[i]

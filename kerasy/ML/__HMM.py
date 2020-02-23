@@ -6,6 +6,7 @@ from scipy.special import logsumexp
 import warnings
 
 from ..utils import Params
+from ..utils import ConvergenceMonitor
 from ..utils import flush_progress_bar
 from ..utils import handleKeyError
 from ..utils import handle_random_state
@@ -250,6 +251,7 @@ class BaseHMM(Params):
         """
         self._init_params(X, self.init)
         self._check_params_validity()
+        # self.monitor = ConvergenceMonitor(tol, max_iter=max_iter, verbose=verbose)
 
         for it in range(max_iter):
             statistics = self._init_statistics()
@@ -262,11 +264,19 @@ class BaseHMM(Params):
                 posterior_prob = self._compute_posteriors(log_alpha, log_beta)
                 self._update_statistics(statistics, X[i:j], log_cond_prob_ij, posterior_prob, log_alpha, log_beta)
 
-            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
             self._mstep(statistics)
-            
-            if "CONDITION":
+            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
+            if it>0 and prev_log_prob - current_log_prob < tol:
                 break
+            prev_log_prob = current_log_prob
+
+            # self.monitor.report(current_log_prob,metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
+            # if self.monitor.converged:
+            #     break
+
+        if (self.transit.sum(axis=1) == 0).any():
+            warnings.warn("Some rows of transit have zero sum because "
+                          "no transition from the hidden state was ever observed.")
 
     def score_samples(self, X, length=None):
         """ Compute the posterior probability for each hidden state.

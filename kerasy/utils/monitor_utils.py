@@ -1,13 +1,14 @@
 #coding: utf-8
 import sys
-import deque
+from collections import deque
+from .progress_utils import flush_progress_bar
 
 class BaseMonitor():
     """ Monitors and reports parameters. """
     def __init__(self, n_target=1, max_iter=300, verbose=1, maxlen=2):
         self.iter = 0
         self.max_iter = max_iter
-        self.histories = [deque(maxlen=maxlen) _ for _ in range(n_target)]
+        self.histories = [deque(maxlen=maxlen) for _ in range(n_target)]
         self.verbose = verbose
 
     def __repr__(self):

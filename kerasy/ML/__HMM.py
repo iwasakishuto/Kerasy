@@ -1,4 +1,35 @@
 #coding: utf-8
+"""[Hidden Markov Model]
+When implementing a hidden Markov model with a new emission probability,
+you need to define the following methods:
+
+- Method which needs to be implemented.
+    - _get_params_size(self)
+    - _generate_sample(self, hstate, random_state=None)
+    - _compute_log_likelihood(self, X)
+    - _check_input_and_get_HOGEHOGE(self, X)
+- Method which needs to be overrided.
+    - _check_params_validity(self)
+    - _init_params(self, X, init)
+    - _init_statistics(self)
+    - _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+    - _Mstep(statistics):
+
+If you need a new instance variable `HOGEHOGE`, use the following method.
+
+```
+def _check_input_and_get_HOGEHOGE():
+    ...
+    return HOGEHOGE
+
+def _init_params(self, X, init):
+    self.HOGEHOGE = self._check_input_and_get_HOGEHOGE(X)
+    super()._init_params(X, init)
+
+    if isinstance(init, str) and init=="random":
+        self.PIYO = self.rnd.rand(...
+```
+"""
 import os
 import string
 import numpy as np
@@ -11,7 +42,7 @@ from ..utils import flush_progress_bar
 from ..utils import handleKeyError
 from ..utils import handle_random_state
 from ..utils import has_not_attrs
-from ..utils import normalize, log_normalize
+from ..utils import normalize, log_normalize, log_mask_zero
 from ..utils import iter_from_variable_len_samples
 from ..clib import c_hmm
 
@@ -99,7 +130,7 @@ class BaseHMM(Params):
         if len(remain_attrs)>0:
             for attr in remain_attrs:
                 warnings.warn(f"`{attr}` is not described in {json_path}, please specify it in the file",
-                              f"or self.{}=SOMETHING to define it.")
+                              f"or self.{attr}=SOMETHING to define it.")
 
     def _init_params_by_dict(self, params_dict):
         """ Initialize parameter by dictionaly. """
@@ -109,7 +140,7 @@ class BaseHMM(Params):
         if len(remain_attrs)>0:
             for attr in remain_attrs:
                 warnings.warn(f"`{attr}` is not described in dictionaly, please specify it in the file",
-                              f"or self.{}=SOMETHING to define it.")
+                              f"or self.{attr}=SOMETHING to define it.")
 
     def _init_params_by_random(self):
         """ Initialize the parameters by random (only support for `initial` and `transit`). """
@@ -151,7 +182,7 @@ class BaseHMM(Params):
             else:
                 self._init_params_by_json(init)
         else:
-            raise ValueError(f"the `init` parameter should be 'random', or 'path/to/json', but got {init})
+            raise ValueError(f"the `init` parameter should be 'random', or 'path/to/json', but got {init}")
 
     # @overrided
     def _init_statistics(self):
@@ -192,27 +223,27 @@ class BaseHMM(Params):
                 with np.errstate(under="ignore"):
                     statistics['transit'] += np.exp(log_xi_sum)
 
-    @abstractmethod
+    # @abstractmethod
     def _get_params_size(self):
         """
         This method is used to check whether there is enough data or not.
         Please refer to `_init_params` method for more details.
         @return (dict) model paramete size per parameter.
         """
-        raise NotImplemented("This class is Abstract.")
+        raise NotImplemented("`_get_params_size` method is not implemented.")
 
-    @abstractmethod
+    # @abstractmethod
     def _generate_sample(self, hstate, random_state=None):
         """ Generate sample from given hidden state. """
-        raise NotImplementedError("This class is Abstract")
+        raise NotImplemented("`_generate_sampl` method is not implemented.")
 
-    @abstractmethod
+    # @abstractmethod
     def _compute_log_likelihood(self, X):
         """ Computes log probability per hidden state under the model.
         @params X             : Multiple connected samples. shape=(n_samples, n_features)
         @params log_cond_prob : Log conditional probabilities. shape=(n_samples, n_hstates)
         """
-        raise NotImplementedError("This class is Abstract")
+        raise NotImplemented("`_compute_log_likelihood` method is not implemented.")
 
     # @overrided
     def _Mstep(self, statistics):
@@ -257,8 +288,7 @@ class BaseHMM(Params):
             #     break
 
         if (self.transit.sum(axis=1) == 0).any():
-            warnings.warn("Some rows of transit have zero sum because "
-                          "no transition from the hidden state was ever observed.")
+            warnings.warn("Some rows of transit have zero sum because no transition from the hidden state was ever observed.")
 
     def score_samples(self, X, length=None):
         """ Compute the posterior probability for each hidden state.
@@ -420,16 +450,25 @@ class MultinomialHMM(BaseHMM):
         self.disp_params.extend([])
         self.model_params.extend(["emission"])
 
+    def _get_params_size(self):
+        raise NotImplemented("`_get_params_size` method is not implemented.")
+
+    def _generate_sample(self, hstate, random_state=None):
+        raise NotImplemented("`_generate_sampl` method is not implemented.")
+
+    def _compute_log_likelihood(self, X):
+        raise NotImplemented("`_compute_log_likelihood` method is not implemented.")
+
     def _check_params_validity(self):
         super()._check_params_validity()
         self.emission = emission = np.asarray(self.emission)
         if emission.shape != (self.n_hstates, self.n_states):
             raise ValueError(f"self.emission must have shape (n_hstates, n_states)",
-                             f"({emission.shape} != {n_hstates, n_states})"
+                             f"({emission.shape} != {n_hstates, n_states})")
         if not np.allclose(emission.sum(axis=1), 1.0):
             raise ValueError(f"self.emission must sum to 1.0 (but got {emission.sum(axis=1)})")
 
-    def _check_and_get_nstates(self, X):
+    def _check_input_and_get_nstates(self, X):
         """ Check if ``X`` is a sample from a Multinomial distribution and get `n_states`. """
         if not np.issubdtype(X.dtype, np.integer):
             raise ValueError("Symbols should be integers")
@@ -438,7 +477,7 @@ class MultinomialHMM(BaseHMM):
         return X.max() + 1
 
     def _init_params(self, X, init):
-        self.n_states = self._check_and_get_nstates(X)
+        self.n_states = self._check_input_and_get_nstates(X)
         super()._init_params(X, init)
 
         if isinstance(init, str) and init=="random":

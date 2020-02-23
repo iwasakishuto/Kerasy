@@ -57,6 +57,7 @@ from .np_utils import inverse_arr
 from .np_utils import _check_sample_weight
 from .np_utils import normalize
 from .np_utils import log_normalize
+from .np_utils import log_mask_zero
 
 from .param_utils import Params
 

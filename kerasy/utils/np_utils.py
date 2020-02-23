@@ -90,5 +90,11 @@ def log_normalize(arr, axis=None):
     @params axis: Dimension along which normalization is performed.
     """
     with np.errstate(under="ignore"):
-        a_lse = logsumexp(a, axis, keepdims=True)
-    a -= a_lse
+        arr_lse = logsumexp(arr, axis, keepdims=True)
+    arr -= arr_lse
+
+def log_mask_zero(arr):
+    """Computes the log of input probabilities masking divide by zero in log."""
+    arr = np.asarray(arr)
+    with np.errstate(divide="ignore"):
+        return np.log(arr)

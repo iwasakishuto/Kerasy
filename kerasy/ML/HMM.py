@@ -12,11 +12,11 @@ from ..utils import handleKeyError
 from ..utils import handle_random_state
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize, log_mask_zero
-from ..utils import reshape_covariances, log_multivariate_normal_density
+from ..utils import decompress_based_on_covariance_type, compress_based_on_covariance_type_from_tied_shape
 from ..utils import iter_from_variable_len_samples
 from ..clib import c_hmm
 
-from EM import KMeans
+from .EM import KMeans
 
 DECODER_ALGORITHMS = ["viterbi", "map",]
 DECODER_FUNC_NAMES = ["_decode_viterbi", "_decode_map"]
@@ -210,7 +210,7 @@ class BaseHMM(Params):
         return {
             "n_sample": 0,
             "initial" : np.zeros(shape=(self.n_hstates)),
-            "transit" : np.zeros(shape=(self.n_hstates, self.n_hstates)),
+            "xi" : np.zeros(shape=(self.n_hstates, self.n_hstates)),
         }
 
     # @overrided
@@ -260,14 +260,14 @@ class BaseHMM(Params):
 
     # @overrided
     def _Mstep(self, statistics):
-        """ Mstep of Hidden Markov Model.
-        """
+        """ Mstep of Hidden Markov Model. """
 
         if 's' in self.up_params:
+            # (PRML 13.18) pi_k = gamma(z_{1k}) / sum_{j=1}^K gamma(z_{ij})
             self.initial = np.where(statistics['initial']==0, 0, statistics['initial'])
             normalize(self.initial)
         if 't' in self.up_params:
-            # (PRML 13.19) A_jk =
+            # (PRML 13.19) A_jk = sum_{n=2}^N xi(z_{n-1,j},z_{nk}) / sum_{l=1}^K sum_{n=2}^N xi(z_{n-1,j},z_{nl})
             self.transit = np.where(statistics['xi']==0, 0, statistics['xi'])
             normalize(self.transit, axis=1)
 
@@ -292,7 +292,8 @@ class BaseHMM(Params):
                 self._update_statistics(statistics, X[i:j], log_cond_prob_ij, posterior_prob, log_alpha, log_beta)
 
             self._Mstep(statistics)
-            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname="Baum-Welch Algorithm")
+            self.statistics = statistics
+            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname=f"{self.__class__.__name__} (Baum-Welch)")
             if it>0 and prev_log_prob - current_log_prob < tol:
                 break
             prev_log_prob = current_log_prob
@@ -336,13 +337,23 @@ class BaseHMM(Params):
         return log_prob
 
     def _decode_viterbi(self, X):
-        """ Decode by viterbi algorithm. """
+        """
+        Decode by viterbi algorithm.
+        The viterbi algorithm computes the probability that an HMM generates an
+        observation sequence in the "best path".
+        """
         log_cond_prob = self._compute_log_likelihood(X)
         # logprob, ml_hstates = self._viterbi(log_cond_prob)
         return self._viterbi(log_cond_prob)
 
     def _decode_map(self, X):
-        """ Decode by MAP(Maximum A Posteriori) estimation """
+        """
+        Decode by MAP(Maximum A Posteriori) estimation.
+        * If we have no prior information,
+          the MAP estimate becomes identical to the ML estimate.
+        The forward algorithm computes the probability that an HMM generates an
+        observation sequence by summing up the probabilities of "all possible" paths.
+        """
         _, posterior_prob = self.score_samples(X)
         log_prob = np.max(posterior_prob, axis=1).sum()
         ml_hstates = np.argmax(posterior_prob, axis=1)
@@ -449,7 +460,12 @@ class BaseHMM(Params):
         return log_beta
 
     def _compute_posteriors(self, log_alpha, log_beta):
-        """ Compute log-scaled gamma(z_n) = p(z_n|X) = p(X|z_n)*p(z_n) / p(X) """
+        """ Compute gamma using the results of forward-backward algorithm.
+        * All parameters have the shape (n_samples, n_hstates).
+        @params log_alpha : alpha(z_n) = p(x_1,...,x_n,z_n)
+        @params log_beta  :  beta(z_n) = p(x_{n+1},...,x_N|z_n)
+        @return gamma     : gamma(z_n) = p(z_n|X,theta^{old})
+        """
         # (PRML 13.33) gamma(z_n) = alpha(z_n)*beta(z_n) / p(X)
         log_gamma = log_alpha + log_beta
         log_normalize(log_gamma, axis=1)
@@ -516,7 +532,10 @@ class MultinomialHMM(BaseHMM):
 
         if 'e' in self.up_params:
             for n,symbol in enumerate(np.concatenate(X)):
+                # posterior_prob has the shape (n_samples, n_hstates), and usually called "gamma".
                 # (PRML 13.23) sum_n(gamma(z_{nk})*x_{ni}) / sum_n(gamma(z_{nk}))
+                # statistics['observation'] has the shape (n_hstates, n_states)
+                # and means that sum_n( gamma(z_{nk})*x_{ni}) )
                 statistics['observation'][:, symbol] += posterior_prob[n]
 
     def _Mstep(self, statistics):
@@ -525,19 +544,120 @@ class MultinomialHMM(BaseHMM):
         if 'e' in self.up_params:
             self.emission = statistics['observation'] / statistics['observation'].sum(axis=1)[:, np.newaxis]
 
+    def MCK(self, X, lengths=None):
+        self._check_params_validity()
+
+        MCKs = np.empty(shape=(0,self.n_states, self.n_hstates))
+        for i, j in iter_from_variable_len_samples(X, lengths):
+            log_cond_prob_ij = self._compute_log_likelihood(X[i:j])
+            log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_ij)
+            log_beta = self._Estep_log_backward(log_cond_prob_ij)
+            posterior_prob = self._compute_posteriors(log_alpha, log_beta)
+            MCK = 1/(j-i) * np.eye(self.n_states)[np.concatenate(X[i:j])].T.dot(posterior_prob) # (M,N)@(N,K)=(M,K)
+            MCKs = np.r_[MCKs, MCK[np.newaxis, :, :]]
+        return MCKs
+
+class MSSHMM(BaseHMM):
+    """ HMM for Maximum Segment Sum.
+    ex.) Detection of methylated regions.
+    @input     X : shape=(n_samples, 2)
+        - X[:, 0] (m) The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+        - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+    @param theta : (float) This parameter controling
+        "How much methylated C is likely to apper in the Hypermethylated region."
+        p(m_n,u_n | Hypermethylated) = theta^{m_n} * (1-theta)^{u_n}
+        p(m_n,u_n | Hypomethylated)  = (1-theta)^{m_n} * theta^{u_n}
+    """
+    def __init__(self, init="random", algorithm="viterbi",
+                 up_params="ite", random_state=None):
+        super().__init__(n_hstates=2, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["theta"])
+        self.model_params.extend(["emission"])
+
+    def _get_params_size(self):
+        nh = self.n_hstates
+        return {
+            "i": nh - 1,
+            "t": 1,
+            "e": 1,
+        }
+
+    def _generate_sample(self, hstate, random_state=None):
+        raise NotImplementedError("I'm soory.")
+
+    def _compute_log_likelihood(self, X):
+        return np.r_[
+            np.prod(np.power(np.asarray([self.theta, 1-self.theta])[:,np.newaxis], X), axis=0),
+            np.prod(np.power(np.asarray([1-self.theta, self.theta])[:,np.newaxis], X), axis=0),
+        ]
+
+    def _check_params_validity(self):
+        super()._check_params_validity()
+        if not isinstance(self.theta, float):
+            raise ValueError("self.theta must be a float value.")
+
+        if not 0<self.theta<1:
+            raise ValueError("self.theta must be greater than 0 and less than 1.")
+
+    def _check_input(self, X):
+        """
+        Check the input data ``X`` is valid sample or not.
+        @params X :  shape=(n_samples, 2)
+        ex.) Detection of methylated regions.
+            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+        """
+        if not X.shape[1] != 2:
+            raise ValueError("Input data must have the shape (n_samples, 2).")
+        if not np.issubdtype(X.dtype, np.integer):
+            raise ValueError("Symbols should be integers")
+        if X.min() < 0:
+            raise ValueError("Symbols should be nonnegative")
+
+    def _init_params(self, X, init):
+        self._check_input(X)
+
+        if isinstance(init, str) and init=="random":
+            self.theta = self.rnd.rand()
+
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+        statistics['observation'] = np.zeros(shape=(2))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if 'e' in self.up_params:
+            statistics['observation'] += np.sum((X * posterior_prob[0]) + (X[::-1] * posterior_prob[1]), axis=1)
+
+    def _Mstep(self, statistics):
+        super()._Mstep(statistics)
+
+        if 'e' in self.up_params:
+            A,B = statistics['observation']
+            self.theta = A/(A+B)
+
 class GaussianHMM(BaseHMM):
-    def __init__(self, n_hstates=3, covariance_type="diag", min_covariance=1e-3, init="random", algorithm="viterbi",
+    def __init__(self, n_hstates=3, covariance_type="diag", min_covariances=1e-3,
+                 means_prior=0, means_weight=0, covariances_prior=1e-2, covariances_weight=1,
+                 init="random", algorithm="viterbi",
                  up_params="itmc", random_state=None):
         super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
                          up_params=up_params, random_state=random_state)
         self.disp_params.extend(["n_features"])
-        self.model_params.extend(["means", "covariance"])
+        self.model_params.extend(["means", "covariances"])
         self.covariance_type = covariance_type
-        self.min_covariance = min_covariance
+        self.min_covariances = min_covariances
+        self.means_prior  = means_prior
+        self.means_weight = means_weight
+        self.covariances_prior  = covariances_prior
+        self.covariances_weight = covariances_weight
 
     @property
     def covariances():
-        return reshape_covariances(
+        return decompress_based_on_covariance_type(
             self._covariances, self.covariance_type, self.n_hstates, self.n_features
         )
 
@@ -562,9 +682,8 @@ class GaussianHMM(BaseHMM):
             self.means[hstate], self._covariances[hstate]
         )
 
-    # @NotImplemented
     def _compute_log_likelihood(self, X):
-        return "HOGEHOGE"
+        return log_multivariate_normal_density(X, self.means, self._covariances, self.covariance_type)
 
     def _check_params_validity(self):
         super()._check_params_validity()
@@ -590,7 +709,6 @@ class GaussianHMM(BaseHMM):
             raise ValueError(f"Unexpected number of dimensions, got {n_features} but expected {self.n_features}")
         return n_features
 
-    # @NotImplemented
     def _init_params(self, X, init):
         self.n_features = self._check_input_and_get_nfeatures(X)
         super()._init_params(X, init)
@@ -600,10 +718,10 @@ class GaussianHMM(BaseHMM):
             kmeans.fit(X, verbose=-1)
             self.means = kmeans.centroids
 
-            cv = np.cov(X.T) + self.min_covariance * np.eye(self.n_features)
-            self._covariances = "HOGEHOGE"
+            # shape=(n_features, n_features)
+            cv = np.cov(X.T) + self.min_covariances * np.eye(self.n_features)
+            self._covariances = compress_based_on_covariance_type_from_tied_shape(cv, covariance_type, n_gaussian=self.n_hstates)
 
-    # @NotImplemented
     def _init_statistics(self):
         statistics = super()._init_statistics()
 
@@ -627,11 +745,63 @@ class GaussianHMM(BaseHMM):
             elif self.covariance_type in ('tied', 'full'):
                 statistics['posterior @ observation @ observation.T'] += np.einsum('ij,ik,il->jkl', posterior_prob, X, X)
 
-    # @NotImplemented
     def _Mstep(self, statistics):
-        super()._do_mstep(statistics)
+        super()._Mstep(statistics)
+
+        means_prior = self.meansprior
+        means_weight = self.meansweight
+
+        denom = statistics['posterior'][:, np.newaxis]
+        if 'm' in self.params:
+            self.means = (means_weight*means_prior+statistics['observation']) / (means_weight+denom)
+
+        if 'c' in self.params:
+            covars_prior = self.covars_prior
+            covars_weight = self.covars_weight
+            meandiff = self.means - means_prior
+
+            if self.covariance_type in ('spherical', 'diag'):
+                cv_num = (means_weight * meandiff**2 + statistics['observation_squared'] - 2*self.means*statistics['observation'] + self.means**2*denom)
+                cv_den = max(covars_weight-1, 0) + denom
+                covariances = (covars_prior + cv_num) / np.maximum(cv_den, 1e-5)
+                if self.covariance_type == 'spherical':
+                    self._covariances = covariances
+                else:
+                    self._covariances = np.tile(covariances.mean(1)[:, np.newaxis], (1, self._covariances.shape[1]))
+            elif self.covariance_type in ('tied', 'full'):
+                cv_num = np.empty(shape=(self.n_hstates, self.n_features, self.n_features))
+                for c in range(self.n_hstates):
+                    obsmean = np.outer(statistics['observation'][c], self.means[c])
+                    cv_num[c] = means_weight*np.outer(meandiff[c], meandiff[c]) \
+                              + statistics['posterior @ observation @ observation.T'][c] - obsmean \
+                              - obsmean.T + np.outer(self.means[c], self.means[c]) * statistics['posterior'][c]
+                cvweight = max(covars_weight-self.n_features, 0)
+                if self.covariance_type == 'tied':
+                    self._covariances = (covars_prior + cv_num.sum(axis=0)) / (cvweight + statistics['posterior'].sum())
+                elif self.covariance_type == 'full':
+                    self._covariances = (covars_prior + cv_num) / (cvweight + statistics['posterior'][:, None, None])
+
+class GaussianMixtureHMM(BaseHMM):
+    """
+    There is no joint conjugate prior density. We can assume different components
+    of the HMM to be mutually independent, so that the optimization can different
+    components of the HMM to be mutually independent, so that the optimization can
+    be split into different subproblems involving only a single component of the
+    parameter set.
+    """
+    def __init__(self, n_hstates=3, n_mix=1, covariance_type="diag", min_covariances=1e-3,
+                 means_prior=0, means_weight=0, covariances_prior=1e-2, covariances_weight=1,
+                 init="random", algorithm="viterbi",
+                 up_params="itmcw", random_state=None):
+        super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["n_features", "n_mix"])
+        self.model_params.extend(["means", "covariances", "weights"])
+
 
 """
+class BernoulliHMM(BaseHMM):
+    def __init__()
 class KerasyHMM(BaseHMM):
     def __init__(self, n_hstates=3, kerasy="kerasy", init="random",
                  algorithm="viterbi", up_params="kerasy", random_state=None):

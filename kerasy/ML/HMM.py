@@ -2,7 +2,7 @@
 import os
 import string
 import numpy as np
-from scipy.special import logsumexp
+from scipy.special import logsumexp, comb
 import warnings
 
 from ..utils import Params
@@ -557,88 +557,6 @@ class MultinomialHMM(BaseHMM):
             MCKs = np.r_[MCKs, MCK[np.newaxis, :, :]]
         return MCKs
 
-class MSSHMM(BaseHMM):
-    """ HMM for Maximum Segment Sum.
-    ex.) Detection of methylated regions.
-    @input     X : shape=(n_samples, 2)
-        - X[:, 0] (m) The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
-        - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
-    @param theta : (float) This parameter controling
-        "How much methylated C is likely to apper in the Hypermethylated region."
-        p(m_n,u_n | Hypermethylated) = theta^{m_n} * (1-theta)^{u_n}
-        p(m_n,u_n | Hypomethylated)  = (1-theta)^{m_n} * theta^{u_n}
-    """
-    def __init__(self, init="random", algorithm="viterbi",
-                 up_params="ite", random_state=None):
-        super().__init__(n_hstates=2, init=init, algorithm=algorithm,
-                         up_params=up_params, random_state=random_state)
-        self.disp_params.extend(["theta"])
-        self.model_params.extend(["emission"])
-
-    def _get_params_size(self):
-        nh = self.n_hstates
-        return {
-            "i": nh - 1,
-            "t": 1,
-            "e": 1,
-        }
-
-    def _generate_sample(self, hstate, random_state=None):
-        raise NotImplementedError("I'm soory.")
-
-    def _compute_log_likelihood(self, X):
-        return np.r_[
-            np.prod(np.power(np.asarray([self.theta, 1-self.theta])[:,np.newaxis], X), axis=0),
-            np.prod(np.power(np.asarray([1-self.theta, self.theta])[:,np.newaxis], X), axis=0),
-        ]
-
-    def _check_params_validity(self):
-        super()._check_params_validity()
-        if not isinstance(self.theta, float):
-            raise ValueError("self.theta must be a float value.")
-
-        if not 0<self.theta<1:
-            raise ValueError("self.theta must be greater than 0 and less than 1.")
-
-    def _check_input(self, X):
-        """
-        Check the input data ``X`` is valid sample or not.
-        @params X :  shape=(n_samples, 2)
-        ex.) Detection of methylated regions.
-            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
-            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
-        """
-        if not X.shape[1] != 2:
-            raise ValueError("Input data must have the shape (n_samples, 2).")
-        if not np.issubdtype(X.dtype, np.integer):
-            raise ValueError("Symbols should be integers")
-        if X.min() < 0:
-            raise ValueError("Symbols should be nonnegative")
-
-    def _init_params(self, X, init):
-        self._check_input(X)
-
-        if isinstance(init, str) and init=="random":
-            self.theta = self.rnd.rand()
-
-    def _init_statistics(self):
-        statistics = super()._init_statistics()
-        statistics['observation'] = np.zeros(shape=(2))
-        return statistics
-
-    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
-        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
-
-        if 'e' in self.up_params:
-            statistics['observation'] += np.sum((X * posterior_prob[0]) + (X[::-1] * posterior_prob[1]), axis=1)
-
-    def _Mstep(self, statistics):
-        super()._Mstep(statistics)
-
-        if 'e' in self.up_params:
-            A,B = statistics['observation']
-            self.theta = A/(A+B)
-
 class GaussianHMM(BaseHMM):
     def __init__(self, n_hstates=3, covariance_type="diag", min_covariances=1e-3,
                  means_prior=0, means_weight=0, covariances_prior=1e-2, covariances_weight=1,
@@ -798,6 +716,175 @@ class GaussianMixtureHMM(BaseHMM):
         self.disp_params.extend(["n_features", "n_mix"])
         self.model_params.extend(["means", "covariances", "weights"])
 
+class MSSHMM(BaseHMM):
+    """ HMM for Maximum Segment Sum.
+    ex.) Detection of methylated regions.
+    @input     X : shape=(n_samples, 2)
+        - X[:, 0] (m) The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+        - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+    @param theta : (float) This parameter controling
+        "How much methylated C is likely to apper in the Hypermethylated region."
+        p(m_n,u_n | Hypermethylated) = theta^{m_n} * (1-theta)^{u_n}
+        p(m_n,u_n | Hypomethylated)  = (1-theta)^{m_n} * theta^{u_n}
+    """
+    def __init__(self, init="random", algorithm="viterbi",
+                 up_params="ite", random_state=None):
+        super().__init__(n_hstates=2, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["theta"])
+        self.model_params.extend(["emission"])
+        warnings.warn("This class is NOT RECOMMENDED. Please use `BinomialHMM`")
+
+    def _get_params_size(self):
+        nh = self.n_hstates
+        return {
+            "i": nh - 1,
+            "t": 1,
+            "e": 1,
+        }
+
+    def _generate_sample(self, hstate, random_state=None):
+        raise NotImplementedError("I'm soory.")
+
+    def _compute_log_likelihood(self, X):
+        return np.r_[
+            np.prod(np.power(np.asarray([self.theta, 1-self.theta])[:,np.newaxis], X), axis=0),
+            np.prod(np.power(np.asarray([1-self.theta, self.theta])[:,np.newaxis], X), axis=0),
+        ]
+
+    def _check_params_validity(self):
+        super()._check_params_validity()
+        if not isinstance(self.theta, float):
+            raise ValueError("self.theta must be a float value.")
+
+        if not 0<self.theta<1:
+            raise ValueError("self.theta must be greater than 0 and less than 1.")
+
+    def _check_input(self, X):
+        """
+        Check the input data ``X`` is valid sample or not.
+        @params X :  shape=(n_samples, 2)
+        ex.) Detection of methylated regions.
+            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+        """
+        if not X.shape[1] != 2:
+            raise ValueError("Input data must have the shape (n_samples, 2).")
+        if not np.issubdtype(X.dtype, np.integer):
+            raise ValueError("Symbols should be integers")
+        if X.min() < 0:
+            raise ValueError("Symbols should be nonnegative")
+
+    def _init_params(self, X, init):
+        self._check_input(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.theta = self.rnd.rand()
+
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+        statistics['observation'] = np.zeros(shape=(2))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if 'e' in self.up_params:
+            statistics['observation'] += np.sum((X * posterior_prob[0]) + (X[::-1] * posterior_prob[1]), axis=1)
+
+    def _Mstep(self, statistics):
+        super()._Mstep(statistics)
+
+        if 'e' in self.up_params:
+            A,B = statistics['observation']
+            self.theta = A/(A+B)
+
+class BinomialHMM(BaseHMM):
+    """ HMM for Maximum Segment Sum.
+    ex.) Detection of methylated regions.
+    @input     X : shape=(n_samples, 2)
+        - X[:, 0] (m) The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+        - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+    @param theta : (float) This parameter controling
+        "How much methylated C is likely to apper in the Hypermethylated region."
+        p(m_n,u_n | total_n, Hypermethylated) = t_nCm_n * theta^{m_n} * (1-theta)^{u_n}
+        p(m_n,u_n | total_n, Hypomethylated)  = t_nCm_n * (1-theta)^{m_n} * theta^{u_n}
+    """
+    def __init__(self, init="random", algorithm="viterbi",
+                 up_params="ite", random_state=None):
+        super().__init__(n_hstates=2, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.disp_params.extend(["theta"])
+        self.model_params.extend(["emission"])
+
+    def _get_params_size(self):
+        nh = self.n_hstates
+        return {
+            "i": nh - 1,
+            "t": 1,
+            "e": 1,
+        }
+
+    def _generate_sample(self, hstate, random_state=None):
+        raise NotImplementedError("I'm soory.")
+
+    def _compute_log_likelihood(self, X):
+        return np.log(list(map(comb, np.sum(X, axis=1), X[:,0])))[:,np.newaxis] * np.c_[
+            np.prod(np.power(np.asarray([self.theta, 1-self.theta])[np.newaxis,:], X), axis=1),
+            np.prod(np.power(np.asarray([1-self.theta, self.theta])[np.newaxis,:], X), axis=1),
+        ]
+
+    def _check_params_validity(self):
+        super()._check_params_validity()
+        if not isinstance(self.theta, float):
+            raise ValueError("self.theta must be a float value.")
+
+        if not 0<self.theta<1:
+            raise ValueError("self.theta must be greater than 0 and less than 1.")
+
+    def _check_input(self, X):
+        """
+        Check the input data ``X`` is valid sample or not.
+        @params X :  shape=(n_samples, 2)
+        ex.) Detection of methylated regions.
+            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+        """
+        if not X.shape[1] == 2:
+            raise ValueError("Input data must have the shape (n_samples, 2).")
+        if not np.issubdtype(X.dtype, np.integer):
+            raise ValueError("Symbols should be integers")
+        if X.min() < 0:
+            raise ValueError("Symbols should be nonnegative")
+
+    def _init_params(self, X, init):
+        self._check_input(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.theta = self.rnd.rand()
+
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+        statistics['observation'] = np.zeros(shape=(2))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if 'e' in self.up_params:
+            statistics['observation'] += np.sum(
+                np.log(list(map(comb, np.sum(X, axis=1), X[:,0])))[:,np.newaxis] * \
+                (X*posterior_prob[:,0,np.newaxis] + X[::-1]*posterior_prob[:,1,np.newaxis]),
+            axis=0)
+
+    def _Mstep(self, statistics):
+        super()._Mstep(statistics)
+
+        if 'e' in self.up_params:
+            A,B = statistics['observation']
+            self.theta = A/(A+B)
 
 """
 class BernoulliHMM(BaseHMM):

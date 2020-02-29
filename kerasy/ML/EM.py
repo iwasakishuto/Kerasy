@@ -67,7 +67,8 @@ class KMeans(BaseEMmodel):
         self.inertia_    = None
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
+        X = X.astype(float)
+        centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.rnd)
         sample_weight = _check_sample_weight(sample_weight, X)
         n_samples = X.shape[0]
         labels    = np.full(n_samples, -1, dtype=np.int32)
@@ -125,7 +126,7 @@ class HamerlyKMeans(KMeans):
         super().__init__(n_clusters=n_clusters, init=init, random_state=random_state, metrics=metrics)
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
+        init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.rnd)
         sample_weight = _check_sample_weight(sample_weight, X)
         self.centroids, self.inertia_, self.labels_, self.iterations_ = c_kmeans.k_means_hamerly(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
 
@@ -134,7 +135,7 @@ class ElkanKMeans(KMeans):
         super().__init__(n_clusters=n_clusters, init=init, random_state=random_state, metrics=metrics)
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed)
+        init_centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.rnd)
         sample_weight = _check_sample_weight(sample_weight, X)
         self.centroids, self.inertia_, self.labels_, self.iterations_ = c_kmeans.k_means_elkan(X, sample_weight, self.n_clusters, init_centroids, tol=tol, max_iter=max_iter, verbose=verbose)
 
@@ -146,7 +147,7 @@ class MixedGaussian(BaseEMmodel):
         self.pi=None
 
     def fit(self, X, sample_weight=None, max_iter=300, memorize=False, tol=1e-4, verbose=1):
-        self.centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.seed) # Initialize the mean value `self.centroids` within data space.
+        self.centroids = self._find_initial_centroids(X, n_clusters=self.n_clusters, init=self.init, random_state=self.rnd) # Initialize the mean value `self.centroids` within data space.
         self.S  = [1*np.eye(2) for k in range(self.n_clusters)] # Initialize with Diagonal matrix
         self.pi = np.ones(self.n_clusters)/self.n_clusters # Initialize with Uniform.
         sample_weight = _check_sample_weight(sample_weight, X)

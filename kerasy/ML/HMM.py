@@ -12,7 +12,9 @@ from ..utils import handleKeyError
 from ..utils import handle_random_state
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize, log_mask_zero
-from ..utils import decompress_based_on_covariance_type, compress_based_on_covariance_type_from_tied_shape
+from ..utils import log_multivariate_normal_density
+from ..utils import decompress_based_on_covariance_type
+from ..utils import compress_based_on_covariance_type_from_tied_shape
 from ..utils import iter_from_variable_len_samples
 from ..clib import c_hmm
 
@@ -293,7 +295,7 @@ class BaseHMM(Params):
 
             self._Mstep(statistics)
             self.statistics = statistics
-            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname=f"{self.__class__.__name__} (Baum-Welch)")
+            flush_progress_bar(it, max_iter, metrics={"log probability": current_log_prob}, barname=f"{self.__class__.__name__} (Baum-Welch)", verbose=verbose)
             if it>0 and prev_log_prob - current_log_prob < tol:
                 break
             prev_log_prob = current_log_prob
@@ -574,7 +576,7 @@ class GaussianHMM(BaseHMM):
         self.covariances_weight = covariances_weight
 
     @property
-    def covariances():
+    def covariances(self):
         return decompress_based_on_covariance_type(
             self._covariances, self.covariance_type, self.n_hstates, self.n_features
         )
@@ -587,7 +589,7 @@ class GaussianHMM(BaseHMM):
             "t": nh * (nh - 1),
             "m": nh * nf,
             "c": {
-                "spherical": nc,
+                "spherical": nh,
                 "diag": nh * nf,
                 "full": nh * nf * (nf + 1) // 2,
                 "tied": nf * (nf + 1) // 2,
@@ -610,15 +612,15 @@ class GaussianHMM(BaseHMM):
         if means.shape != (self.n_hstates, self.n_features):
             raise ValueError(f"self.means must have length n_hstates, ({initial.shape[0]} != {self.n_hstates})")
 
-        self._covariances = covariance = no.asarray(self._covariances)
+        self._covariances = covariance = np.asarray(self._covariances)
         expected_shape = {
-            "spherical" : (self.n_hstates),
+            "spherical" : (self.n_hstates,),
             "diag"      : (self.n_hstates, self.n_features),
             "full"      : (self.n_hstates, self.n_features, self.n_features),
             "tied"      : (self.n_features, self.n_features),
         }[self.covariance_type]
         if covariance.shape != expected_shape:
-            raise ValueError(f"if covariance type is {self.covariance_type}, self._covariances must have shape ",
+            raise ValueError(f"if covariance type is {self.covariance_type}, self._covariances must have shape "\
                              f"{expected_shape}, but got {covariance.shape}")
 
     def _check_input_and_get_nfeatures(self, X):
@@ -638,7 +640,7 @@ class GaussianHMM(BaseHMM):
 
             # shape=(n_features, n_features)
             cv = np.cov(X.T) + self.min_covariances * np.eye(self.n_features)
-            self._covariances = compress_based_on_covariance_type_from_tied_shape(cv, covariance_type, n_gaussian=self.n_hstates)
+            self._covariances = compress_based_on_covariance_type_from_tied_shape(cv, covariance_type=self.covariance_type, n_gaussian=self.n_hstates)
 
     def _init_statistics(self):
         statistics = super()._init_statistics()
@@ -666,16 +668,16 @@ class GaussianHMM(BaseHMM):
     def _Mstep(self, statistics):
         super()._Mstep(statistics)
 
-        means_prior = self.meansprior
-        means_weight = self.meansweight
+        means_prior = self.means_prior
+        means_weight = self.means_weight
 
         denom = statistics['posterior'][:, np.newaxis]
-        if 'm' in self.params:
+        if 'm' in self.up_params:
             self.means = (means_weight*means_prior+statistics['observation']) / (means_weight+denom)
 
-        if 'c' in self.params:
-            covars_prior = self.covars_prior
-            covars_weight = self.covars_weight
+        if 'c' in self.up_params:
+            covars_prior = self.covariances_prior
+            covars_weight = self.covariances_weight
             meandiff = self.means - means_prior
 
             if self.covariance_type in ('spherical', 'diag'):
@@ -744,7 +746,9 @@ class MSSHMM(BaseHMM):
         }
 
     def _generate_sample(self, hstate, random_state=None):
-        raise NotImplementedError("I'm soory.")
+        raise NotImplementedError(
+            "This model could not sampling a sequence."
+        )
 
     def _compute_log_likelihood(self, X):
         return np.r_[

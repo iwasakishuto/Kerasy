@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+  <head>
+    <link rel="shortcut icon" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" />
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Shuto" />
+    <meta name="twitter:card" content="summary">
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/MachineLearning/HMM/index.html" />
+    <meta property="og:title" content="HMM">
+    <meta property="og:description" content="Brief explanation of HMM and introduction of modules that can be used in Kerasy">
+    <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
+    <meta property="og:type" content="article" />
+
+    <title>HMM - Kerasy Documentation</title>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme_extra.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/theme.css">
+
+    <script>
+      // Current page data
+      var mkdocs_page_name = "HMM";
+      var mkdocs_page_input_path = "MachineLearning/HMM.md";
+      var mkdocs_page_url = "/Kerasy/MachineLearning/HMM/";
+    </script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/theme.js" defer></script>
+
+    <!-- Common CSS in my portofolio  -->
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css">
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
+    <!-- Use fontawesome Icon -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" rel="stylesheet" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <!-- Syntax highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css">
+    <!-- Custom CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+      });
+    </script>
+    <!-- Mermaid -->
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" charset="UTF-8"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad:true
+      });
+    </script>
+    <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+  </head>
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Kerasy Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../..">Home</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">DeepLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/CNN/">CNN</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Optimizers/">Optimizers</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/NeuralNetwork/">Neural Network</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/TrainOnlyDense/">TrainOnlyDense</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/ComputationalGraph/">Computational Graph</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Initializers/">Initializers</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">MachineLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../sampling/">sampling</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Linear Regression/">Linear Regression</a>
+  </li>
+        
+          
+
+
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        HMM
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Principal Component Analysis/">Principal Component Analysis</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../EM algorithm/">EM algorithm</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Tree/">Tree</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Support Vector Machine/">Support Vector Machine</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">BioInformatics</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../BioInformatics/RefSeq/">RefSeq</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../BioInformatics/Secondary Structure/">Secondary Structure</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../BioInformatics/Alignment/">Alignment</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../BioInformatics/String Search/">String Search</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Kerasy Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>MachineLearning &raquo;</li>
+        
+      
+    
+    <li>HMM</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <div class="topRibbon">
+          <h3>HMM</h3>
+        </div>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2020-01-10(金)</span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/ML/HMM.py">ML/HMM.py</a></span></li>
+            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/machinelearning.html">MachineLearning</a></span></li> -->
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <div class="admonition tip">
+  <p class="admonition-title">Notebook</p>
+  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/HMM.ipynb">Kerasy.examples.HMM.ipynb</a></p>
+</div>
+
+<p>The <strong><em>hidden Markov model</em> (HMM)</strong> is a very powerful statistical method of characterizing the observed data samples of a discrete-time series. It's <strong>joint probability distribution</strong> over both latent and observed variables is then given by</p>
+<div class="math">$$
+p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})=p\left(\mathbf{z}_{1} | \boldsymbol{\pi}\right)\left[\prod_{n=2}^{N} p\left(\mathbf{z}_{n} | \mathbf{z}_{n-1}, \mathbf{A}\right)\right] \prod_{m=1}^{N} p\left(\mathbf{x}_{m} | \mathbf{z}_{m}, \boldsymbol{\phi}\right)\qquad (13.10)
+$$</div>
+<p>where <span class="math">\(\mathbf{Z}=\left\{z_1,\ldots,z_N\right\}\)</span> are the discrete latent variables, <span class="math">\(\mathbf{X}=\left\{x_1,\ldots,x_N\right\}\)</span> are the corresponding observations, and <span class="math">\(\boldsymbol{\theta} = \left\{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right\}\)</span> denotes the set of parameters governing the model.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Name</th>
+<th align="center">Probability</th>
+<th align="center">Conditional Distribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">initial state</td>
+<td align="center">
+<div class="math">$$\pi_{k} \equiv p\left(z_{1 k}=1\right)$$</div>
+</td>
+<td align="center">
+<div class="math">$$p\left(\mathbf{z}_{1} \mid \boldsymbol{\pi}\right)=\prod_{k=1}^{K} \pi_{k}^{z_{1 k}}\quad (13.8)$$</div>
+</td>
+</tr>
+<tr>
+<td align="left">transition probability</td>
+<td align="center">
+<div class="math">$$A_{j k} \equiv p\left(z_{n k}=1\mid z_{n-1, j}=1\right)$$</div>
+</td>
+<td align="center">
+<div class="math">$$p\left(\mathbf{z}_{n} \mid \mathbf{z}_{n-1}, \mathbf{A}\right)=\prod_{k=1}^{K} \prod_{j=1}^{K} A_{j k}^{z_{n-1, j} z_{n k}}\quad (13.7)$$</div>
+</td>
+</tr>
+<tr>
+<td align="left">emission probability</td>
+<td align="center"><strong>depend on your model.</strong></td>
+<td align="center">
+<div class="math">$$p\left(\mathbf{x}_n\mid\mathbf{z}_n,\boldsymbol{\phi}\right) = \prod_{k=1}^Kp\left(\mathbf{x}_n\mid\phi_k\right)^{z_{nk}}\quad (13.9)$$</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p>If we have observed a data set <span class="math">\(\mathbf{X} = \left\{x_1,\ldots,x_N\right\}\)</span>, we can determine the parameters of an HMM using maximum likelihood. The likelihood function is given by</p>
+<div class="math">$$
+p(\mathbf{X} | \boldsymbol{\theta})=\sum_{\mathbf{Z}} p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})\qquad (13.11)
+$$</div>
+<p>However, <span class="math">\(\sum_{\mathbf{Z}}\)</span> leads to complex expressions, so we turn to the <strong>expectation maximization (EM) algorithm</strong>.</p>
+<blockquote>
+<p>The EM algorithm starts with some initial selection for the model parameters, which we denote by <span class="math">\(\boldsymbol{\theta}^{\text{old}}\)</span>.</p>
+<p>In the E step, we take these parameter values and find the posterior distribution of the latent variables <span class="math">\(p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right)\)</span>. We then, <strong>use this posterior distribution to evaluate the expectation of the logarithm of the complete-data likelihood function</strong>, as a function of the parameters <span class="math">\(\boldsymbol{\theta}\)</span>, to give the function <span class="math">\(Q\left(\boldsymbol{\theta},\boldsymbol{\theta}^{\text{old}}\right)\)</span> defined by
+<div class="math">$$
+Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\text {old }}\right)=\sum_{\mathbf{Z}} p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) \ln p\left(\mathbf{X},\mathbf{Z} | \boldsymbol{\theta}\right)\qquad (13.12)
+$$</div>
+At this point, it is convenient to introduce some notation. We shall use <span class="math">\(\gamma(\mathbf{z}_n)\)</span> to denote <strong>the marginal posterior distribution of a latent variable <span class="math">\(\mathbf{z}_n\)</span></strong>, and <span class="math">\(\xi\left(z_{n-1, j}, z_{n k}\right)\)</span> to denote <strong>the joint posterior distribution of two successive latent variables</strong>, so that
+<div class="math">$$
+\begin{aligned} \gamma\left(\mathbf{z}_{n}\right) &amp;=p\left(\mathbf{z}_{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.13)\\ \xi\left(\mathbf{z}_{n-1}, \mathbf{z}_{n}\right) &amp;=p\left(\mathbf{z}_{n-1}, \mathbf{z}_{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.14) \end{aligned}
+$$</div>
+If we substitute the joint distribution <span class="math">\(p\left(\mathbf{X},\mathbf{Z}|\boldsymbol{\theta}\right)\)</span> given by <span class="math">\((13.10)\)</span> into <span class="math">\((13.12)\)</span>, and make use of the definition of <span class="math">\(\gamma\)</span> and <span class="math">\(\xi\)</span>, we obtain
+<div class="math">$$
+\begin{aligned} Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)=&amp; \sum_{k=1}^{K} \gamma\left(z_{1 k}\right) \ln \pi_{k}+\sum_{n=2}^{N} \sum_{j=1}^{K} \sum_{k=1}^{K} \xi\left(z_{n-1, j}, z_{n k}\right) \ln A_{j k} \\ &amp;+\sum_{n=1}^{N} \sum_{k=1}^{K}\gamma\left(z_{n k}\right) \sum_{i=1}^Dx_{ni} \ln \phi_{i k} \end{aligned}\qquad (13.17)
+$$</div>
+The goal of the E step will be to evaluate the quantities <span class="math">\(\gamma\left(\mathbf{z}_n\right)\)</span> and <span class="math">\(\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right)\)</span> efficiently. <strong>(→ forward-backward algorithm.)</strong></p>
+<p>In the M step, we maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to the parameters <span class="math">\(\boldsymbol{\theta} = \left\{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right\}\)</span> in which we treat <span class="math">\(\gamma\left(\mathbf{z}_n\right)\)</span> and <span class="math">\(\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right)\)</span> as constant. Maximization with respect to <span class="math">\(\boldsymbol{\pi}\)</span> and <span class="math">\(\mathbf{A}\)</span> is easily achieved using appropriate <strong>Lagrange multipliers</strong> with the results
+<div class="math">$$
+\begin{aligned}
+\pi_{k}&amp;= \frac{\gamma\left(z_{1 k}\right)}{\sum_{j=1}^{K} \gamma\left(z_{1 j}\right)} &amp; (13.18)\\
+A_{j k}&amp;= \frac{\sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n k}\right)}{\sum_{l=1}^{K} \sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n l}\right)} &amp; (13.19)\\
+\end{aligned}
+$$</div>
+To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to <span class="math">\(\phi_k\)</span>, we notice that only the final term in <span class="math">\((13.17)\)</span> depends on <span class="math">\(\phi_k\)</span>, and the quantities <span class="math">\(\gamma\left(z_{nk}\right)\)</span> are playing the role of the responsibilities. If the parameters <span class="math">\(\phi_k\)</span> are independent for the different components, then this term decouples into a sum of terms one for each value <span class="math">\(k\)</span>, each of which can be maximized independently. We are then simply maximizing the weighted log likelihood function for the emission density <span class="math">\(p\left(\mathbf{x}|\phi_k\right)\)</span> with weights <span class="math">\(\gamma\left(z_{nk}\right)\)</span>.</p>
+</blockquote>
+<h2>Multinomial HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
+    <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
+    <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For the case of discrete multinomial observed variables, the conditional distribution of the observations takes the form</p>
+<div class="math">$$p\left(x|z\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</div>
+<p>and the corresponding M-step equations are given by</p>
+<div class="math">$$\mu_{ik} = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_{ni}}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}\qquad (13.23)$$</div>
+<h2>Gaussian HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
+    <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
+    <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;itmc&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+    <span class="n">covariance_type</span><span class="o">=</span><span class="s2">&quot;diag&quot;</span><span class="p">,</span> <span class="n">min_covariance</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Gaussian emission densities we have <span class="math">\(p(x|\phi_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)\)</span>, and maximization of the function <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> then gives</p>
+<div class="math">$$
+\begin{aligned}
+\boldsymbol{\mu_k} &amp;= \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^{N}\gamma\left(z_{nk}\right)} &amp;(13.20)\\
+\boldsymbol{\Sigma_k} &amp;=\frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)^T}{\sum_{n=1}^N\gamma\left(z_{nk}\right)} &amp;(13.21)
+\end{aligned}
+$$</div>
+<h2>Gaussian Mixture HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
+</pre></div>
+
+
+<h4>Correspondence between code and formula</h4>
+<table>
+<thead>
+<tr>
+<th align="center">code</th>
+<th align="center">index</th>
+<th align="left">formula</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>log_cond_prob</code></td>
+<td align="center">
+<div class="math">$$[n][k] = p\left(\mathbf{x}_n\mid z_{nk}\right)$$</div>
+</td>
+<td align="left">
+<div class="math">$$p\left(\mathbf{X}\mid\mathbf{Z}\right)$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"><code>log_prob</code></td>
+<td align="center">constant.</td>
+<td align="left">
+<div class="math">$$\begin{aligned}p\left(\mathbf{X}\right) &amp;=\sum_{\mathbf{z}_n}\alpha(\mathbf{z}_n)\beta(\mathbf{z}_n)\quad \text{for all $\mathbf{z}_n$}\\&amp;=\sum_{\mathbf{z}_N}\alpha(\mathbf{z}_N)\end{aligned}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"><code>log_alpha</code></td>
+<td align="center">
+<div class="math">$$[n][k] = \alpha\left(z_{nk}\right)$$</div>
+</td>
+<td align="left">
+<div class="math">$$\alpha\left(\mathbf{z}_n\right) \equiv p\left(\mathbf{x}_1,\ldots,\mathbf{x}_n,\mathbf{z}_n\right)$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"><code>log_beta</code></td>
+<td align="center">
+<div class="math">$$[n][k] = \beta\left(z_{nk}\right)$$</div>
+</td>
+<td align="left">
+<div class="math">$$\beta\left(\mathbf{z}_n\right)\equiv\left(\mathbf{x}_{n+1},\ldots,\mathbf{x}_N\mid\mathbf{z}_n\right)$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"><code>posterior_prob</code></td>
+<td align="center">
+<div class="math">$$[n][k] = \gamma\left(z_{nk}\right)$$</div>
+</td>
+<td align="left">
+<div class="math">$$\gamma\left(\mathbf{z}_n\right) = \frac{p\left(\mathbf{z}_n,\mathbf{X}\right)}{p\left(\mathbf{X}\right)} = \frac{\alpha\left(\mathbf{z}_n\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"><code>log_xi_sum</code></td>
+<td align="center">
+<div class="math">$$[k][j]= \sum_{n=2}^N\xi\left(z_{n-1,k},z_{n,j}\right)$$</div>
+</td>
+<td align="left">
+<div class="math">$$\begin{aligned}\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_{n-1},\mathbf{z}_n\mid\mathbf{X}\right) \\&amp;= \frac{\alpha\left(\mathbf{z}_{n-1}\right)p\left(\mathbf{x}_n\mid\mathbf{z}_n\right)p\left(\mathbf{z}_n\mid\mathbf{z}_{n-1}\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition reference">
+  <p class="admonition-title">Reference</p>
+  <ul>
+    <li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/#!prml-book">Pattern Recognition and Machine Learning by Christopher Bishop</a></li>
+    <li><a href="https://dl.acm.org/doi/book/10.5555/560905">Spoken Language Processing: A Guide to Theory, Algorithm, and System Development</a></li>
+  </ul>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        </section>
+    </div>
+</div>
+</div>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Principal Component Analysis/" class="btn btn-neutral float-right" title="Principal Component Analysis">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Linear Regression/" class="btn btn-neutral" title="Linear Regression"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Linear Regression/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Principal Component Analysis/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

@@ -230,13 +230,8 @@ class BaseHMM(Params):
             # (PRML 13.18) pi_k = gamma(z_{ik}) / sum_j(gamma(z_{ij}))
             statistics['initial'] += posterior_prob[0]
         if 't' in self.up_params:
-            n_samples, n_components = log_cond_prob.shape
-            if n_samples>1:
-                log_xi_sum = c_hmm._compute_log_xi_sum(
-                    log_alpha, log_beta, log_mask_zero(self.transit), log_cond_prob
-                )
-                with np.errstate(under="ignore"):
-                    statistics['xi'] += np.exp(log_xi_sum)
+            if log_cond_prob.shape[0]>1:
+                statistics['xi'] += self._compute_posteriors_xi_sum(log_alpha, log_beta, log_cond_prob)
 
     # @abstractmethod
     def _get_params_size(self):
@@ -290,7 +285,7 @@ class BaseHMM(Params):
                 log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_ij)
                 current_log_prob += log_prob
                 log_beta = self._Estep_log_backward(log_cond_prob_ij)
-                posterior_prob = self._compute_posteriors(log_alpha, log_beta)
+                posterior_prob = self._compute_posteriors_gamma(log_alpha, log_beta)
                 self._update_statistics(statistics, X[i:j], log_cond_prob_ij, posterior_prob, log_alpha, log_beta)
 
             self._Mstep(statistics)
@@ -322,7 +317,7 @@ class BaseHMM(Params):
             log_prob += log_prob_ij
 
             log_beta = self._Estep_log_backward(log_cond_prob_ij)
-            posterior_prob[i:j] = self._compute_posteriors(log_alpha, log_beta)
+            posterior_prob[i:j] = self._compute_posteriors_gamma(log_alpha, log_beta)
         return log_prob, posterior_prob
 
     def score(self, X, lengths=None):
@@ -461,7 +456,7 @@ class BaseHMM(Params):
         )
         return log_beta
 
-    def _compute_posteriors(self, log_alpha, log_beta):
+    def _compute_posteriors_gamma(self, log_alpha, log_beta):
         """ Compute gamma using the results of forward-backward algorithm.
         * All parameters have the shape (n_samples, n_hstates).
         @params log_alpha : alpha(z_n) = p(x_1,...,x_n,z_n)
@@ -473,6 +468,19 @@ class BaseHMM(Params):
         log_normalize(log_gamma, axis=1)
         with np.errstate(under="ignore"):
             return np.exp(log_gamma)
+
+    def _compute_posteriors_xi_sum(self, log_alpha, log_beta, log_cond_prob):
+        """ Compute sum_{n=2}^N xi(z_{n-1},z_n) using the results of forward-backward algorithm.
+        @params log_cond_prob : p(x_n,z_n). shape=(n_samples, n_hstates)
+        @params log_alpha     : alpha(z_n) = p(x_1,...,x_n,z_n). shape=(n_samples, n_hstates).
+        @params log_beta      :  beta(z_n) = p(x_{n+1},...,x_N|z_n). shape=(n_samples, n_hstates).
+        @return xi_sum        : sum_{n=2}^N xi(z_{n-1},z_n) = sum_{n=2}^N p(z_{n-1},z_n|X,theta^{old}). shape=(n_hstates, n_hstates)
+        """
+        log_xi_sum = c_hmm._compute_log_xi_sum(
+            log_alpha, log_beta, log_mask_zero(self.transit), log_cond_prob
+        )
+        with np.errstate(under="ignore"):
+            return np.exp(log_xi_sum)
 
 class MultinomialHMM(BaseHMM):
     """ Hidden Markov Model with multinomial (discrete) emissions """
@@ -554,10 +562,22 @@ class MultinomialHMM(BaseHMM):
             log_cond_prob_ij = self._compute_log_likelihood(X[i:j])
             log_prob, log_alpha = self._Estep_log_forward(log_cond_prob_ij)
             log_beta = self._Estep_log_backward(log_cond_prob_ij)
-            posterior_prob = self._compute_posteriors(log_alpha, log_beta)
+            posterior_prob = self._compute_posteriors_gamma(log_alpha, log_beta)
             MCK = 1/(j-i) * np.eye(self.n_states)[np.concatenate(X[i:j])].T.dot(posterior_prob) # (M,N)@(N,K)=(M,K)
             MCKs = np.r_[MCKs, MCK[np.newaxis, :, :]]
         return MCKs
+
+class BernoulliHMM(MultinomialHMM):
+    def __init__(self, n_hstates=3, init="random", algorithm="viterbi",
+                 up_params="ite", random_state=None):
+        super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+
+    def _check_input_and_get_nstates(self, X):
+        """ Check if ``X`` is a sample from a Bernoulli distribution and get `n_states`. """
+        if not np.issubdtype(X.dtype, np.integer) or X.min() < 0 or X.max() > 1:
+            raise ValueError("Symbols should be 0 or 1.")
+        return 2
 
 class GaussianHMM(BaseHMM):
     def __init__(self, n_hstates=3, covariance_type="diag", min_covariances=1e-3,
@@ -685,9 +705,9 @@ class GaussianHMM(BaseHMM):
                 cv_den = max(covars_weight-1, 0) + denom
                 covariances = (covars_prior + cv_num) / np.maximum(cv_den, 1e-5)
                 if self.covariance_type == 'spherical':
-                    self._covariances = covariances
+                    self._covariances = covariances.mean(1)
                 else:
-                    self._covariances = np.tile(covariances.mean(1)[:, np.newaxis], (1, self._covariances.shape[1]))
+                    self._covariances = covariances
             elif self.covariance_type in ('tied', 'full'):
                 cv_num = np.empty(shape=(self.n_hstates, self.n_features, self.n_features))
                 for c in range(self.n_hstates):
@@ -795,7 +815,7 @@ class MSSHMM(BaseHMM):
         super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
 
         if 'e' in self.up_params:
-            statistics['observation'] += np.sum((X * posterior_prob[0]) + (X[::-1] * posterior_prob[1]), axis=1)
+            statistics['observation'] += np.sum((X * posterior_prob[0,:]) + (X[::-1] * posterior_prob[1,:]), axis=1)
 
     def _Mstep(self, statistics):
         super()._Mstep(statistics)
@@ -831,7 +851,7 @@ class BinomialHMM(BaseHMM):
         }
 
     def _generate_sample(self, hstate, random_state=None):
-        raise NotImplementedError("I'm soory.")
+        raise NotImplementedError("Binomial distribution needs a population of size N. B(N,theta)")
 
     def _compute_log_likelihood(self, X):
         return np.log(list(map(comb, np.sum(X, axis=1), X[:,0])))[:,np.newaxis] * np.c_[

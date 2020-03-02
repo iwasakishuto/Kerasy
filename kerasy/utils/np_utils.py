@@ -214,10 +214,11 @@ def decompress_based_on_covariance_type(covars, covariance_type='full', n_gaussi
     Create the correct shape of covariance matris
     from each feature based on the covariance type.
     ~~~~~~~~
-    @params tied_cv         : Input tied covariance.
+    @params covars          : compressed covariance values.
     @params covariance_type : string.
     @params n_gauusian      : number of gaussian
-    @return cv              : compressed values.
+    @params n_features      : number of features.
+    @return covariances     : covariances. shape=(n_gaussian, n_features, n_features)
     ==========================================================
     | covariance_type |               Gaussian               |
     ----------------------------------------------------------
@@ -238,7 +239,9 @@ def decompress_based_on_covariance_type(covars, covariance_type='full', n_gaussi
     elif covariance_type == 'spherical':
         # shape=(1, n_features, n_features)
         eye = np.eye(n_features)[np.newaxis, :, :]
+        # shape=(n_gaussian, 1, 1)
         covars = covars[:, np.newaxis, np.newaxis]
+        # shape=(n_gaussian, n_features, n_features)
         return eye * covars
 
 # ref: https://github.com/hmmlearn/hmmlearn/blob/0e9274cb138427919c13ef79f11a7358c4e2b4a9/lib/hmmlearn/_utils.py#L47

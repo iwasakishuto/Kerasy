@@ -387,6 +387,17 @@ A_{j k}&amp;= \frac{\sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n k}\right)}{\sum_{l=
 $$</div>
 To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to <span class="math">\(\phi_k\)</span>, we notice that only the final term in <span class="math">\((13.17)\)</span> depends on <span class="math">\(\phi_k\)</span>, and the quantities <span class="math">\(\gamma\left(z_{nk}\right)\)</span> are playing the role of the responsibilities. If the parameters <span class="math">\(\phi_k\)</span> are independent for the different components, then this term decouples into a sum of terms one for each value <span class="math">\(k\)</span>, each of which can be maximized independently. We are then simply maximizing the weighted log likelihood function for the emission density <span class="math">\(p\left(\mathbf{x}|\phi_k\right)\)</span> with weights <span class="math">\(\gamma\left(z_{nk}\right)\)</span>.</p>
 </blockquote>
+<h2>Bernoulli HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BernoulliHMM</span><span class="p">(</span>
+    <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
+    <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For the case of discrete Bernoulli observed variables, the conditional distribution of the observations takes the form</p>
+<div class="math">$$p\left(x|\mathbf{z}\right) = \prod_{k=1}^{K}\left(\theta_k^x\left(1-\theta_k\right)^{1-x}\right)^{z_k}$$</div>
+<p>and the corresponding M-step equations are given by</p>
+<div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}$$</div>
 <h2>Multinomial HMM</h2>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
@@ -395,9 +406,22 @@ To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}
 
 
 <p>For the case of discrete multinomial observed variables, the conditional distribution of the observations takes the form</p>
-<div class="math">$$p\left(x|z\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</div>
+<div class="math">$$p\left(\mathbf{x}|\mathbf{z}\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</div>
+<p><strong>※ <em>When <span class="math">\(k\)</span> is <span class="math">\(2\)</span> and, the multinomial distribution is the Bernoulli distribution.</em></strong></p>
 <p>and the corresponding M-step equations are given by</p>
 <div class="math">$$\mu_{ik} = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_{ni}}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}\qquad (13.23)$$</div>
+<h2>Binomial HMM</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BinomialHMM</span><span class="p">(</span>
+    <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
+    <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+</pre></div>
+
+
+<p>For the case of discrete binomial observed variables, the conditional distribution of the observations takes the form</p>
+<div class="math">$$p\left(x|n,\mathbf{z}\right) = \prod_{k=1}^{K}\left(\begin{array}{l}n \\ x\end{array}\right) \left(\theta_k^x\left(1-\theta_k\right)^{n-x}\right)^{z_k}$$</div>
+<p><strong>※ <em>A single success/failure experiment is also called a Bernoulli trial or Bernoulli experiment and a sequence of outcomes is called a Bernoulli process; for a single trial, i.e., n = 1, the binomial distribution is a Bernoulli distribution.</em></strong></p>
+<p>and the corresponding M-step equations are given by</p>
+<div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)n_n}$$</div>
 <h2>Gaussian HMM</h2>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
@@ -406,13 +430,76 @@ To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}
 </pre></div>
 
 
-<p>Gaussian emission densities we have <span class="math">\(p(x|\phi_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)\)</span>, and maximization of the function <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> then gives</p>
+<p>Gaussian emission densities we have <span class="math">\(p(\mathbf{x}|\boldsymbol{\phi}_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)\)</span>, and maximization of the function <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> then gives</p>
 <div class="math">$$
 \begin{aligned}
 \boldsymbol{\mu_k} &amp;= \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^{N}\gamma\left(z_{nk}\right)} &amp;(13.20)\\
 \boldsymbol{\Sigma_k} &amp;=\frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)^T}{\sum_{n=1}^N\gamma\left(z_{nk}\right)} &amp;(13.21)
 \end{aligned}
 $$</div>
+<h4 id="covariance-type">Covariance type</h4>
+
+<h5>definition</h5>
+<table>
+<thead>
+<tr>
+<th align="center">Name</th>
+<th align="center"></th>
+<th align="center">example</th>
+<th align="center">parameter size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><strong>spherical</strong></td>
+<td align="center">Each state uses a single variance value that applies to all features.</td>
+<td align="center">
+<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)} &amp; &amp; &amp; 0 \\ &amp; \sigma^{(k)} &amp; &amp; \\ &amp; &amp; \ddots &amp; \\ 0 &amp; &amp; &amp; \sigma^{(k)} \end{array}\right)$$</div>
+</td>
+<td align="center"><code>nh</code> * 1</td>
+</tr>
+<tr>
+<td align="center"><strong>diag</strong></td>
+<td align="center">Each state uses a diagonal covariance matrix.</td>
+<td align="center">
+<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}_{1} &amp; &amp; &amp; 0 \\ &amp; \sigma^{(k)}_{2} &amp; &amp; \\ &amp; &amp; \ddots &amp; \\ 0 &amp; &amp; &amp; \sigma^{(k)}_{\text{nf}} \end{array}\right)$$</div>
+</td>
+<td align="center"><code>nh</code> * <code>nf</code></td>
+</tr>
+<tr>
+<td align="center"><strong>full</strong></td>
+<td align="center">Each state uses a full (i.e. unrestricted) covariance matrix.</td>
+<td align="center">
+<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}_{1} &amp; \sigma^{(k)}_{2} &amp; \cdots &amp; \sigma^{(k)}_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \\ \sigma^{(k)}_{2} &amp; \sigma^{(k)}_{3} &amp; \cdots &amp; \sigma^{(k)}_{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ \sigma^{(k)}_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma^{(k)}_{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</div>
+</td>
+<td align="center"><code>nh</code> * <code>nf</code> * (<code>nf</code> + 1) \/\/ 2,</td>
+</tr>
+<tr>
+<td align="center"><strong>tied</strong></td>
+<td align="center">All states use <strong>the same</strong> full covariance matrix.</td>
+<td align="center">
+<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma_{1} &amp; \sigma_{2} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \\ \sigma_{2} &amp; \sigma_{3} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma_{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</div>
+</td>
+<td align="center"><code>nf</code> * (<code>nf</code> + 1) \/\/ 2</td>
+</tr>
+</tbody>
+</table>
+<h5>conversion function</h5>
+<p>conversion functions are described at <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/utils/np_utils.py">kerasy/utils/np_utils.py</a>.</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compress_based_on_covariance_type_from_tied_shape</span><span class="p">(</span><span class="n">tied_cv</span><span class="p">,</span> <span class="n">covariance_type</span><span class="p">,</span> <span class="n">n_gaussian</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create all the covariance matrices</span>
+<span class="sd">    from a given template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<span class="k">def</span> <span class="nf">decompress_based_on_covariance_type</span><span class="p">(</span><span class="n">covars</span><span class="p">,</span> <span class="n">covariance_type</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">,</span> <span class="n">n_gaussian</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_features</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the correct shape of covariance matris</span>
+<span class="sd">    from each feature based on the covariance type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+
+
 <h2>Gaussian Mixture HMM</h2>
 <div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
 </pre></div>
@@ -424,7 +511,7 @@ $$</div>
 <tr>
 <th align="center">code</th>
 <th align="center">index</th>
-<th align="left">formula</th>
+<th align="center">formula</th>
 </tr>
 </thead>
 <tbody>
@@ -433,14 +520,14 @@ $$</div>
 <td align="center">
 <div class="math">$$[n][k] = p\left(\mathbf{x}_n\mid z_{nk}\right)$$</div>
 </td>
-<td align="left">
+<td align="center">
 <div class="math">$$p\left(\mathbf{X}\mid\mathbf{Z}\right)$$</div>
 </td>
 </tr>
 <tr>
 <td align="center"><code>log_prob</code></td>
 <td align="center">constant.</td>
-<td align="left">
+<td align="center">
 <div class="math">$$\begin{aligned}p\left(\mathbf{X}\right) &amp;=\sum_{\mathbf{z}_n}\alpha(\mathbf{z}_n)\beta(\mathbf{z}_n)\quad \text{for all $\mathbf{z}_n$}\\&amp;=\sum_{\mathbf{z}_N}\alpha(\mathbf{z}_N)\end{aligned}$$</div>
 </td>
 </tr>
@@ -449,7 +536,7 @@ $$</div>
 <td align="center">
 <div class="math">$$[n][k] = \alpha\left(z_{nk}\right)$$</div>
 </td>
-<td align="left">
+<td align="center">
 <div class="math">$$\alpha\left(\mathbf{z}_n\right) \equiv p\left(\mathbf{x}_1,\ldots,\mathbf{x}_n,\mathbf{z}_n\right)$$</div>
 </td>
 </tr>
@@ -458,7 +545,7 @@ $$</div>
 <td align="center">
 <div class="math">$$[n][k] = \beta\left(z_{nk}\right)$$</div>
 </td>
-<td align="left">
+<td align="center">
 <div class="math">$$\beta\left(\mathbf{z}_n\right)\equiv\left(\mathbf{x}_{n+1},\ldots,\mathbf{x}_N\mid\mathbf{z}_n\right)$$</div>
 </td>
 </tr>
@@ -467,8 +554,8 @@ $$</div>
 <td align="center">
 <div class="math">$$[n][k] = \gamma\left(z_{nk}\right)$$</div>
 </td>
-<td align="left">
-<div class="math">$$\gamma\left(\mathbf{z}_n\right) = \frac{p\left(\mathbf{z}_n,\mathbf{X}\right)}{p\left(\mathbf{X}\right)} = \frac{\alpha\left(\mathbf{z}_n\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}$$</div>
+<td align="center">
+<div class="math">$$\begin{aligned}\gamma\left(\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_n\mid\mathbf{X}\right)= \frac{p\left(\mathbf{z}_n,\mathbf{X}\right)}{p\left(\mathbf{X}\right)} \\&amp;= \frac{\alpha\left(\mathbf{z}_n\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</div>
 </td>
 </tr>
 <tr>
@@ -476,7 +563,7 @@ $$</div>
 <td align="center">
 <div class="math">$$[k][j]= \sum_{n=2}^N\xi\left(z_{n-1,k},z_{n,j}\right)$$</div>
 </td>
-<td align="left">
+<td align="center">
 <div class="math">$$\begin{aligned}\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_{n-1},\mathbf{z}_n\mid\mathbf{X}\right) \\&amp;= \frac{\alpha\left(\mathbf{z}_{n-1}\right)p\left(\mathbf{x}_n\mid\mathbf{z}_n\right)p\left(\mathbf{z}_n\mid\mathbf{z}_{n-1}\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</div>
 </td>
 </tr>

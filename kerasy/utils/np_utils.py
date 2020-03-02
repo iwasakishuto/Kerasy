@@ -3,6 +3,8 @@ import numpy as np
 from scipy import linalg
 from scipy.special import logsumexp
 
+from .generic_utils import handleKeyError
+
 class CategoricalEncoder():
     def __init__(self):
         self.obj2cls = {}
@@ -207,14 +209,69 @@ def _log_multivariate_normal_density_full(X, means, covars, min_covar=1.e-7):
     return log_prob
 
 # ref: https://github.com/hmmlearn/hmmlearn/blob/0e9274cb138427919c13ef79f11a7358c4e2b4a9/lib/hmmlearn/utils.py#L89
-def reshape_covariances(covars, covariance_type='full', n_components=1, n_features=1):
+def decompress_based_on_covariance_type(covars, covariance_type='full', n_gaussian=1, n_features=1):
+    """
+    Create the correct shape of covariance matris
+    from each feature based on the covariance type.
+    ~~~~~~~~
+    @params tied_cv         : Input tied covariance.
+    @params covariance_type : string.
+    @params n_gauusian      : number of gaussian
+    @return cv              : compressed values.
+    ==========================================================
+    | covariance_type |               Gaussian               |
+    ----------------------------------------------------------
+    | "spherical"     | (n_gaussian)                         |
+    | "diag"          | (n_gaussian, n_features)             |
+    | "full"          | (n_gaussian, n_features, n_features) |
+    | "tied"          | (n_features, n_features)             |
+    """
     if covariance_type == 'full':
         return covars
     elif covariance_type == 'diag':
+        # np.diag(n_features).shape=(n_features, n_features)
+        # shape=(n_gaussian, n_features) → shape=(n_gaussian, (n_features, n_features))
         return np.array(list(map(np.diag, covars)))
     elif covariance_type == 'tied':
-        return np.tile(covars, (n_components, 1, 1))
+        # shape=(n_features, n_features) → shape=(n_gaussian, n_features*1, n_features*1)
+        return np.tile(covars, (n_gaussian, 1, 1))
     elif covariance_type == 'spherical':
+        # shape=(1, n_features, n_features)
         eye = np.eye(n_features)[np.newaxis, :, :]
         covars = covars[:, np.newaxis, np.newaxis]
         return eye * covars
+
+# ref: https://github.com/hmmlearn/hmmlearn/blob/0e9274cb138427919c13ef79f11a7358c4e2b4a9/lib/hmmlearn/_utils.py#L47
+def compress_based_on_covariance_type_from_tied_shape(tied_cv, covariance_type, n_gaussian):
+    """ Create all the covariance matrices from a given template.
+    @params tied_cv         : Input tied covariance.
+    @params covariance_type : string.
+    @params n_gauusian      : number of gaussian
+    @return cv              : compressed values.
+    ==========================================================
+    | covariance_type |               Gaussian               |
+    ----------------------------------------------------------
+    | "spherical"     | (n_gaussian)                         |
+    | "diag"          | (n_gaussian, n_features)             |
+    | "full"          | (n_gaussian, n_features, n_features) |
+    | "tied"          | (n_features, n_features)             |
+    """
+    n_features = tied_cv.shape[1]
+    if covariance_type == 'spherical':
+        # shape=(n_features,) → shape=(n_gaussian, n_features*1)
+        # Before:
+        # cv = np.tile(tied_cv.mean()*np.ones(n_features), (n_gaussian, 1))
+        # Modified by Shuto Iwasaki.
+        cv = np.full(shape=n_gaussian, fill_value=tied_cv.mean())
+    elif covariance_type == 'tied':
+        # shape=((n_features, n_features)
+        cv = tied_cv
+    elif covariance_type == 'diag':
+        # shape=(n_features,) → shape=(n_gaussian, n_features*1)
+        cv = np.tile(np.diag(tied_cv), (n_gaussian, 1))
+    elif covariance_type == 'full':
+        # shape=(n_features, n_features) → shape=(n_gaussian, n_features*1, n_features*1)
+        cv = np.tile(tied_cv, (n_gaussian, 1, 1))
+    else:
+        handleKeyError(['spherical', 'tied', 'diag', 'full'], covariance_type=covariance_type)
+    return cv

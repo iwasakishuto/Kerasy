@@ -22,6 +22,7 @@ from .EM import KMeans
 
 DECODER_ALGORITHMS = ["viterbi", "map",]
 DECODER_FUNC_NAMES = ["_decode_viterbi", "_decode_map"]
+COVARIANCE_TYPES   = ["spherical", "diag", "full", "tied"]
 
 class BaseHMM(Params):
     """ Hidden Markov Model.

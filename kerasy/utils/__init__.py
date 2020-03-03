@@ -1,4 +1,7 @@
 from __future__ import absolute_import
+import os
+
+UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from . import bio_utils
 from . import deep_utils
@@ -88,3 +91,5 @@ from .vis_utils import objVSexp
 from .vis_utils import silhouette_plot
 from .vis_utils import _left_silhouette_plot
 from .vis_utils import _right_silhouette_plot
+from .vis_utils import plot_CDF
+from .vis_utils import plot_roc_curve

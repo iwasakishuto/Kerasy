@@ -1,0 +1,8 @@
+{
+    "vmin"   : 0,
+    "vmax"   : 1,
+    "annot"  : true,
+    "fmt"    : ".3g",
+    "cmap"   : "binary",
+    "cbar"   : false
+}

@@ -8,8 +8,7 @@ from fractions import Fraction
 
 from .generic_utils import handleKeyError
 from .generic_utils import priColor
-
-UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+from . import UTILS_DIR_PATH
 
 DICT_SORT_METHODS = ["rnd_is_last"]
 DICT_SORT_FUNCS   = ["_dict_rnd_is_last"]

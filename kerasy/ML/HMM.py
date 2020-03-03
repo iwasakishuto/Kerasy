@@ -482,6 +482,42 @@ class BaseHMM(Params):
         with np.errstate(under="ignore"):
             return np.exp(log_xi_sum)
 
+    def heatmap_params(self, **plot_kwargs):
+        """ Not necessary !! """
+        try:
+            import os
+            import json
+            import seaborn as sns
+            import matplotlib.pyplot as plt
+            from ..utils import UTILS_DIR_PATH
+            abs_path = os.path.join(UTILS_DIR_PATH, "default_params", "sns_heatmap_kwargs.json")
+            with open(abs_path, 'r') as f:
+                DEFAULT_KWARGS = json.load(f)
+        except:
+            raise ImportError("You Need to install `seaborn`")
+
+        n_hstates = self.n_hstates
+        n_rows = n_hstates + 1
+        mk_ticklabels = lambda n:["$z_{" + f"{n},{k}" + "}$" for k in range(n_hstates)]
+
+        DEFAULT_KWARGS["center"] = 1/n_hstates
+        DEFAULT_KWARGS.update(plot_kwargs)
+
+        fig = plt.figure(figsize=(2*n_hstates, 2*n_rows))
+        fig.suptitle('Initial hidden state probs\n&\ntransit probs')
+        axi = plt.subplot2grid((n_rows, n_hstates), (0, 0), colspan=n_hstates)
+        axt = plt.subplot2grid((n_rows, n_hstates), (1, 0), colspan=n_hstates, rowspan=n_hstates)
+
+        sns.heatmap(
+            self.initial.reshape(1,-1), ax=axi, **DEFAULT_KWARGS,
+            yticklabels=False, xticklabels=mk_ticklabels(0)
+        )
+        sns.heatmap(
+            self.transit, ax=axt, **DEFAULT_KWARGS,
+            yticklabels=mk_ticklabels("n-1"), xticklabels=mk_ticklabels("n")
+        )
+        plt.show()
+
 class MultinomialHMM(BaseHMM):
     """ Hidden Markov Model with multinomial (discrete) emissions """
     def __init__(self, n_hstates=3, init="random", algorithm="viterbi",
@@ -576,8 +612,87 @@ class BernoulliHMM(MultinomialHMM):
     def _check_input_and_get_nstates(self, X):
         """ Check if ``X`` is a sample from a Bernoulli distribution and get `n_states`. """
         if not np.issubdtype(X.dtype, np.integer) or X.min() < 0 or X.max() > 1:
-            raise ValueError("Symbols should be 0 or 1.")
+            raise ValueError("Symbols should be integers 0 or 1.")
         return 2
+
+class BinomialHMM(BaseHMM):
+    """ Hidden Markov Model with binomial (discrete) emissions
+    @input     X : shape=(n_samples, 2)
+        - X[:, 0] (yes) The number of success/yes/true/one experiments.
+        - X[:, 1] (no)  The number of failure/no/false/zero experiments.
+    """
+    def __init__(self, n_hstates=3, init="random", algorithm="viterbi",
+                 up_params="itθ", random_state=None):
+        super().__init__(n_hstates=n_hstates, init=init, algorithm=algorithm,
+                         up_params=up_params, random_state=random_state)
+        self.model_params.extend(["thetas"])
+
+    def _get_params_size(self):
+        nh = self.n_hstates
+        return {
+            "i": nh - 1,
+            "t": nh * (nh - 1),
+            "θ": nh,
+        }
+
+    def _generate_sample(self, hstate, random_state=None):
+        raise NotImplementedError("Binomial distribution needs a population of size N. B(N,theta)")
+
+    def _compute_log_likelihood(self, X):
+        """ Return `log_cond_prob`[n][k] = p(x_n|z_{nk}) """
+        num_comb = comb(X.sum(1), X[:,0])
+        log_cond_prob = log_mask_zero([num_comb * np.power(theta, X[:,0]) * np.power(1-theta, X[:,1]) for theta in self.thetas]).T
+        return np.ascontiguousarray(log_cond_prob)
+
+    def _check_params_validity(self):
+        super()._check_params_validity()
+
+        self.thetas = thetas = np.asarray(self.thetas)
+        if len(thetas) != self.n_hstates:
+            raise ValueError(f"self.thetas must have length n_hstates, ({len(thetas)} != {self.n_hstates})")
+
+        if not np.all([0<=theta<=1 for theta in thetas]):
+            raise ValueError("self.thetas must be greater than 0 and less than 1.")
+
+    def _check_input(self, X):
+        """
+        Check the input data ``X`` is valid sample or not.
+        @params X :  shape=(n_samples, 2)
+        ex.) Detection of methylated regions.
+            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
+            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
+        """
+        if not X.shape[1] == 2:
+            raise ValueError("Input data must have the shape (n_samples, 2).")
+        if not np.issubdtype(X.dtype, np.integer):
+            raise ValueError("Symbols should be integers")
+        if X.min() < 0:
+            raise ValueError("Symbols should be nonnegative")
+
+    def _init_params(self, X, init):
+        self._check_input(X)
+        super()._init_params(X, init)
+
+        if isinstance(init, str) and init=="random":
+            self.thetas = self.rnd.rand(self.n_hstates)
+
+    def _init_statistics(self):
+        statistics = super()._init_statistics()
+        statistics['observation'] = np.zeros(shape=(2,self.n_hstates))
+        return statistics
+
+    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
+        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
+
+        if 'θ' in self.up_params:
+            statistics['observation'] += X.T.dot(posterior_prob)
+
+    def _Mstep(self, statistics):
+        super()._Mstep(statistics)
+
+        if 'e' in self.up_params:
+            A,B = statistics['observation']
+            self.thetas = A/(A+B)
 
 class GaussianHMM(BaseHMM):
     def __init__(self, n_hstates=3, covariance_type="diag", min_covariances=1e-3,
@@ -746,125 +861,46 @@ class MSSHMM(BaseHMM):
         - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
     @param theta : (float) This parameter controling
         "How much methylated C is likely to apper in the Hypermethylated region."
-        p(m_n,u_n | Hypermethylated) = theta^{m_n} * (1-theta)^{u_n}
-        p(m_n,u_n | Hypomethylated)  = (1-theta)^{m_n} * theta^{u_n}
-    """
-    def __init__(self, init="random", algorithm="viterbi",
-                 up_params="ite", random_state=None):
-        super().__init__(n_hstates=2, init=init, algorithm=algorithm,
-                         up_params=up_params, random_state=random_state)
-        self.disp_params.extend(["theta"])
-        self.model_params.extend(["emission"])
-        warnings.warn("This class is NOT RECOMMENDED. Please use `BinomialHMM`")
-
-    def _get_params_size(self):
-        nh = self.n_hstates
-        return {
-            "i": nh - 1,
-            "t": 1,
-            "e": 1,
-        }
-
-    def _generate_sample(self, hstate, random_state=None):
-        raise NotImplementedError(
-            "This model could not sampling a sequence."
-        )
-
-    def _compute_log_likelihood(self, X):
-        return np.r_[
-            np.prod(np.power(np.asarray([self.theta, 1-self.theta])[:,np.newaxis], X), axis=0),
-            np.prod(np.power(np.asarray([1-self.theta, self.theta])[:,np.newaxis], X), axis=0),
-        ]
-
-    def _check_params_validity(self):
-        super()._check_params_validity()
-        if not isinstance(self.theta, float):
-            raise ValueError("self.theta must be a float value.")
-
-        if not 0<self.theta<1:
-            raise ValueError("self.theta must be greater than 0 and less than 1.")
-
-    def _check_input(self, X):
-        """
-        Check the input data ``X`` is valid sample or not.
-        @params X :  shape=(n_samples, 2)
-        ex.) Detection of methylated regions.
-            - X[:, 0] The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
-            - X[:, 1] The number of reads of 'converted' C on bisulfite-seq at each CpC site.
-        """
-        if not X.shape[1] != 2:
-            raise ValueError("Input data must have the shape (n_samples, 2).")
-        if not np.issubdtype(X.dtype, np.integer):
-            raise ValueError("Symbols should be integers")
-        if X.min() < 0:
-            raise ValueError("Symbols should be nonnegative")
-
-    def _init_params(self, X, init):
-        self._check_input(X)
-        super()._init_params(X, init)
-
-        if isinstance(init, str) and init=="random":
-            self.theta = self.rnd.rand()
-
-    def _init_statistics(self):
-        statistics = super()._init_statistics()
-        statistics['observation'] = np.zeros(shape=(2))
-        return statistics
-
-    def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
-        super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
-
-        if 'e' in self.up_params:
-            statistics['observation'] += np.sum((X * posterior_prob[0,:]) + (X[::-1] * posterior_prob[1,:]), axis=1)
-
-    def _Mstep(self, statistics):
-        super()._Mstep(statistics)
-
-        if 'e' in self.up_params:
-            A,B = statistics['observation']
-            self.theta = A/(A+B)
-
-class BinomialHMM(BaseHMM):
-    """ HMM for Maximum Segment Sum.
-    ex.) Detection of methylated regions.
-    @input     X : shape=(n_samples, 2)
-        - X[:, 0] (m) The number of reads of 'unconverted' C on bisulfite-seq at each CpC site.
-        - X[:, 1] (u) The number of reads of 'converted' C on bisulfite-seq at each CpC site.
-    @param theta : (float) This parameter controling
-        "How much methylated C is likely to apper in the Hypermethylated region."
         p(m_n,u_n | total_n, Hypermethylated) = t_nCm_n * theta^{m_n} * (1-theta)^{u_n}
         p(m_n,u_n | total_n, Hypomethylated)  = t_nCm_n * (1-theta)^{m_n} * theta^{u_n}
     """
-    def __init__(self, init="random", algorithm="viterbi",
-                 up_params="ite", random_state=None):
+    def __init__(self, n_hstates=2, init="random", algorithm="viterbi",
+                 up_params="itθ", random_state=None):
+        if n_hstates != 2:
+            raise ValueError(
+                "This Model is a special case of the `BinomialHMM`.\
+                There are only 2 hidden states (A,B), and theta_A = 1-theta_B, \
+                so if you want to increase the hidden state, please define it yourself, \
+                pr use BinomialHMM`."
+            )
         super().__init__(n_hstates=2, init=init, algorithm=algorithm,
                          up_params=up_params, random_state=random_state)
         self.disp_params.extend(["theta"])
-        self.model_params.extend(["emission"])
+        self.model_params.extend(["theta"])
 
     def _get_params_size(self):
         nh = self.n_hstates
         return {
             "i": nh - 1,
             "t": 1,
-            "e": 1,
+            "θ": 1,
         }
 
     def _generate_sample(self, hstate, random_state=None):
         raise NotImplementedError("Binomial distribution needs a population of size N. B(N,theta)")
 
     def _compute_log_likelihood(self, X):
-        return np.log(list(map(comb, np.sum(X, axis=1), X[:,0])))[:,np.newaxis] * np.c_[
+        return log_mask_zero(comb(X.sum(1), X[:,0])[:,np.newaxis] * np.c_[
             np.prod(np.power(np.asarray([self.theta, 1-self.theta])[np.newaxis,:], X), axis=1),
             np.prod(np.power(np.asarray([1-self.theta, self.theta])[np.newaxis,:], X), axis=1),
-        ]
+        ])
 
     def _check_params_validity(self):
         super()._check_params_validity()
         if not isinstance(self.theta, float):
             raise ValueError("self.theta must be a float value.")
 
-        if not 0<self.theta<1:
+        if not 0<=self.theta<=1:
             raise ValueError("self.theta must be greater than 0 and less than 1.")
 
     def _check_input(self, X):
@@ -897,11 +933,9 @@ class BinomialHMM(BaseHMM):
     def _update_statistics(self, statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta):
         super()._update_statistics(statistics, X, log_cond_prob, posterior_prob, log_alpha, log_beta)
 
-        if 'e' in self.up_params:
-            statistics['observation'] += np.sum(
-                np.log(list(map(comb, np.sum(X, axis=1), X[:,0])))[:,np.newaxis] * \
-                (X*posterior_prob[:,0,np.newaxis] + X[::-1]*posterior_prob[:,1,np.newaxis]),
-            axis=0)
+        if 'θ' in self.up_params:
+            statistics['observation'][0] += np.sum(X*posterior_prob)
+            statistics['observation'][1] += np.sum(X[:,::-1]*posterior_prob)
 
     def _Mstep(self, statistics):
         super()._Mstep(statistics)
@@ -911,8 +945,8 @@ class BinomialHMM(BaseHMM):
             self.theta = A/(A+B)
 
 """
-class BernoulliHMM(BaseHMM):
-    def __init__()
+If you want to add your original HMM, please follow the format below.
+~~~~~~~
 class KerasyHMM(BaseHMM):
     def __init__(self, n_hstates=3, kerasy="kerasy", init="random",
                  algorithm="viterbi", up_params="kerasy", random_state=None):

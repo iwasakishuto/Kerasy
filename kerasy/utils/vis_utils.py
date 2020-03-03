@@ -221,3 +221,62 @@ def _right_silhouette_plot(X, labels, centers, ax=None, set_style=True):
         if n_features>=2: ax.set_ylabel("Feature space for the 2nd feature")
         if n_features==3: ax.set_zlabel("Feature space for the 3rd feature")
     return ax
+
+def plot_CDF(data, ax=None, reverse=False, plot=True, **plotargs):
+    """ plot Cumulative Ratio. """
+    n_samples = len(data)
+    X = sorted(data, reverse=reverse)
+    Y = np.arange(1,n_samples+1)/n_samples
+
+    if plot or ax:
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(X, Y, **plotargs)
+        ax.set_ylabel("Cumulative Ratio")
+        return ax
+
+    return (X, Y)
+
+def plot_roc_curve(labels, scores, num=50, ax=None, plot=True, **plotargs):
+    flags = labels>0
+    tX,tY = plot_CDF(scores[flags], plot=False)
+    fX,fY = plot_CDF(scores[~flags], reverse=True, plot=False)
+    plot_CDF
+
+    def FRR2score(y):
+        idx = np.abs(np.asarray(tY) - y).argmin()
+        if y==tY[idx]:
+            x=tX[idx]
+        else:
+            idx = idx-1 if y<tY[idx] else idx
+            x = ((y-tY[idx])*tX[idx+1] + (tY[idx+1]-y)*tX[idx])/(tY[idx+1]-tY[idx])
+        return x
+
+    def score2FAR(x):
+        if x<fX[0]:  return fY[0]
+        if x>fX[-1]: return fY[-1]
+        idx = np.abs(np.asarray(fX) - x).argmin()
+        if x==fX[idx]:
+            y=fY[idx]
+        else:
+            idx = idx-1 if x<fX[idx] else idx
+            if fX[idx+1]==fX[idx]:
+                y = fY[idx]
+            else:
+                y = ((x-fX[idx])*fY[idx+1] + (fX[idx+1]-x)*fY[idx])/(fX[idx+1]-fX[idx])
+        return y
+
+    FRRs = [i/N for i in range(N+1)]
+    FARs = [score2FAR(FRR2score(frr)) for frr in FRRs]
+    FARs[0] = 1
+
+    if plot or ax:
+        if ax is None:
+            fig, ax = plt.subplots()
+        ax.plot(FRRs, FARs, **plotargs)
+        ax.set_xlabel("FRR(False Rejection Rate)")
+        ax.set_ylabel("FAR(False Acceptance Rate)")
+        ax.set_title("The relationship between FRR and FAR")
+        return ax
+
+    return (FRRs, FARs)

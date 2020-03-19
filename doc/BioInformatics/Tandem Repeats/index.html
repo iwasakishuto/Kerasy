@@ -8,13 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Shuto" />
     <meta name="twitter:card" content="summary">
-    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/BioInformatics/Secondary Structure/index.html" />
-    <meta property="og:title" content="Secondary Structure">
-    <meta property="og:description" content="Brief explanation of Secondary Structure and introduction of modules that can be used in Kerasy">
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/BioInformatics/Tandem Repeats/index.html" />
+    <meta property="og:title" content="Tandem Repeats">
+    <meta property="og:description" content="Brief explanation of Tandem Repeats and introduction of modules that can be used in Kerasy">
     <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
     <meta property="og:type" content="article" />
 
-    <title>Secondary Structure - Kerasy Documentation</title>
+    <title>Tandem Repeats - Kerasy Documentation</title>
     <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
@@ -24,9 +24,9 @@
 
     <script>
       // Current page data
-      var mkdocs_page_name = "Secondary Structure";
-      var mkdocs_page_input_path = "BioInformatics/Secondary Structure.md";
-      var mkdocs_page_url = "/Kerasy/BioInformatics/Secondary Structure/";
+      var mkdocs_page_name = "Tandem Repeats";
+      var mkdocs_page_input_path = "BioInformatics/Tandem Repeats.md";
+      var mkdocs_page_url = "/Kerasy/BioInformatics/Tandem Repeats/";
     </script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
@@ -222,9 +222,17 @@
           
 
 
-  <li class="navtree toctree-l2 inactive">
-    <a class="" href="../Tandem Repeats/">Tandem Repeats</a>
-  </li>
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Tandem Repeats
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
         
           
 
@@ -236,17 +244,9 @@
           
 
 
-  
-    
-    <li class="navtree toctree-l2 page current">
-      <a class="current" href="./">
-        Secondary Structure
-          <span class="toctree-expand"></span>
-      </a>
-    </li>
-    
-
-  
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Secondary Structure/">Secondary Structure</a>
+  </li>
         
           
 
@@ -291,7 +291,7 @@
         
       
     
-    <li>Secondary Structure</li>
+    <li>Tandem Repeats</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
@@ -307,13 +307,13 @@
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Secondary Structure</h3>
+          <h3>Tandem Repeats</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-12-09(月)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/structure.py">Bio/structure.py</a></span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-03-18(月)</span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/tandem.py">Bio/tandem.py</a></span></li>
             <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/bioinformatics.html">BioInformatics</a></span></li> -->
         </ul>
     </div>
@@ -321,179 +321,102 @@
         <section class="article">
             <div class="admonition tip">
   <p class="admonition-title">Notebook</p>
-  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/structure.ipynb">Kerasy.examples.structure.ipynb</a></p>
+  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/tandem.ipynb">Kerasy.examples.tandem.ipynb</a></p>
 </div>
 
-<div class="admonition summary">
-  <p class="admonition-title">Free energy minimization of RNA secondary structure</p>
-  <p>In cells, RNAs are likely to form energetically stable
-secondary structure, so <b>the correctness of secondary structure should be evaluated based on the <font color="red">free energy.</font></b></p>
-</div>
-
-<h2>Nussinov Algorithm</h2>
-<p>Nussinov Algorithm calculate the free energy by <strong>the number of base-pairs.</strong></p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Nussinov</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</pre></div>
-
-
-<ul>
-<li>params:<ul>
-<li><code>nucleic_acid</code></li>
-<li><code>WatsonCrick</code></li>
-<li><code>minspan</code></li>
-</ul>
-</li>
-</ul>
+<h2>Tandem Repeats</h2>
+<p><strong>Tandem Repeats</strong> are simple sequence repeats that are extremely common throughout the genomes of a wide range of species. <strong>Tandem repeats are helpful to determine the inherited traits</strong> of gene from its parent and in determining the ancestor relationship. Tandem repeats are proven to be biologically significant as they can help in discovery of dynamic mutations for genetic diseases.</p>
+<p>There are two main methods like <strong>dynamic programming</strong>, <strong>suffix array induced sorting</strong>, to find exact tandem repeats.</p>
 <table>
 <thead>
 <tr>
-<th align="center">variable</th>
-<th align="left">definition</th>
+<th align="center">#</th>
+<th align="center">Suffix Array - Induced Sorting</th>
+<th align="center">Dynamic Programming</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td align="center">Construction</td>
 <td align="center">
-<div class="math">$$\gamma\left(i,j\right)$$</div>
+<div class="math">$$O\left(n\right)$$</div>
 </td>
-<td align="left">the maximum number of base-pairs <b>for</b> subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
+<td align="center">
+<div class="math">$$O\left(n^2\right)$$</div>
+</td>
 </tr>
 <tr>
+<td align="center">Tandem repeats discovery</td>
 <td align="center">
-<div class="math">$$\omega\left(i,j\right)$$</div>
+<div class="math">$$O\left(n\ast m\right)$$</div>
 </td>
-<td align="left">the maximum number of base-pairs <b>excluding</b> subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
+<td align="center">
+<div class="math">$$O\left(n^2\right)$$</div>
+</td>
 </tr>
 <tr>
+<td align="center">Total time</td>
 <td align="center">
-<div class="math">$$Z(i,j)$$</div>
+<div class="math">$$O\left(n + n\ast m\right)$$</div>
 </td>
-<td align="left">the maximum number of base-pairs <b>if <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> form base pair.</b></td>
+<td align="center">
+<div class="math">$$O\left(n^2\right)$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">Space complexity</td>
+<td align="center">
+<div class="math">$$O\left(n\right)$$</div>
+</td>
+<td align="center">
+<div class="math">$$O\left(n^2\right)$$</div>
+</td>
 </tr>
 </tbody>
 </table>
-<div class="math">$$
-\begin{aligned}
-  \gamma(i,j) &amp;= \max
-  \begin{cases}
-    \gamma(i+1,j)\\
-    \gamma(i,j-1)\\
-    \gamma(i+1,j-1)+\delta(i,j)\\
-    \max_{i\leq k\verb|&lt;|j}\left[\gamma(i,k) + \gamma(k+1,j)\right]
-  \end{cases}\\
-  \omega(i,j) &amp;= \max
-  \begin{cases}
-    \omega(i-1,j)\\
-    \omega(i,j+1)\\
-    \omega(i-1,j+1)+\delta(i-1,j+1)\\
-    \max_{1\leq k\verb|&lt;|i}\left[\omega(k,j) + \gamma(k,i-1)\right]\\
-    \max_{j\verb|&lt;| k\leq L}\left[\omega(j+1,k) + \gamma(i,k)\right]
-  \end{cases}\\
-  Z(i,j) &amp;=
-  \begin{cases}
-    \gamma\left(i+1,j-1\right) + 1 + \omega\left(i,j\right) &amp; (\text{if }i\text{ and }j\text{-th nucleotides can form a base-pair})\\
-    0 &amp; (\text{otherwise})
-  \end{cases}
-\end{aligned}
-$$</div>
-<h2>Zuker Algorithm</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Zuker</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<p><small><em>here, <strong><span class="math">\(n\)</span></strong> is the length of the sequence and <strong><span class="math">\(m\)</span></strong> is the average length of the suffix.</em></small></p>
+<p>The time required to identify tandem repeats mainly depends on construction of the required data structure.</p>
+<ul>
+<li>For <strong>Dynamic programming</strong> method, a square matrix of size of the sequence is constructed and values are calculated which takes the time and space complexity of <span class="math">\(O\left(n^2\right)\)</span>.</li>
+<li>In <strong>SA-IS</strong> method, the time and space needed for construction is <span class="math">\(O\left(n\right)\)</span>.</li>
+</ul>
+<h3>Dynamic Programming Method</h3>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">tandem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;DP&quot;</span><span class="p">)</span>
 </pre></div>
 
 
+<p>To find all tandem repeats in a sequence we <strong>perform slight modifications to the Smith-Waterman algorithm for local alignments.</strong> The time complexity of the method will be <span class="math">\(O\left(n\ast n\right)\)</span> as we will be filling a two-dimensional matrix. We then align the sequence with itself to find tandem repeats.</p>
+<p>The modifications we perform to the algorithm are:</p>
 <ul>
-<li>params:<ul>
-<li><code>nucleic_acid</code></li>
-<li><code>WatsonCrick</code></li>
-<li><code>hairpin</code></li>
-<li><code>internal</code></li>
-<li><code>buldge</code></li>
-<li><code>a</code></li>
-<li><code>b</code></li>
-<li><code>c</code></li>
-<li><code>stacking_cols</code></li>
-<li><code>stacking_score</code></li>
+<li>Align the string with itself by placing the string on the top and on the left.</li>
+<li><strong>Set all diagonal elements to zero</strong> so we don't align a character by itself.</li>
+<li>Since both strings are same, we only need to calculate one half of the matrix.</li>
+<li>When calculating the next cell of the matrix, we<ul>
+<li>assign a score of zero for mismatch or gap.</li>
+<li>just increment the score by one for match.</li>
 </ul>
 </li>
+<li>The scores in this matrix represent the length of the tandem repeat. We repeat the longest tandem repeat in the sequences. If we have multiple repeats of the same length, we repeat all of them.</li>
 </ul>
-<p>The free energy of a secondary structure is approximated as the sum of the free energy of <b>"loops".</b></p>
-<div class="math">$$E = \sum_iE_i$$</div>
-<p>The free energy of individual loop is <b>given</b> by experimental data. (ex. <span class="math">\(\mathrm{C-G: }-3.4\mathrm{kcal/mol}\)</span>, <span class="math">\(\mathrm{U-A: }-0.9\mathrm{kcal/mol}\)</span>)</p>
-<h3>Five types of "loops"</h3>
-<table>
-    <thead>
-        <tr>
-            <th align="center">hairpin loop</th>
-            <th align="center">stacking</th>
-            <th align="center">bulge loop</th>
-            <th align="center">internal loop</th>
-            <th align="center">multi-loop</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th align="center"><img src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_secondary_structure/hairpin_loop.png"></th>
-            <th align="center"><img src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_secondary_structure/stacking.png"></th>
-            <th align="center"><img src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_secondary_structure/bulge_loop.png"></th>
-            <th align="center"><img src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_secondary_structure/internal_loop.png"></th>
-            <th align="center"><img src="https://iwasakishuto.github.io/University/3A/theme/img/3A_Basic_Laboratory/RNA_secondary_structure/multi_loop.png"></th>
-        </tr>
-        <tr>
-            <th align="center">F1(i,j)</th>
-            <th align="center" colspan=3>F2(i,j,h,l)</th>
-            <th align="center">Fm=a+bk+cu</th>
-        </tr>
-    </tbody>
-</table>
+<h3>Suffix Array - Induced Sorting Method</h3>
+<p><small>※ If you are not familiar with Suffix Array, please look at <strong><a href="https://iwasakishuto.github.io/Kerasy/doc/BioInformatics/String%20Search/">String Search page</a></strong>.</small></p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">tandem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;SAIS&quot;</span><span class="p">)</span>
+</pre></div>
 
-<ul>
-    <li>a,b,c: constant</li>
-    <li>k: the number of <b>base-pairs</b> in a multi-loop</li>
-    <li>u: the number of <b>single stranded nucleotides</b> in a multi-loop</li>
-</ul>
 
-<table>
-<thead>
-<tr>
-<th align="center">variable</th>
-<th align="left">meaning</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center"><span class="math">\(W(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
-</tr>
-<tr>
-<td align="center"><span class="math">\(V(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span> <b>when <span class="math">\(i\)</span> to <span class="math">\(j\)</span> forms a base-pair.</b></td>
-</tr>
-<tr>
-<td align="center"><span class="math">\(M(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence <b>when subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span> are in the <font color="red">multi-loop</font> and contain one or more base pairs <font color="red">which close it.</font></b></td>
-</tr>
-</tbody>
-</table>
-<div class="math">$$
-\begin{aligned}
-    W(i,j) &amp;= \min
-    \begin{cases}
-        W(i+1,j)\\W(i,j-1)\\V(i,j)\\\min_{i\leq k&lt;j}\left\{W(i,k) + W(k+1,j)\right\}
-    \end{cases}\\
-    V(i,j) &amp;= \min
-    \begin{cases}
-        F_1(i,j)\\\min_{i&lt;h&lt;l&lt;j}F_2(i,j,h,l) + V(h,l)\\\min_{i+1\leq k&lt;j-1}\left[M(i+1,k) + M(k+1,j)\right]+a+b
-    \end{cases}\\
-    M(i,j) &amp;= \min
-    \begin{cases}
-        V(i,j)+b\\M(i+1,j)+c\\M(i,j-1)+c\\\min_{i\leq&lt;k&lt;j}\left[M(i,k) + M(k+1,j)\right]
-    \end{cases}\\    
-\end{aligned}
-$$</div>
-<div class="admonition warning">
-  <p class="admonition-title">Warning</p>
-  <p>None of the algorithms we see this week can deal with <span class="marker-info" aria-label="a nucleic acid secondary structure containing at least two stem-loop structures in which half of one stem is intercalated between the two halves of another stem.">pseudoknot</span></p>
-  <a href="https://en.wikipedia.org/wiki/Pseudoknot"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Pseudoknot.svg/1024px-Pseudoknot.svg.png" alt="Pseudoknot"></a>
+<p>To find the tandem repeats from the suffix array we need to follow the below steps.</p>
+<ol>
+<li>We need to build the suffixes from the suffix array.</li>
+<li>Iterate through the suffixes in the order of suffix array and record the common substring for every two consecutive strings in the suffixes.</li>
+<li>From the common substrings we return all those with maximum length as exact tandem repeats.</li>
+</ol>
+<div class="admonition reference">
+  <p class="admonition-title">Reference</p>
+  <ul>
+    <li><a href="https://github.com/meghanamadineni/TandemRepeats/blob/master/TandemRepeats.pdf">Study, Analysis, and Implementation of Different Techniques to Find Tandem Repeats.</a></li>
+    <li><a href="http://monge.univ-mlv.fr/~koutcher/PAPERS/KolpakovKucherovFOCS99.pdf">Finding Maximal Repetitions in a Word in Linear Time.</a></li>
+    <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC169196/pdf/gkg617.pdf">mreps: efficient and flexible detection of tandem repeats in DNA</a></li>
+  </ul>
 </div>
 
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
@@ -568,10 +491,10 @@ $$</div>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../Alignment/" class="btn btn-neutral float-right" title="Alignment">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../RefSeq/" class="btn btn-neutral float-right" title="RefSeq">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../RefSeq/" class="btn btn-neutral" title="RefSeq"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../MachineLearning/Support Vector Machine/" class="btn btn-neutral" title="Support Vector Machine"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -597,10 +520,10 @@ $$</div>
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../RefSeq/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../MachineLearning/Support Vector Machine/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../Alignment/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../RefSeq/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

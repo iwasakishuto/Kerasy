@@ -1,4 +1,10 @@
-""" For developers (Shuto Iwasaki) """
+"""
+Created on Thu Jan 2 2020
+@author: Shuto Iwasaki
+```
+$ python setup.py build_ext --inplace
+```
+"""
 
 # codin: utf-8
 import os
@@ -29,6 +35,7 @@ if __name__ == "__main__":
                 sources=[fn],
                 include_dirs=['.', get_include()],
                 libraries=libraries,
+                language="c++"
             )
         )
     setup(name="Kerasy_clib", ext_modules=cythonize(extentions))

@@ -4,6 +4,7 @@
 
 # Ref: <math.h> https://www.qnx.com/developers/docs/6.4.1/dinkum_en/c99/math.html
 from numpy.math cimport expl, logl, log1pl, isinf, fabsl, INFINITY
+from libc.math import sqrt, ceil
 
 # np.argmax(X)
 cdef inline int c_argmax(double[:] X) nogil:
@@ -35,7 +36,7 @@ cdef inline double c_logsumexp(double[:] X) nogil:
         sumexp_ += expl(X[i] - Xmax)
 
     return logl(sumexp_) + Xmax
-    
+
 # log(exp(a) + exp(b))
 cdef inline double c_logaddexp(double a, double b) nogil:
     if isinf(a) and a < 0:
@@ -44,3 +45,12 @@ cdef inline double c_logaddexp(double a, double b) nogil:
         return a
     else:
         return max(a, b) + log1pl(expl(-fabsl(a - b)))
+
+cdef inline c_maxdivisor(int n):
+    cdef int i
+    cdef int max_val = int(ceil(sqrt(n)))
+
+    for i in range(2, max_val):
+        if n%i==0:
+            return n//i
+    return 1

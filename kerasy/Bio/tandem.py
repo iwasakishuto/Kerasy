@@ -16,7 +16,10 @@ def _find_tandem_DP(sequence):
 def _find_tandem_SAIS(sequence):
     max_val = 0
     tandem_lists = [(0,len(sequence))]
-    #NOTE: This is not true.
+    #TODO: Implementation
+    # - O(n^2)   LCP + naive
+    # - O(nlogn) LCP + divide-and-conquer method
+    # - O(n)     LCP + factorization
     return max_val, tandem_lists
 
 def find_tandem(sequence, method="SAIS"):
@@ -25,7 +28,4 @@ def find_tandem(sequence, method="SAIS"):
         "DP"   : _find_tandem_DP,
         "SAIS" : _find_tandem_SAIS
     }[method](sequence)
-
-    # 最小要素にする。
-
     return max_val, tandem_lists

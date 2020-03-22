@@ -3,6 +3,7 @@ import numpy as np
 from ..utils import CategoricalEncoder
 from ..utils import printAlignment
 from ..utils import inverse_arr
+from ..utils import priColor
 
 def checkString(string):
     if "$" in string:
@@ -54,25 +55,43 @@ class StringSearch():
                 return -1
         return self.SA[lb:ub+1]
 
-    def where(self, query, width=60):
+    def where(self, query, width=60, is_adjacent=False):
         len_query  = len(query)
         len_string = len(self.string)
 
         positions  = self.search(query)
         score = 0 if isinstance(positions, int) else len(positions)
+
+        if len_query<3:
+            is_adjacent = False
+        else:
+            post_end_pos=-1
+            for pos in positions:
+                if pos==post_end_pos:
+                    is_adjacent = True
+                    break
+                post_end_pos = pos+len_query
+
         pos_info   = list(" " * len_string)
         if not isinstance(positions, int):
             for pos in positions:
-                pos_info[pos:pos+len_query] = list("*" * len_query)
+                if is_adjacent:
+                    mark = "<" + "-"*(len_query-2) + ">"
+                else:
+                    mark = "*" * len_query
+                pos_info[pos:pos+len_query] = list(mark)
         pos_info = "".join(pos_info)
+
         printAlignment(
             sequences=[self.string, pos_info],
             indexes=[np.arange(len_string), np.arange(len_string)],
-            seqname=['S', ' '],
-            width=width,
             score=score,
             scorename="Number of matches",
-            model="Suffix Array"
+            add_info=f"Query: {query}",
+            seqname=['S', ' '],
+            model="Suffix Array",
+            width=width,
+            blank=" ",
         )
 
 def mkBWT(string, SA):
@@ -172,10 +191,10 @@ def SAIS(string):
     if isinstance(string, str):
         encoder = CategoricalEncoder()
         string = list(encoder.to_categorical(string, origin=1))
-    SA = SAIS_recursive(string, isLMSsorted=False, LMS=None)
+    SA = SAIS_recursion(string, isLMSsorted=False, LMS=None)
     return np.asarray(SA, dtype=int)
 
-def SAIS_recursive(string, isLMSsorted=False, LMS=None):
+def SAIS_recursion(string, isLMSsorted=False, LMS=None):
     """Make suffix array recursively in linear order.
     @params string      : (list) A query strings
     @params isLMSsorted : (bool) Whether LMS is already sorted or not.
@@ -275,11 +294,11 @@ def SAIS_recursive(string, isLMSsorted=False, LMS=None):
     if enc < LMSn:
         # If we couldn't order LMS correctly, sort LMS recursively.
         sub_string = [pLMS[e] for e in LMS if e<l-1] # We have to remove last symbol "$".
-        order = SAIS_recursive(sub_string, isLMSsorted=False, LMS=None) # Sort LMS recursively.
+        order = SAIS_recursion(sub_string, isLMSsorted=False, LMS=None) # Sort LMS recursively.
         LMS = [LMS[i] for i in order]
     else:
         LMS = [i for i in SA if isLMS[i]]
-    return SAIS_recursive(string, isLMSsorted=True, LMS=LMS)
+    return SAIS_recursion(string, isLMSsorted=True, LMS=LMS)
 
 def simple_compression(string):
     """ Simple way to compress string. """

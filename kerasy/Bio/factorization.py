@@ -33,6 +33,7 @@ def LPF_on_line(SA, LCP):
     12  8 bbabbb            2       1
     13 11 bbb               2       2
     -------------------------------------
+    NOTE: This definition is different from 'suffix.py'
     """
     n = len(LCP)
     S = [] # Empty Stack
@@ -61,3 +62,43 @@ def LPF_on_line(SA, LCP):
         else:
             raise ValueError("Some element of the LPF array are calculated.")
     return LPF
+
+def LZfactorization(LPF, PrevOcc):
+    """ Lempel-Ziv(LZ77) factorization, or s-factorization
+    Ref: "Computing the Longest Previous Factor"
+         (https://doi.org/10.1016/j.ejc.2012.07.011)
+    """
+    raise NotImplementedError("ERROR!!")
+    pass
+
+def simple_compression(string):
+    """ Simple way to compress string. """
+    symbol = ""; compressed_string = ""; n=1
+    for cha in string:
+        if cha==symbol: n+=1
+        else:
+            if n>1: compressed_string+=str(n)
+            compressed_string+=cha
+            symbol=cha
+            n=1
+    return compressed_string
+
+def simple_decompression(compressed_string):
+    """Decompression for `simple_compression(string)`"""
+    string=""; i=0; len_string = len(compressed_string)
+    while True:
+        if compressed_string[i].isdigit():
+            print(compressed_string[i])
+            s = i
+            while i<len_string and compressed_string[i].isdigit():
+                i+=1
+            n = int(compressed_string[s:i])
+            string += string[-1]*(n-1)
+        else:
+            string+=compressed_string[i]
+            i+=1
+        if i==len_string:
+            break
+    return string
+
+# TODE: "Move-to-front encoding" and "Run-length encoding".

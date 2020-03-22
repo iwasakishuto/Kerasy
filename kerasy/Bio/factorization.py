@@ -4,8 +4,11 @@
 based on a certain rule.
 """
 
-def LPF_on_line(SA, LCP):
+import numpy as np
+
+def LPF_create(SA, LCP):
     """
+    LPF_{on-line}
     Ref: "Computing the Longest Previous Factor"
          (https://doi.org/10.1016/j.ejc.2012.07.011)
     ~~~~~

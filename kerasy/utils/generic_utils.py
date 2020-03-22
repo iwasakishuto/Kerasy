@@ -124,3 +124,6 @@ def handle_random_state(seed):
     if isinstance(seed, int):
         return np.random.RandomState(seed)
     raise ValueError(f"Could not conver {seed} to numpy.random.RandomState instance.")
+
+def fout_args(*args, sep="\t"):
+    return sep.join([str(e) for e in args])+"\n"

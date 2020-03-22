@@ -33,6 +33,7 @@ from .generic_utils import measure_complexity
 from .generic_utils import has_all_attrs
 from .generic_utils import has_not_attrs
 from .generic_utils import handle_random_state
+from .generic_utils import fout_args
 
 from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors

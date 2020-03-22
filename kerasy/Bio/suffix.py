@@ -35,13 +35,19 @@ import numpy as np
 
 from ..utils import CategoricalEncoder
 from ..utils import inverse_arr
-from .string import checkString
+
+def checkString(string):
+    if "$" in string:
+        raise TypeError(
+            "You do not need to add '$' at the end.",
+            "If '$' is in `string`, please replace them."
+        )
 
 ################
 # Suffix Array #
 ################
 
-def SAIS_create(string):
+def SAIS(string):
     """ Suffix Array Induced Sorting Handler. """
     checkString(string)
     if isinstance(string, str):

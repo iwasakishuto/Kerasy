@@ -5,6 +5,7 @@ This file contains the following algorithms:
 """
 import numpy as np
 
+from .suffix import checkString
 from ..utils import inverse_arr
 
 def lcp(string,i,j):

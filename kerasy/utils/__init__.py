@@ -80,6 +80,7 @@ from .toydata_utils import generateMultivariateNormal
 from .toydata_utils import generateWholeCakes
 from .toydata_utils import generateWhirlpool
 from .toydata_utils import generateSeq
+from .toydata_utils import generateSeq_embedded_Motif
 
 from .training_utils import make_batches
 from .training_utils import train_test_split

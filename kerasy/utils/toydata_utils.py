@@ -4,27 +4,32 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from .generic_utils import handleKeyError
+from .generic_utils import handle_random_state
+
+DNA_BASE_TYPES=["A","T","G","C"]
+RNA_BASE_TYPES=["A","U","G","C"]
 
 def generateX(size, xmin=-1, xmax=1, seed=None):
+    rnd = handle_random_state(seed)
     x = np.linspace(xmin, xmax, size+2)[1:-1]
-    x += np.random.normal(0, scale=(xmax-xmin)/(4*size), size=size)
-    x = np.where(x<xmin, xmin, x)
-    x = np.where(x>xmax, xmax, x)
-    return x
+    x += rnd.normal(0, scale=(xmax-xmin)/(4*size), size=size)
+    return np.clip(a=x, a_min=xmin, a_max=xmax)
 
 def generateSin(size, xmin=-1, xmax=1, noise_scale=0.1, seed=None):
-    x     = generateX(size=size, xmin=xmin, xmax=xmax, seed=seed)
-    noise = np.random.RandomState(seed).normal(loc=0,scale=noise_scale,size=size)
+    rnd = handle_random_state(seed)
+    x     = generateX(size=size, xmin=xmin, xmax=xmax, seed=rnd)
+    noise = rnd.normal(loc=0,scale=noise_scale,size=size)
     y     = np.sin(2*np.pi*x) + noise
     return (x,y)
 
 def generateGausian(size, x=None, loc=0, scale=0.1, seed=None):
+    rnd = handle_random_state(seed)
     x = x if x is not None else np.linspace(-1,1,size)
-    y = np.random.RandomState(seed).normal(loc=loc,scale=scale,size=size)
+    y = rnd.normal(loc=loc,scale=scale,size=size)
     return (x,y)
 
 def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=None, same=True):
-    rnd = np.random.RandomState(seed)
+    rnd = handle_random_state(seed)
     means = rnd.uniform(low,high,(cls,dim))
     covs = np.eye(dim)*scale
     if same:
@@ -38,7 +43,7 @@ def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=No
 
 def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=False, add_noise=True, noise_scale=5, figsize=(6,6), return_ax=False):
     """ Generate cls-class, 2-dimensional data. """
-    rnd = np.random.RandomState(seed)
+    rnd = handle_random_state(seed)
     if same:
         Ns = [N//cls for i in range(cls)]
     else:
@@ -65,12 +70,13 @@ def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=Fal
 
 def generateWhirlpool(N, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
     """ Generate 2-class 2-dimensional data. """
+    rnd = handle_random_state(seed)
     a = np.linspace(xmin, xmax*np.pi, num=N//2)
     x = np.concatenate([
         np.stack([        a*np.cos(a),         a*np.sin(a)], axis=1),
         np.stack([(a+np.pi)*np.cos(a), (a+np.pi)*np.sin(a)], axis=1)
     ])
-    x += np.random.RandomState(seed).uniform(size=x.shape)
+    x += rnd.uniform(size=x.shape)
     y  = np.repeat(np.arange(2), N//2)
     if plot:
         plt.figure(figsize=figsize)
@@ -85,11 +91,58 @@ def generateSeq(size, nucleic_acid="DNA", weights=None, seed=None):
     @params weights     : weights for each base. it must sum to 1.
     @params seed        : for the porpose of Reproducibility.
     """
+    rnd = handle_random_state(seed)
     if nucleic_acid == "DNA":
-        bases = ["A","T","G","C"]
+        bases = DNA_BASE_TYPES
     elif nucleic_acid == "RNA":
-        bases = ["A","U","G","C"]
+        bases = RNA_BASE_TYPES
     else:
         handleKeyError(["DNA","RNA"], nucleic_acid=nucleic_acid)
-    sequences = np.random.RandomState().choice(bases, p=weights, size=size)
+    sequences = rnd.choice(bases, p=weights, size=size)
     return sequences
+
+def generateSeq_embedded_Motif(Np, Nn, length, motif, nuc=DNA_BASE_TYPES, seed=None):
+    """ Generate dataset for DeepBind.
+    @params Np     : (Positive) Number of sequence which has motif.
+    @params Nn     : (Negative) Number of sequence which doesn't have motif.
+    @params length : (int) The length of sequence. (Fixed length)
+                     (tuple) The range of length of sequence. (Varying length)
+    @params motif  : shape=(len_motif, num_base_types)
+    @params nuc    : Types of Base.
+    """
+    rnd = handle_random_state(seed)
+    num_total = Np+Nn
+
+    if isinstance(length, int):
+        len_fix = True
+    else:
+        len_min = min(length)
+        len_max = max(length)
+        len_fix = False
+
+    len_motif, num_base_types = motif.shape
+    if num_base_types != len(nuc):
+        raise ValueError(f"The number of bases in the `motif` is different from \
+                            the number of bases in the `nuc`.\
+                            ({num_base_types} != {len(nuc)})")
+    if (len_fix and len_motif > length) or (not len_fix and len_motif > len_min):
+        raise ValueError(f"The length of motif should be smaller than \
+                            the length of each sequence. \
+                            (got {len_motif} > {length if len_fix else len_min})")
+
+    y = [1] * Np + [0] * Nn
+    x = [None] * num_total
+
+    for i in range(num_total):
+        if len_fix:
+            len_seq = length
+        else:
+            len_seq = int(rnd.uniform(low=len_min, high=len_max, size=1))
+        seq = rnd.choice(nuc, size=len_seq) # generate Random Sequence.
+        if i < Np: # If positive, embed motif at random position.
+            j = rnd.randint(len_seq - len_motif + 1)
+            for k in range(len_motif):
+                # embed motif based on respective probabilities.
+                seq[j + k] = rnd.choice(nuc, p=motif[k])
+        x[i] = "".join(seq)
+    return (x, y)

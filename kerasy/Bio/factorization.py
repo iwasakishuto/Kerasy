@@ -66,13 +66,19 @@ def LPF_create(SA, LCP):
             raise ValueError("Some element of the LPF array are calculated.")
     return LPF
 
-def LZfactorization(LPF, PrevOcc):
+def LZfactorization(LPF, string):
     """ Lempel-Ziv(LZ77) factorization, or s-factorization
     Ref: "Computing the Longest Previous Factor"
          (https://doi.org/10.1016/j.ejc.2012.07.011)
     """
-    raise NotImplementedError("ERROR!!")
-    pass
+    s_factorization = []
+    ini_pos = 0;
+    while(ini_pos < len(string)):
+        l = max(1, LPF[ini_pos])
+        end_pos = ini_pos+l
+        s_factorization.append(string[ini_pos:end_pos])
+        ini_pos = end_pos
+    return s_factorization
 
 def simple_compression(string):
     """ Simple way to compress string. """

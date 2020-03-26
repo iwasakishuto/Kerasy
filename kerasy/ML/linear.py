@@ -58,7 +58,7 @@ class LinearRegressionLASSO(LinearRegression):
         c = lambda_/rho
         return z0-c if c<z0 else z0+c if z0<-c else 0
 
-    def fit(self, train_x, train_y, rho=1e-3, tol=1e-7, max_iter=100, verbose=verbose):
+    def fit(self, train_x, train_y, rho=1e-3, tol=1e-7, max_iter=100, verbose=1):
         """
         @param train_x: shape=(N,?)
         @param train_y: shape=(N,M)

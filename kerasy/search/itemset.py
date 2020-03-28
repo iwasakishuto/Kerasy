@@ -1,5 +1,24 @@
 # coding: utf-8
 import numpy as np
+from ..utils import flatten_dual
+
+def create_one_hot(data):
+    """
+    Create the one-hot binary matrix.
+    @params data     : (list) Each element of data (data[i]) have variable length items.
+    @return one_hot  : shape=(num_data,num_unique)
+        one_hot[n][i]=1 means data[n] contains idx2data[i]
+    @return idx2data : Dictionary from index to original data.
+    """
+    unique_data = sorted(list(set(flatten_dual(data))))
+    num_unique = len(unique_data)
+    num_data = len(data)
+    data2idx = dict(zip(unique_data, range(num_unique)))
+    one_hot = np.zeros(shape=(num_data,num_unique), dtype=np.int32)
+    for i,row in enumerate(data):
+        one_hot[i, np.asarray([data2idx[e] for e in row], dtype=int)]=1
+    idx2data = dict(zip(range(num_unique), unique_data))
+    return one_hot, idx2data
 
 class Node():
     N = None

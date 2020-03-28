@@ -35,7 +35,7 @@ class SCODE():
             b[d] = rnd.uniform(low=b_min, high=b_max, size=1)
             Z = np.power(np.e, (np.expand_dims(t, axis=1) * np.expand_dims(b, axis=0)))
             # Solution of linear regression (X^{(e)}≃WZ^{(e)})
-            W = np.dot(np.dot(X, Z), np.linalg.inv(np.dot(Z.T,Z) + np.eye(dimension)*lamda))
+            W = np.dot(np.dot(X,Z), np.linalg.inv(np.dot(Z.T,Z) + np.eye(dimension)*lamda))
             # Residual sum of squares.
             RSS = np.linalg.norm(X-np.dot(W,Z.T))
             if it==0 or RSS < RSS_best:

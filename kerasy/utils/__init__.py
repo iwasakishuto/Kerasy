@@ -28,12 +28,16 @@ from .generic_utils import flatten_dual
 from .generic_utils import get_file
 from .generic_utils import priColor
 from .generic_utils import handleKeyError
+from .generic_utils import handleTypeError
 from .generic_utils import urlDecorate
 from .generic_utils import measure_complexity
 from .generic_utils import has_all_attrs
 from .generic_utils import has_not_attrs
 from .generic_utils import handle_random_state
 from .generic_utils import fout_args
+from .generic_utils import format_spec_create
+from .generic_utils import print_func_create
+from .generic_utils import Table
 
 from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors

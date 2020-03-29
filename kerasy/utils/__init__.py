@@ -14,6 +14,7 @@ from . import param_utils
 from . import prepro_utils
 from . import toydata_utils
 from . import training_utils
+from . import tree_utils
 from . import vis_utils
 
 # Globally-importable utils.
@@ -89,6 +90,8 @@ from .toydata_utils import generateSeq_embedded_Motif
 from .training_utils import make_batches
 from .training_utils import train_test_split
 from .training_utils import iter_from_variable_len_samples
+
+from .tree_utils import _DOTTreeExporter
 
 from .vis_utils import rgb2hex, rgba2rgb, hex2rgb
 from .vis_utils import chooseTextColor

@@ -1,7 +1,8 @@
 # coding: utf-8
 # Ref: http://darden.hatenablog.com/entry/2016/12/15/222447
+import os
 import numpy as np
-from ..utils import _DOTTreeExporter
+from ..utils import DecisionTreeDOTExporter
 
 def split_data(data, cond):
     return (data[cond], data[~cond])
@@ -154,10 +155,21 @@ class DecisionTreeClassifier():
     def score(self, x_train, y_train):
         return sum(self.predict(x_train) == y_train)/float(len(y_train))
 
-    def export_graphviz(self, cmap="jet", feature_names=None, class_names=None):
+    def export_graphviz(self, out_file=None, feature_names=None,
+                        class_names=None, cmap="jet", filled=True,
+                        rounded=True, precision=3):
         if feature_names is None:
             feature_names = [f"x{i+1}" for i in range(self.num_features)]
         if class_names is None:
             class_names = [f"cls{k+1}" for k in self.ini_classes]
-        exporter = _DOTTreeExporter(cmap=cmap, feature_names=feature_names, class_names=class_names)
-        return exporter.export(self.tree)
+        exporter = DecisionTreeDOTExporter(
+            cmap=cmap, feature_names=feature_names, class_names=class_names,
+            filled=filled, rounded=rounded, precision=precision
+        )
+        if out_file is not None:
+            ext = os.path.splitext(os.path.basename(out_file))[-1]
+            if ext==".png":
+                return exporter.write_png(self.tree, path=out_file)
+            elif ext==".dot":
+                return exporter.export(self.tree, out_file=out_file)
+        return exporter.export(self.tree, out_file=None)

@@ -91,7 +91,8 @@ from .training_utils import make_batches
 from .training_utils import train_test_split
 from .training_utils import iter_from_variable_len_samples
 
-from .tree_utils import _DOTTreeExporter
+from .tree_utils import BaseTreeDOTExporter
+from .tree_utils import DecisionTreeDOTExporter
 
 from .vis_utils import rgb2hex, rgba2rgb, hex2rgb
 from .vis_utils import chooseTextColor

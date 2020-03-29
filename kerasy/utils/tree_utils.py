@@ -3,74 +3,128 @@ from .vis_utils import mk_color_dict
 from .vis_utils import chooseTextColor
 from .vis_utils import rgb2hex
 
-class _DOTTreeExporter(object):
-    def __init__(self, feature_names, class_names, cmap="jet"):
+BLACK_hex = "#000000"
+WHITE_hex = "#FFFFFF"
+
+class BaseTreeDOTExporter():
+    def __init__(self, feature_names, class_names, cmap="jet",
+                 filled=True, rounded=True, precision=3):
         self.node_id = None
-        self.dot_data = None
+        self.dot_text = None
         self.feature_names = feature_names
         self.class_names = class_names
-        fill_color_dict = mk_color_dict(class_names, cmap=cmap, ctype="rgb")
-        self.color_dict = {
-            cls: {
-                "fillcolor": rgb2hex(rgb_bg),
-                "fontcolor":rgb2hex(chooseTextColor(rgb_bg))
-            } for cls,rgb_bg in fill_color_dict.items()
+        self.filled = filled
+        self.rounded = rounded
+        self.precision = precision
+        self._mk_color_dict(class_names=class_names, cmap=cmap)
+
+    def _mk_color_dict(self, class_names, cmap):
+        bg_color_dict = mk_color_dict(class_names, cmap=cmap, ctype="rgb")
+        fw_color_dict = {
+            cls: rgb2hex(chooseTextColor(rgb_bg)) for cls,rgb_bg in bg_color_dict.items()
         }
+        bg_color_dict = {cls : rgb2hex(rgb_bg) for cls,rgb_bg in bg_color_dict.items()}
+        if not self.filled:
+            fw_color_dict = {cls : BLACK_hex for cls,rgb_bg in fw_color_dict.items()}
+        self.fill_color_dict = bg_color_dict
+        self.font_color_dict = fw_color_dict
 
-    def export(self, node):
+    def _add_head(self):
+        head_info = "digraph Tree {\nnode [shape=box"
+        # Specify node aesthetics (`round`, and `filled`).
+        rounded_filled = []
+        rounded_filled.extend(["filled"]  if self.filled  else [])
+        rounded_filled.extend(["rounded"] if self.rounded else [])
+        if len(rounded_filled) > 0:
+            head_info += f", style=\"{', '.join(rounded_filled)}\", color=\"black\""
+        if self.rounded:
+            head_info += ", fontname=helvetica"
+        head_info += "] ;\n"
+        # Specify graph & edge aesthetics
+        if self.rounded:
+            head_info += "\tedge [fontname=helvetica] ;\n"
+        self.dot_text += head_info
+
+    def _add_node_info(self, node_id, label_="", fillcolor_=WHITE_hex, fontcolor_=BLACK_hex):
+        self.dot_text += f'\t{node_id} [label=<{label_}>, fontcolor="{fontcolor_}", fillcolor="{fillcolor_}"] ;\n'
+
+    def _add_par_chil_info(self, son_id, par_id, arrow_info_=""):
+        self.dot_text += f'\t{par_id} -> {son_id} {arrow_info_} ;\n'
+
+    def _add_tail(self):
+        self.dot_text += "}"
+
+    def _initialize(self):
         self.node_id = 0
-        self.dot_data = ""
-        self.head()
-        self.recurse(node, 0)
-        self.tail()
-        return self.dot_data
+        self.dot_text = ""
 
-    def head(self):
-        self.dot_data = """digraph Tree {
-        node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
-        edge [fontname=helvetica] ;
-        """
+    def recurse(self, node, par_node_id=None):
+        my_node_id = self.node_id
+        self.node_id += 1
+        self._add_node_info(node=node, node_id=my_node_id)
+        if par_node_id is not None:
+            self._add_par_chil_info(son_id=my_node_id, par_id=par_node_id)
+        if node.left is not None:
+            self.recurse(node.left, my_node_id)
+        if node.right is not None:
+            self.recurse(node.right, my_node_id)
 
-    def tail(self):
-        self.dot_data += "}"
-
-    def recurse(self, node, par_node_id):
-        my_node_num = self.node_id
-
-        tree_str = ""
-        if node.feature == None or node.depth == node.max_depth:
-            tree_str += str(self.node_id) + " [label=<" + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
-                                           + "samples = " + str(node.num_samples) + "<br/>" \
-                                           + "value = " + str(node.num_classes) + "<br/>" \
-                                           + "class = " + self.class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fillcolor") + "\", fontcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fontcolor") +"\"] ;\n"
-            if my_node_num!=par_node_id:
-                tree_str += str(par_node_id) + " -> "
-                tree_str += str(my_node_num)
-                if par_node_id==0 and my_node_num==1:
-                    tree_str += " [labeldistance=2.5, labelangle=45, headlabel=\"True\"] ;\n"
-                elif par_node_id==0:
-                    tree_str += " [labeldistance=2.5, labelangle=-45, headlabel=\"False\"] ;\n"
-                else:
-                    tree_str += " ;\n"
-            self.dot_data += tree_str
+    def export(self, node, out_file=None):
+        self._initialize()
+        self._add_head()
+        self.recurse(node, par_node_id=None)
+        self._add_tail()
+        if out_file is not None:
+            with open(out_file, mode="w", encoding="utf-8") as f:
+                f.write(self.dot_text)
         else:
-            tree_str += str(self.node_id) + " [label=<" + self.feature_names[node.feature] + " &le; " + str(node.threshold) + "<br/>" \
-                                           + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
-                                           + "samples = " + str(node.num_samples) + "<br/>" \
-                                           + "value = " + str(node.num_classes) + "<br/>" \
-                                           + "class = " + self.class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fillcolor") + "\", fontcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fontcolor") +"\"] ;\n"
-            if my_node_num!=par_node_id:
-                tree_str += str(par_node_id) + " -> "
-                tree_str += str(my_node_num)
-                if par_node_id==0 and my_node_num==1:
-                    tree_str += " [labeldistance=2.5, labelangle=45, headlabel=\"True\"] ;\n"
-                elif par_node_id==0:
-                    tree_str += " [labeldistance=2.5, labelangle=-45, headlabel=\"False\"] ;\n"
-                else:
-                    tree_str += " ;\n"
-            self.dot_data += tree_str
+            return self.dot_text
 
-            self.node_id+=1
-            self.recurse(node.left, my_node_num)
-            self.node_id+=1
-            self.recurse(node.right, my_node_num)
+    def write_png(self, node, path):
+        try:
+            import pydotplus
+        except:
+            raise ImportError("You Need to run the following command\
+                              \n`$ pip install -U pydotplus`")
+        if path[-4:] != ".png":
+            path += ".png"
+        dot_data = self.export(node, out_file=None)
+        graph = pydotplus.graph_from_dot_data(dot_data)
+        graph.write_png(path, f='png', prog='dot')
+
+class DecisionTreeDOTExporter(BaseTreeDOTExporter):
+    def __init__(self, feature_names, class_names, cmap="jet",
+                 filled=True, rounded=True, precision=3):
+        super().__init__(feature_names=feature_names, class_names=class_names,
+                         cmap=cmap, filled=filled, rounded=rounded,
+                         precision=precision)
+        self.headlabeled = False
+
+    def _initialize(self):
+        self.headlabeled = False
+        super()._initialize()
+
+    def _add_node_info(self, node, node_id):
+        precision = self.precision
+        class_names = self.class_names
+        # label info.
+        label = ""
+        if not (node.feature == None or node.depth == node.max_depth):
+            label += f"{self.feature_names[node.feature]} &le; {round(node.threshold, precision)}<br/>"
+        label += f"{node.criterion} = {round(node.impurity, precision)}<br/>" \
+               + f"N = {node.num_samples}<br/>" \
+               + f"classes = {node.num_classes}<br/>" \
+               + f"class = {class_names[node.label]}"
+        # fill color info.
+        fillcolor = self.fill_color_dict.get(class_names[node.label], WHITE_hex)
+        # font color info.
+        fontcolor = self.font_color_dict.get(class_names[node.label], BLACK_hex)
+        super()._add_node_info(node_id=node_id, label_=label, fillcolor_=fillcolor, fontcolor_=fontcolor)
+
+    def _add_par_chil_info(self, son_id, par_id):
+        arrow_info_ = ""
+        if par_id==0:
+            deg = "" if self.headlabeled else "-"
+            arrow_info_ += f'[labeldistance=2.5, labelangle={deg}45, headlabel="{not self.headlabeled}"]'
+            self.headlabeled = not self.headlabeled
+        super()._add_par_chil_info(son_id=son_id, par_id=par_id, arrow_info_=arrow_info_)

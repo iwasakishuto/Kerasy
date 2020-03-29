@@ -2,6 +2,8 @@
 # Ref: http://darden.hatenablog.com/entry/2016/12/15/222447
 import numpy as np
 from ..utils import mk_color_dict
+from ..utils import chooseTextColor
+from ..utils import rgb2hex
 
 def split_data(data, cond):
     return (data[cond], data[~cond])
@@ -34,10 +36,10 @@ class Node():
         self.num_samples  = None
         self.num_classes  = None
 
-    def split_node(self, x_train, y_train, depth, ini_num_classes):
+    def split_node(self, x_train, y_train, depth, ini_classes):
         self.depth = depth
         self.num_samples, num_features = x_train.shape
-        self.num_classes = [np.count_nonzero([y_train==k]) for k in ini_num_classes]
+        self.num_classes = [np.count_nonzero([y_train==k]) for k in ini_classes]
 
         unique_classes = np.unique(y_train)
         if len(unique_classes) == 1: # We don't have to divide!!
@@ -72,10 +74,10 @@ class Node():
         y_train_l, y_train_r = split_data(data=y_train, cond=x_train[:,self.feature]<=self.threshold)
         # Left Node
         self.left  = Node(self.criterion, self.max_depth)
-        self.left.split_node(x_train_l, y_train_l, depth+1, ini_num_classes)
+        self.left.split_node(x_train_l, y_train_l, depth+1, ini_classes)
         # Left Node
-        self.right = Node(self.criterion, self.max_depth, ini_num_classes)
-        self.right.split_node(x_train_r, y_train_r, depth+1, ini_num_classes)
+        self.right = Node(self.criterion, self.max_depth, ini_classes)
+        self.right.split_node(x_train_r, y_train_r, depth+1, ini_classes)
 
     def criterion_func(self, y_train):
         num_classes = np.unique(y_train)
@@ -140,9 +142,12 @@ class DecisionTreeClassifier():
 
     def fit(self, x_train, y_train):
         num_samples, num_features = x_train.shape
+        ini_classes = np.unique(y_train)
         self.tree = Node(criterion=self.criterion, max_depth=self.max_depth, random_state=self.random_state)
-        self.tree.split_node(x_train=x_train, y_train=y_train, depth=0, ini_num_classes=np.unique(y_train))
+        self.tree.split_node(x_train=x_train, y_train=y_train, depth=0, ini_classes=ini_classes)
         self.feature_importances_ = self.tree_analysis.get_feature_importances(node=self.tree, num_features=num_features)
+        self.num_features = num_features
+        self.ini_classes = ini_classes
 
     def predict(self, x_train):
         predictions = np.asarray([self.tree.predict(x) for x in x_train])
@@ -151,14 +156,47 @@ class DecisionTreeClassifier():
     def score(self, x_train, y_train):
         return sum(self.predict(x_train) == y_train)/float(len(y_train))
 
-class TreeStructure(object):
-    def __init__(self, cmap="jet"):
+    def export_graphviz(self, cmap="jet", feature_names=None, class_names=None):
+        if feature_names is None:
+            feature_names = [f"x{i+1}" for i in range(self.num_features)]
+        if class_names is None:
+            class_names = [f"cls{k+1}" for k in self.ini_classes]
+        exporter = _DOTTreeExporter(cmap=cmap, feature_names=feature_names, class_names=class_names)
+        return exporter.export(self.tree)
+
+# Tree2Graphviz
+class _DOTTreeExporter(object):
+    def __init__(self, feature_names, class_names, cmap="jet"):
         self.num_node = None
         self.dot_data = None
-        self.cmap = cmap
+        self.feature_names = feature_names
+        self.class_names = class_names
+        fill_color_dict = mk_color_dict(class_names, cmap=cmap, ctype="rgb")
+        self.color_dict = {
+            cls: {
+                "fillcolor": rgb2hex(rgb_bg),
+                "fontcolor":rgb2hex(chooseTextColor(rgb_bg))
+            } for cls,rgb_bg in fill_color_dict.items()
+        }
 
-    def print_tree(self, node, feature_names, class_names, parent_node_num):
-        self.color_dict = mk_color_dict(class_names, cmap=self.cmap, ctype="hex")
+    def export(self, node):
+        self.num_node = 0
+        self.dot_data = ""
+        self.head()
+        self.recurse(node, 0)
+        self.tail()
+        return self.dot_data
+
+    def head(self):
+        self.dot_data = """digraph Tree {
+        node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+        edge [fontname=helvetica] ;
+        """
+
+    def tail(self):
+        self.dot_data += "}"
+
+    def recurse(self, node, parent_node_num):
         node.my_node_num = self.num_node
         node.parent_node_num = parent_node_num
 
@@ -167,7 +205,7 @@ class TreeStructure(object):
             tree_str += str(self.num_node) + " [label=<" + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
                                            + "samples = " + str(node.num_samples) + "<br/>" \
                                            + "value = " + str(node.num_classes) + "<br/>" \
-                                           + "class = " + class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(class_names[node.label]) +"\"] ;\n"
+                                           + "class = " + self.class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fillcolor") + "\", fontcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fontcolor") +"\"] ;\n"
             if node.my_node_num!=node.parent_node_num:
                 tree_str += str(node.parent_node_num) + " -> "
                 tree_str += str(node.my_node_num)
@@ -179,11 +217,11 @@ class TreeStructure(object):
                     tree_str += " ;\n"
             self.dot_data += tree_str
         else:
-            tree_str += str(self.num_node) + " [label=<" + feature_names[node.feature] + " &le; " + str(node.threshold) + "<br/>" \
+            tree_str += str(self.num_node) + " [label=<" + self.feature_names[node.feature] + " &le; " + str(node.threshold) + "<br/>" \
                                            + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
                                            + "samples = " + str(node.num_samples) + "<br/>" \
                                            + "value = " + str(node.num_classes) + "<br/>" \
-                                           + "class = " + class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(class_names[node.label]) +"\"] ;\n"
+                                           + "class = " + self.class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fillcolor") + "\", fontcolor=\""+ self.color_dict.get(self.class_names[node.label]).get("fontcolor") +"\"] ;\n"
             if node.my_node_num!=node.parent_node_num:
                 tree_str += str(node.parent_node_num) + " -> "
                 tree_str += str(node.my_node_num)
@@ -196,13 +234,6 @@ class TreeStructure(object):
             self.dot_data += tree_str
 
             self.num_node+=1
-            self.print_tree(node.left, feature_names, class_names, node.my_node_num)
+            self.recurse(node.left, node.my_node_num)
             self.num_node+=1
-            self.print_tree(node.right, feature_names, class_names, node.my_node_num)
-
-    def export_graphviz(self, node, feature_names, class_names):
-        self.num_node = 0
-        self.dot_data = "digraph Tree {\nnode [shape=box, style=\"filled, rounded\", color=\"black\", fontname=helvetica] ;\nedge [fontname=helvetica] ;\n"
-        self.print_tree(node, feature_names, class_names, 0)
-        self.dot_data += "}"
-        return self.dot_data
+            self.recurse(node.right, node.my_node_num)

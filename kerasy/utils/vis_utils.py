@@ -19,8 +19,28 @@ COLOR_TYPES = ["rgba", "rgb", "hex"]
 def rgb2hex(rgb, max_val=1):
     return "#"+"".join([format(int(255/max_val*e), '02x') for e in rgb]).upper()
 
+def rgba2rgb(rgba, max_val=1):
+    alpha = rgba[-1]
+    rgb = rgba[:-1]
+    type_ = int if max_val==255 else float
+    # compute the color as alpha against white
+    return tuple([type_(alpha*e+(1-alpha)*max_val) for e in rgb])
+
 def hex2rgb(hex, max_val=1):
     tuple([int(hex[-6:][i*2:(i+1)*2], 16)/255*max_val for i in range(3)])
+
+def chooseTextColor(rgb, ctype="rgb", max_val=1):
+    # Ref: WCAG (https://www.w3.org/TR/WCAG20/)
+    R,G,B = [e/max_val for e in rgb]
+    # Relative Brightness BackGround.
+    Lbg = 0.2126*R + 0.7152*G + 0.0722*B
+
+    Lw = 1 # Relative Brightness of White
+    Lb = 0 # Relative Brightness of Black
+
+    Cw = (Lw + 0.05) / (Lbg + 0.05)
+    Cb = (Lbg + 0.05) / (Lb + 0.05)
+    return (0,0,0) if Cb>Cw else (max_val,max_val,max_val)
 
 def mk_color_dict(keys, cmap="jet", reverse=False, max_val=1, ctype="rgba"):
     """
@@ -40,22 +60,25 @@ def mk_color_dict(keys, cmap="jet", reverse=False, max_val=1, ctype="rgba"):
 
     if isinstance(keys, int):
         N  = keys-1
-        color_dict = {n: cmap(n/N) for n in range(keys)}
+        color_dict_rgba = {n: cmap(n/N) for n in range(keys)}
     else:
         unique_keys = sorted(list(set(keys)))
         N = len(unique_keys)-1
-        color_dict = {
+        color_dict_rgba = {
             key: tuple([
                 max_val*e if i<3 else e for i,e in enumerate(cmap(n/N))
             ]) for n,key in enumerate(unique_keys)
         }
     if ctype=="rgba":
-        pass
-    elif ctype=="rgb":
-        color_dict = {k:v[:-1] for k,v in color_dict.items()}
+        return color_dict_rgba
+
+    color_dict_rgb = {k:rgba2rgb(v, max_val=max_val) for k,v in color_dict_rgba.items()}
+    if ctype=="rgb":
+        return color_dict_rgb
+
     if ctype=="hex":
-        color_dict = {k:rgb2hex(v[:-1],max_val=max_val) for k,v in color_dict.items()}
-    return color_dict
+        color_dict_hex = {k:rgb2hex(v[:-1],max_val=max_val) for k,v in color_dict_rgb.items()}
+    return color_dict_hex
 
 def measureCanvas(nfigs, ncols_max=2, figinches=(6,4)):
     """

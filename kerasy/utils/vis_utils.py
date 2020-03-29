@@ -1,14 +1,61 @@
 # coding: utf-8
+import re
 import copy
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import matplotlib.colors as colors
+from matplotlib._cm import datad
 from mpl_toolkits.mplot3d import Axes3D
 
 from .generic_utils import handleKeyError
 from .metric_utils import silhouette_samples
 from .metric_utils import silhouette_score
+
+ALL_CMAP_NAMES = [name for name in datad.keys() if not re.search(r".*_r", name, re.IGNORECASE)]
+COLOR_TYPES = ["rgba", "rgb", "hex"]
+
+def rgb2hex(rgb, max_val=1):
+    return "#"+"".join([format(int(255/max_val*e), '02x') for e in rgb]).upper()
+
+def hex2rgb(hex, max_val=1):
+    tuple([int(hex[-6:][i*2:(i+1)*2], 16)/255*max_val for i in range(3)])
+
+def mk_color_dict(keys, cmap="jet", reverse=False, max_val=1, ctype="rgba"):
+    """
+    @params keys    :
+    @params cmap    :
+    @params reverse :
+    @params max_val :
+    @params ctype   : rgb, rgba, hex
+    """
+    handleKeyError(lst=COLOR_TYPES, ctype=ctype)
+    if not isinstance(cmap, colors.Colormap):
+        # If `cmap` is string.
+        handleKeyError(lst=ALL_CMAP_NAMES, cmap=cmap)
+        if reverse:
+            cmap += "_r"
+        cmap = plt.get_cmap(cmap)
+
+    if isinstance(keys, int):
+        N  = keys-1
+        color_dict = {n: cmap(n/N) for n in range(keys)}
+    else:
+        unique_keys = sorted(list(set(keys)))
+        N = len(unique_keys)-1
+        color_dict = {
+            key: tuple([
+                max_val*e if i<3 else e for i,e in enumerate(cmap(n/N))
+            ]) for n,key in enumerate(unique_keys)
+        }
+    if ctype=="rgba":
+        pass
+    elif ctype=="rgb":
+        color_dict = {k:v[:-1] for k,v in color_dict.items()}
+    if ctype=="hex":
+        color_dict = {k:rgb2hex(v[:-1],max_val=max_val) for k,v in color_dict.items()}
+    return color_dict
 
 def measureCanvas(nfigs, ncols_max=2, figinches=(6,4)):
     """

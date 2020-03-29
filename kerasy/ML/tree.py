@@ -1,34 +1,53 @@
 # coding: utf-8
 # Ref: http://darden.hatenablog.com/entry/2016/12/15/222447
 import numpy as np
+from ..utils import mk_color_dict
 
-def split_data(data, cond): return (data[cond], data[~cond])
+def split_data(data, cond):
+    return (data[cond], data[~cond])
 
 class Node():
+    """ Node for Tree structure.
+    @params depth       : (int)   Depth (Root: depth=0)
+    @params left        : (Node)  Left side node.
+    @params right       : (Node)  Right side node.
+    @params feature     : (int)   Index of the features.
+    @params threshold   : (float) Threshold for dividing
+    @params label       : (int)   Class label for this node. It is used when this node is the last one.
+    @params impurity    : (float) Node impurity.
+    @params info_gain   : (float) How much information was obtained by dividing at this node.
+    @params num_samples : (int)   The number of samples which flowed into the node
+    @params num_classes : (list)  The number of samples which belongs to each class.
+    """
     def __init__(self, criterion="gini", max_depth=None, random_state=None):
         self.criterion    = criterion
         self.max_depth    = max_depth
         self.random_state = random_state
-        self.depth        = None # (int)   Depth (Root: depth=0)
-        self.left         = None # (Node)  Left side node.
-        self.right        = None # (Node)  Right side node.
-        self.feature      = None # (int)   Index of the features.
-        self.threshold    = None # (float) Threshold for dividing
-        self.label        = None # (int)   Class label for this node. It is used when this node is the last one.
-        self.info_gain    = None # (float) How much information was obtained by dividing at this node.
-        self.num_samples  = None # (int)   The number of samples which flowed into the node
+        self.depth        = None
+        self.left         = None
+        self.right        = None
+        self.feature      = None
+        self.threshold    = None
+        self.label        = None
+        self.impurity     = None
+        self.info_gain    = None
+        self.num_samples  = None
+        self.num_classes  = None
 
-    def split_node(self, x_train, y_train, depth):
+    def split_node(self, x_train, y_train, depth, ini_num_classes):
         self.depth = depth
         self.num_samples, num_features = x_train.shape
+        self.num_classes = [np.count_nonzero([y_train==k]) for k in ini_num_classes]
 
         unique_classes = np.unique(y_train)
         if len(unique_classes) == 1: # We don't have to divide!!
             self.label = unique_classes[0]
+            self.impurity = self.criterion_func(y_train)
             return
 
         class_count = {cls: np.count_nonzero(y_train==cls) for cls in np.unique(y_train)}
         self.label  = max(class_count.items(), key=lambda x:x[1])[0]
+        self.impurity = self.criterion_func(y_train)
 
         self.info_gain = 0.0
         # The order of looking at features. (If Information gain is equal, the fastest one is given priority.)
@@ -53,10 +72,10 @@ class Node():
         y_train_l, y_train_r = split_data(data=y_train, cond=x_train[:,self.feature]<=self.threshold)
         # Left Node
         self.left  = Node(self.criterion, self.max_depth)
-        self.left.split_node(x_train_l, y_train_l, depth+1)
+        self.left.split_node(x_train_l, y_train_l, depth+1, ini_num_classes)
         # Left Node
-        self.right = Node(self.criterion, self.max_depth)
-        self.right.split_node(x_train_r, y_train_r, depth+1)
+        self.right = Node(self.criterion, self.max_depth, ini_num_classes)
+        self.right.split_node(x_train_r, y_train_r, depth+1, ini_num_classes)
 
     def criterion_func(self, y_train):
         num_classes = np.unique(y_train)
@@ -88,7 +107,6 @@ class Node():
         else:
             if x_train[self.feature] <= self.threshold: return self.left.predict(x_train)
             else: return self.right.predict(x_train)
-
 
 class TreeAnalysis():
     """ Calcurate the feature importances. """
@@ -123,7 +141,7 @@ class DecisionTreeClassifier():
     def fit(self, x_train, y_train):
         num_samples, num_features = x_train.shape
         self.tree = Node(criterion=self.criterion, max_depth=self.max_depth, random_state=self.random_state)
-        self.tree.split_node(x_train=x_train, y_train=y_train, depth=0)
+        self.tree.split_node(x_train=x_train, y_train=y_train, depth=0, ini_num_classes=np.unique(y_train))
         self.feature_importances_ = self.tree_analysis.get_feature_importances(node=self.tree, num_features=num_features)
 
     def predict(self, x_train):
@@ -132,3 +150,59 @@ class DecisionTreeClassifier():
 
     def score(self, x_train, y_train):
         return sum(self.predict(x_train) == y_train)/float(len(y_train))
+
+class TreeStructure(object):
+    def __init__(self, cmap="jet"):
+        self.num_node = None
+        self.dot_data = None
+        self.cmap = cmap
+
+    def print_tree(self, node, feature_names, class_names, parent_node_num):
+        self.color_dict = mk_color_dict(class_names, cmap=self.cmap, ctype="hex")
+        node.my_node_num = self.num_node
+        node.parent_node_num = parent_node_num
+
+        tree_str = ""
+        if node.feature == None or node.depth == node.max_depth:
+            tree_str += str(self.num_node) + " [label=<" + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
+                                           + "samples = " + str(node.num_samples) + "<br/>" \
+                                           + "value = " + str(node.num_classes) + "<br/>" \
+                                           + "class = " + class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(class_names[node.label]) +"\"] ;\n"
+            if node.my_node_num!=node.parent_node_num:
+                tree_str += str(node.parent_node_num) + " -> "
+                tree_str += str(node.my_node_num)
+                if node.parent_node_num==0 and node.my_node_num==1:
+                    tree_str += " [labeldistance=2.5, labelangle=45, headlabel=\"True\"] ;\n"
+                elif node.parent_node_num==0:
+                    tree_str += " [labeldistance=2.5, labelangle=-45, headlabel=\"False\"] ;\n"
+                else:
+                    tree_str += " ;\n"
+            self.dot_data += tree_str
+        else:
+            tree_str += str(self.num_node) + " [label=<" + feature_names[node.feature] + " &le; " + str(node.threshold) + "<br/>" \
+                                           + node.criterion + " = " + "%.4f" % (node.impurity) + "<br/>" \
+                                           + "samples = " + str(node.num_samples) + "<br/>" \
+                                           + "value = " + str(node.num_classes) + "<br/>" \
+                                           + "class = " + class_names[node.label] + ">, fillcolor=\""+ self.color_dict.get(class_names[node.label]) +"\"] ;\n"
+            if node.my_node_num!=node.parent_node_num:
+                tree_str += str(node.parent_node_num) + " -> "
+                tree_str += str(node.my_node_num)
+                if node.parent_node_num==0 and node.my_node_num==1:
+                    tree_str += " [labeldistance=2.5, labelangle=45, headlabel=\"True\"] ;\n"
+                elif node.parent_node_num==0:
+                    tree_str += " [labeldistance=2.5, labelangle=-45, headlabel=\"False\"] ;\n"
+                else:
+                    tree_str += " ;\n"
+            self.dot_data += tree_str
+
+            self.num_node+=1
+            self.print_tree(node.left, feature_names, class_names, node.my_node_num)
+            self.num_node+=1
+            self.print_tree(node.right, feature_names, class_names, node.my_node_num)
+
+    def export_graphviz(self, node, feature_names, class_names):
+        self.num_node = 0
+        self.dot_data = "digraph Tree {\nnode [shape=box, style=\"filled, rounded\", color=\"black\", fontname=helvetica] ;\nedge [fontname=helvetica] ;\n"
+        self.print_tree(node, feature_names, class_names, 0)
+        self.dot_data += "}"
+        return self.dot_data

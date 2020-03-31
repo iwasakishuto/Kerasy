@@ -153,9 +153,9 @@ class DecisionTreeDOTexporter(BaseTreeDOTexporter):
         super()._add_par_chil_info(son_id=son_id, par_id=par_id, arrow_info_=arrow_info_)
 
 class ItemsetTreeDOTexporter(BaseTreeDOTexporter):
-    def __init__(self, feature_names=None, class_names=None, cmap="jet",
+    def __init__(self, class_names, cmap="jet",
                  filled=True, rounded=True, precision=3):
-        super().__init__(feature_names=feature_names, class_names=class_names,
+        super().__init__(feature_names=None, class_names=class_names,
                          cmap=cmap, filled=filled, rounded=rounded,
                          precision=precision, tree_structure="sons")
 
@@ -163,7 +163,7 @@ class ItemsetTreeDOTexporter(BaseTreeDOTexporter):
         # label info.
         label = ""
         label += f"frequency = {node.freq}<br/>" \
-               + f"itemset = {node.itemset}<br/>"
+               + f"itemset = {[self.class_names[idx] for idx in node.itemset]}<br/>"
         super()._add_node_info(node_id=node_id, label_=label)
 
     # def _add_par_chil_info(self, son_id, par_id):

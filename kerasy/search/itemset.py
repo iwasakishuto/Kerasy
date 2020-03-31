@@ -1,8 +1,12 @@
 # coding: utf-8
 import os
 import numpy as np
+
+from ..utils import handleKeyError
 from ..utils import flatten_dual
 from ..utils import ItemsetTreeDOTexporter
+
+ITEM_MINING_METHODS = ["all", "closed"]
 
 def create_one_hot(data):
     """
@@ -23,8 +27,6 @@ def create_one_hot(data):
     return one_hot, idx2data
 
 class Node():
-    num_items = 0
-    node_id = 0
     """ Node for Tree structure.
     @params database  :
     @params itemset   :
@@ -33,23 +35,33 @@ class Node():
     @params tail      :
     @params threshold :
     """
-    def __init__(self, database, freq, threshold, itemset, tail):
+    def __init__(self, itemset, freq, tail):
         self.itemset = itemset
         self.freq = freq # (=len(database))
         self.tail = tail
         self.sons = []
-        self.deepen(database, threshold)
 
-    def deepen(self, database, threshold):
-        for i in range(self.tail+1, Node.num_items):
+    def _recurse_all(self, database, threshold, num_items):
+        """ Find ALL closed Itemsets. """
+        for i in range(self.tail+1, num_items):
             next_itemset = self.itemset + [i]
             next_data = database[database[:,i]==1,:]
             freq = len(next_data)
             if freq >= threshold:
-                son = Node(
-                    database=next_data, freq=freq, threshold=threshold,
-                    itemset=next_itemset, tail=i,
-                )
+                son = Node(itemset=next_itemset, freq=freq, tail=i)
+                son._recurse_all(next_data, threshold, num_items)
+                self.sons.append(son)
+
+    def _recurse_closed(self, database, threshold, num_items):
+        """ Find ONLY closed Itemsets. """
+        for i in range(self.tail+1, num_items):
+            next_data = database[database[:,i]==1,:]
+            freq = len(next_data)
+            if freq >= threshold:
+                add_itemset = i+np.where(np.all(next_data[:,i:], axis=0))[0]
+                next_itemset = self.itemset + add_itemset.tolist()
+                son = Node(itemset=next_itemset, freq=freq, tail=max(add_itemset))
+                son._recurse_closed(next_data, threshold, num_items)
                 self.sons.append(son)
 
 class FrequentSet():
@@ -58,28 +70,34 @@ class FrequentSet():
         self.threshold = threshold
         self.freq_sets = []
 
-    def fit(self, database):
+    def fit(self, database, method="closed"):
         """
         @param database: Binary Matrix. shape=(num_transactions, num_items)
         """
-        num_transactions, Node.num_items = database.shape
-        self.tree = Node(
-            database=database, freq=num_transactions, threshold=self.threshold,
-            itemset=[], tail=-1
-        )
-        self.freq_sets = []
-        self._get_all_frequentset(self.tree)
+        method = method.lower()
+        handleKeyError(lst=ITEM_MINING_METHODS, method=method)
+        num_transactions, num_items = database.shape
+        self.tree = Node(itemset=[], freq=num_transactions, tail=-1)
+        self.tree.__getattribute__({
+            "all"    : "_recurse_all",
+            "closed" : "_recurse_closed",
+        }[method]).__call__(database, self.threshold, num_items)
+        self.num_items = num_items
+        self.all = self.get_itemsets(self.tree)
 
-    def _get_all_frequentset(self, node):
-        self.freq_sets.append(node.itemset)
+    def get_itemsets(self, node):
+        freq_sets = [node.itemset]
         for son in node.sons:
-            self._get_all_frequentset(node=son)
+            freq_sets.extend(self.get_itemsets(node=son))
+        return freq_sets
 
     def export_graphviz(self, out_file=None, feature_names=None,
                         class_names=None, cmap="jet", filled=True,
                         rounded=True, precision=3):
+        if class_names is None:
+            class_names = np.arange(self.num_items)
         exporter = ItemsetTreeDOTexporter(
-            cmap=cmap, feature_names=None, class_names=None,
+            cmap=cmap, class_names=class_names,
             filled=filled, rounded=rounded, precision=precision
         )
         if out_file is not None:

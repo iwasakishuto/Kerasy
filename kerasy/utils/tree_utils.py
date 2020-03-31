@@ -1,4 +1,5 @@
 # coding: utf-8
+from .generic_utils import handleKeyError
 from .vis_utils import mk_color_dict
 from .vis_utils import chooseTextColor
 from .vis_utils import rgb2hex
@@ -6,9 +7,11 @@ from .vis_utils import rgb2hex
 BLACK_hex = "#000000"
 WHITE_hex = "#FFFFFF"
 
-class BaseTreeDOTExporter():
-    def __init__(self, feature_names, class_names, cmap="jet",
-                 filled=True, rounded=True, precision=3):
+TREE_STRUCTURES = ["lr", "sons"]
+
+class BaseTreeDOTexporter():
+    def __init__(self, feature_names=None, class_names=None, cmap="jet",
+                 filled=True, rounded=True, precision=3, tree_structure="lr"):
         self.node_id = None
         self.dot_text = None
         self.feature_names = feature_names
@@ -16,7 +19,11 @@ class BaseTreeDOTExporter():
         self.filled = filled
         self.rounded = rounded
         self.precision = precision
-        self._mk_color_dict(class_names=class_names, cmap=cmap)
+        handleKeyError(lst=TREE_STRUCTURES, tree_structure=tree_structure)
+        self.tree_structure = tree_structure
+        # Coloring according to `class names`.
+        if class_names is not None:
+            self._mk_color_dict(class_names=class_names, cmap=cmap)
 
     def _mk_color_dict(self, class_names, cmap):
         bg_color_dict = mk_color_dict(class_names, cmap=cmap, ctype="rgb")
@@ -59,15 +66,30 @@ class BaseTreeDOTExporter():
         self.dot_text = ""
 
     def recurse(self, node, par_node_id=None):
+        {
+            "lr"   : self._recurse_lr,
+            "sons" : self._recurse_sons,
+        }[self.tree_structure](node=node, par_node_id=par_node_id)
+
+    def _recurse_lr(self, node, par_node_id=None):
         my_node_id = self.node_id
         self.node_id += 1
         self._add_node_info(node=node, node_id=my_node_id)
         if par_node_id is not None:
             self._add_par_chil_info(son_id=my_node_id, par_id=par_node_id)
         if node.left is not None:
-            self.recurse(node.left, my_node_id)
+            self._recurse_lr(node.left, my_node_id)
         if node.right is not None:
-            self.recurse(node.right, my_node_id)
+            self._recurse_lr(node.right, my_node_id)
+
+    def _recurse_sons(self, node, par_node_id=None):
+        my_node_id = self.node_id
+        self.node_id += 1
+        self._add_node_info(node=node, node_id=my_node_id)
+        if par_node_id is not None:
+            self._add_par_chil_info(son_id=my_node_id, par_id=par_node_id)
+        for son in node.sons:
+            self._recurse_sons(son, my_node_id)
 
     def export(self, node, out_file=None):
         self._initialize()
@@ -77,6 +99,7 @@ class BaseTreeDOTExporter():
         if out_file is not None:
             with open(out_file, mode="w", encoding="utf-8") as f:
                 f.write(self.dot_text)
+            print(f"{out_file} was created.")
         else:
             return self.dot_text
 
@@ -90,14 +113,14 @@ class BaseTreeDOTExporter():
             path += ".png"
         dot_data = self.export(node, out_file=None)
         graph = pydotplus.graph_from_dot_data(dot_data)
-        graph.write_png(path, f='png', prog='dot')
+        return graph.write_png(path, f='png', prog='dot')
 
-class DecisionTreeDOTExporter(BaseTreeDOTExporter):
+class DecisionTreeDOTexporter(BaseTreeDOTexporter):
     def __init__(self, feature_names, class_names, cmap="jet",
                  filled=True, rounded=True, precision=3):
         super().__init__(feature_names=feature_names, class_names=class_names,
                          cmap=cmap, filled=filled, rounded=rounded,
-                         precision=precision)
+                         precision=precision, tree_structure="lr")
         self.headlabeled = False
 
     def _initialize(self):
@@ -128,3 +151,25 @@ class DecisionTreeDOTExporter(BaseTreeDOTExporter):
             arrow_info_ += f'[labeldistance=2.5, labelangle={deg}45, headlabel="{not self.headlabeled}"]'
             self.headlabeled = not self.headlabeled
         super()._add_par_chil_info(son_id=son_id, par_id=par_id, arrow_info_=arrow_info_)
+
+class ItemsetTreeDOTexporter(BaseTreeDOTexporter):
+    def __init__(self, feature_names=None, class_names=None, cmap="jet",
+                 filled=True, rounded=True, precision=3):
+        super().__init__(feature_names=feature_names, class_names=class_names,
+                         cmap=cmap, filled=filled, rounded=rounded,
+                         precision=precision, tree_structure="sons")
+
+    def _add_node_info(self, node, node_id):
+        # label info.
+        label = ""
+        label += f"frequency = {node.freq}<br/>" \
+               + f"itemset = {node.itemset}<br/>"
+        super()._add_node_info(node_id=node_id, label_=label)
+
+    # def _add_par_chil_info(self, son_id, par_id):
+    #     arrow_info_ = ""
+    #     if par_id==0:
+    #         deg = "" if self.headlabeled else "-"
+    #         arrow_info_ += f'[labeldistance=2.5, labelangle={deg}45, headlabel="{not self.headlabeled}"]'
+    #         self.headlabeled = not self.headlabeled
+    #     super()._add_par_chil_info(son_id=son_id, par_id=par_id, arrow_info_=arrow_info_)

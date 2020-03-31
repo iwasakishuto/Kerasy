@@ -2,7 +2,7 @@
 # Ref: http://darden.hatenablog.com/entry/2016/12/15/222447
 import os
 import numpy as np
-from ..utils import DecisionTreeDOTExporter
+from ..utils import DecisionTreeDOTexporter
 
 def split_data(data, cond):
     return (data[cond], data[~cond])
@@ -162,7 +162,7 @@ class DecisionTreeClassifier():
             feature_names = [f"x{i+1}" for i in range(self.num_features)]
         if class_names is None:
             class_names = [f"cls{k+1}" for k in self.ini_classes]
-        exporter = DecisionTreeDOTExporter(
+        exporter = DecisionTreeDOTexporter(
             cmap=cmap, feature_names=feature_names, class_names=class_names,
             filled=filled, rounded=rounded, precision=precision
         )

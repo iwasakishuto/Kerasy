@@ -1,6 +1,8 @@
 # coding: utf-8
+import os
 import numpy as np
 from ..utils import flatten_dual
+from ..utils import ItemsetTreeDOTexporter
 
 def create_one_hot(data):
     """
@@ -21,48 +23,69 @@ def create_one_hot(data):
     return one_hot, idx2data
 
 class Node():
-    N = None
-    M = None
-    threshold = None
-
-    def __init__(self, itemset, frq, tail, shape=None, threshold=None):
+    num_items = 0
+    node_id = 0
+    """ Node for Tree structure.
+    @params database  :
+    @params itemset   :
+    @params num_items :
+    @params freq      :
+    @params tail      :
+    @params threshold :
+    """
+    def __init__(self, database, freq, threshold, itemset, tail):
         self.itemset = itemset
-        self.frq  = frq
+        self.freq = freq # (=len(database))
         self.tail = tail
         self.sons = []
+        self.deepen(database, threshold)
 
-        if shape is not None:
-            Node.N, Node.M = shape
-            Node.threshold = threshold
-
-    def deepen(self, data):
-        for i in range(self.tail+1, Node.M):
-            next_itemset = np.append(self.itemset,i) if self.itemset is not None else np.array([i])
-            next_data = data[np.all(data[:,next_itemset]==1, axis=1)]
-            frq = len(next_data)
-            if frq >= Node.threshold:
-                son = Node(itemset=next_itemset, frq=frq, tail=i)
-                son.deepen(next_data)
+    def deepen(self, database, threshold):
+        for i in range(self.tail+1, Node.num_items):
+            next_itemset = self.itemset + [i]
+            next_data = database[database[:,i]==1,:]
+            freq = len(next_data)
+            if freq >= threshold:
+                son = Node(
+                    database=next_data, freq=freq, threshold=threshold,
+                    itemset=next_itemset, tail=i,
+                )
                 self.sons.append(son)
 
 class FrequentSet():
     def __init__(self, threshold):
-        self.root = None
+        self.tree = None
         self.threshold = threshold
-        self.all = []
+        self.freq_sets = []
 
     def fit(self, database):
         """
-        @param database: Binary Matrix.(ndarray) shape=(N,M)
-            - N: The number of transactions.
-            - M: The number of items(elements).
+        @param database: Binary Matrix. shape=(num_transactions, num_items)
         """
-        self.root = Node(itemset=None, frq=len(database), tail=-1, shape=database.shape, threshold=self.threshold)
-        self.root.deepen(data=database)
-        self.all = []
-        self.get_all_frequentset(self.root)
+        num_transactions, Node.num_items = database.shape
+        self.tree = Node(
+            database=database, freq=num_transactions, threshold=self.threshold,
+            itemset=[], tail=-1
+        )
+        self.freq_sets = []
+        self._get_all_frequentset(self.tree)
 
-    def get_all_frequentset(self, node):
-        self.all.append(node.itemset)
+    def _get_all_frequentset(self, node):
+        self.freq_sets.append(node.itemset)
         for son in node.sons:
-            self.get_all_frequentset(node=son)
+            self._get_all_frequentset(node=son)
+
+    def export_graphviz(self, out_file=None, feature_names=None,
+                        class_names=None, cmap="jet", filled=True,
+                        rounded=True, precision=3):
+        exporter = ItemsetTreeDOTexporter(
+            cmap=cmap, feature_names=None, class_names=None,
+            filled=filled, rounded=rounded, precision=precision
+        )
+        if out_file is not None:
+            ext = os.path.splitext(os.path.basename(out_file))[-1]
+            if ext==".png":
+                return exporter.write_png(self.tree, path=out_file)
+            elif ext==".dot":
+                return exporter.export(self.tree, out_file=out_file)
+        return exporter.export(self.tree, out_file=None)

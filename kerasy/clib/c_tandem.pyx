@@ -36,8 +36,7 @@ cdef inline _calc_tandem_score(int i, j, score):
     return (score//len_tandem+1)*len_tandem
 
 # Dynamic Programming for finding tandem repeats.
-def _DPrecursion_Tandem(
-    np.ndarray[np.int32_t, ndim=2] DPmatrix, str X):
+def _DPrecursion_Tandem(np.ndarray[np.int32_t, ndim=2] DPmatrix, str X):
     """ Dynamic Programming for finding tandem repeats.
     @params DPmatrix : shape=(n+1,n+1)
     @params X        : Sequence. len(X) = n

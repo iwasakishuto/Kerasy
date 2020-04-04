@@ -3,6 +3,7 @@ import numpy as np
 
 from ..utils import handleKeyError
 from ..clib import c_tandem
+from ..clib import c_prefix
 
 TANDEM_FINDING_ALGORITHMS = ["SAIS", "DP"]
 

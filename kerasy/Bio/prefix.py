@@ -50,4 +50,27 @@ def LP_create(string):
     n = len(string)
     LP = np.zeros(shape=(n), dtype=np.int32)
     c_prefix.LP_create(string, LP, n)
-    return np.append(LP, 0)
+    # c_prefix.lppatern_create(string, LP, n)
+    return LP
+
+def LP_with_pattern_create(pattern, text):
+    """
+    Ref : https://www.sciencedirect.com/science/article/abs/pii/019667748490021X
+
+    lppattern[i] is the length of the longest substring of pattern
+                 which begins at position i and is a prefix of pattern (1<i<=m).
+                 This array may be computed in time O(m).
+    lptext[i] is the length of the longet substring of text
+              which begins at position i and is a prefix of pattern (1<=i<=n).
+              This array may be computed in time O(n).
+
+    Therefore, the total time to find lptext is O(m+n).
+    """
+    m = len(pattern)
+    lppattern = np.zeros(shape=m, dtype=np.int32)
+    c_prefix.LP_create(pattern, lppattern, m)
+
+    n = len(text)
+    lptext = np.zeros(shape=n, dtype=np.int32)
+    c_prefix.lptext_create(pattern, lppattern, text, lptext, n)
+    return lptext

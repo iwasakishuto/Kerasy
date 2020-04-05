@@ -83,7 +83,7 @@ def LPS_create(str string, np.ndarray[np.int32_t, ndim=1] lps, int n):
                 lps[i] = 0
                 i += 1
 
-def lppatern_create(str pattern, np.ndarray[np.int32_t, ndim=1] lppattern, int m, str unmatchable="$"):
+def lppatern_create(str pattern, np.ndarray[np.int32_t, ndim=1] lppattern, int m, str unmatchable="("):
     """
     Ref : https://www.sciencedirect.com/science/article/abs/pii/019667748490021X
     NOTE: This function is same as `LP_create`

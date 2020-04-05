@@ -4,16 +4,14 @@
 
 import numpy as np
 cimport numpy as np
+
 cimport cython
-
-from cython cimport view, floating
-from numpy.math cimport INFINITY
-from _cutils cimport c_argmax, c_max, c_logsumexp, c_logaddexp
-from ..utils import flush_progress_bar
-
+from cython cimport floating
 from libcpp.vector cimport vector
 from libcpp.pair cimport pair
-from libc.math cimport sqrt, ceil
+
+from .c_prefix import LP_create
+from .c_prefix import lptext_create
 
 # Cut out the exact tandem area, and calculate the score.
 cdef inline _calc_tandem_score(int i, j, score):
@@ -72,6 +70,57 @@ def _DPrecursion_Tandem(np.ndarray[np.int32_t, ndim=2] DPmatrix, str X):
                     tandem_pos_lists.push_back(p)
 
     return max_val, tandem_pos_lists
+
+def _SAIS_Tandem(list U):
+    """
+    @params U: LZ_factorization
+    """
+    cdef int k=len(U)
+    cdef Py_ssize_t i
+    cdef int m_i,n_i
+    cdef str t_i,u_i,v_i
+    cdef list tandems_right = []
+    cdef list tandems_left = []
+
+    for i in range(1, k):
+        # O(|u_{i-1}|+|u_i|) for each iteration.
+        t_i = "".join(U[:i])[-(2*len(U[i-1])+len(U[i])):]
+        u_i = U[i]
+        v_i = t_i+u_i
+
+        m_i = len(t_i)
+        n_i = len(u_i)
+        # type1. rightmax
+        _find_type1(t_i,u_i,m_i,n_i,tandems_right)
+        # type1. rightmax
+        _find_type1(u_i[::-1],t_i[::-1],n_i,m_i,tandems_left)
+    tandems_left = [tandem[::-1] for tandem in tandems_left]
+    return tandems_left+tandems_right
+
+cdef _find_type1(str t, str u, int m, int n, list tandems):
+    cdef np.ndarray[np.int32_t, ndim=1] LP, lppattern, LS
+    cdef str v = t+u
+    cdef int j
+    # Function LP is computed in time linear in |u|, O(n)
+    # shape=(n+1) is same as "'shape=n' and 'np.append(LP, 0)'"
+    LP=np.zeros(shape=(n+1), dtype=np.int32)
+    LP_create(u, LP, n)
+
+    # Function LS is computed in time linear in |v| O(n+m)
+    lppattern=np.zeros(shape=m, dtype=np.int32)
+    LP_create(t, lppattern, m)
+    LS=np.zeros(shape=n, dtype=np.int32)
+    lptext_create(
+        pattern=t[::-1], lppattern=lppattern[::-1],
+        text=v[::-1], lptext=LS, n=n
+    )
+    LS = LS[::-1]
+    for j in range(1,n):
+        if LS[j]+LP[j+1]>=j+1:
+            # max_reps = v[m-LS[j]:m+(j+1)+LP[j+1]]
+            # tandem = max_reps[:(j+1)]
+            # tandems.append(tandem)
+            tandems.append(v[m-LS[j]:m-LS[j]+(j+1)])
 
 # # Log-scaled forward algorithm
 # def _DPrecursion_NeedlemanWunshGotoh(

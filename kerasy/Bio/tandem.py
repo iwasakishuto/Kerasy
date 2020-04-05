@@ -2,6 +2,7 @@
 import numpy as np
 
 from ..utils import handleKeyError
+from .string import StringSearch
 from ..clib import c_tandem
 from ..clib import c_prefix
 
@@ -15,12 +16,11 @@ def _find_tandem_DP(sequence):
     return max_val, tandem_lists
 
 def _find_tandem_SAIS(sequence):
-    max_val = 0
-    tandem_lists = [(0,len(sequence))]
-    #TODO: Implementation
-    # - O(n^2)   LCP + naive
-    # - O(nlogn) LCP + divide-and-conquer method
-    # - O(n)     LCP + factorization
+    db = StringSearch(sequence, verbose=-1)
+    tandem_lists = c_tandem._SAIS_Tandem(db.LZ_factorization)
+    scores = [db.calc_tandem_score(tandem) for tandem in tandem_lists]
+    max_val = max(scores)
+    tandem_lists = [tandem for tandem,score in zip(tandem_lists,scores) if score==max_val]
     return max_val, tandem_lists
 
 def find_tandem(sequence, method="SAIS"):
@@ -30,26 +30,3 @@ def find_tandem(sequence, method="SAIS"):
         "SAIS" : _find_tandem_SAIS
     }[method](sequence)
     return max_val, tandem_lists
-
-def find_type1(t,u):
-    """
-    * type1 and has a period in u.
-    x type1 and has a period in t are found symmetrically.
-    """
-    m = len(t)
-    n = len(u)
-    v = t+u
-    # Function LP is computed in time linear in |u|, O(n)
-    # shape=(n+1) is same as "'shape=n' and 'np.append(LP, 0)'"
-    LP = np.zeros(shape=(n+1), dtype=np.int32)
-    c_prefix.LP_create(u, LP, n)
-
-    # Function LS is computed in time linear in |v| O(n+m)
-    lppattern = np.zeros(shape=m, dtype=np.int32)
-    c_prefix.LP_create(t, lppattern, m)
-    LS = np.zeros(shape=n, dtype=np.int32)
-    c_prefix.lptext_create(
-        pattern=t[::-1], lppattern=lppattern[::-1],
-        text=v[::-1], lptext=LS, n=n,
-    )
-    return LP, LS[::-1]

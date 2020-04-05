@@ -10,6 +10,7 @@ from .suffix import SAIS, checkString
 from .suffix import BWT_create, reverseBWT, C_create, Occ_create
 from .prefix import lcp, LCP_create
 from .factorization import LPF_create, LZfactorization
+from ..clib import c_tandem
 
 alphabets = [chr(i) for i in range(ord("a"), ord("z")+1)]
 ALPHABETS = [chr(i) for i in range(ord("A"), ord("Z")+1)]
@@ -102,11 +103,24 @@ class StringSearch():
                 return -1
         return self.SA[lb:ub+1]
 
+    def calc_tandem_score(self, query):
+        len_query = len(query)
+        positions = np.sort(self.search(query))
+        span = np.diff(positions)
+        not_repeat = np.nonzero(span != len_query)[0]
+        len_repeat = np.diff(np.append(np.append(-1, not_repeat), len(span)))
+        return len_query*np.max(len_repeat)
+
+    def find_tandem(self):
+        tandems = c_tandem._SAIS_Tandem(self.LZ_factorization)
+        scores = [self.calc_tandem_score(tandem) for tandem in tandems]
+        return tandems[np.argmax(scores)]
+
     def where(self, query, width=60, is_adjacent=False):
         len_query  = len(query)
         len_string = len(self.string)
 
-        positions  = self.search(query)
+        positions  = np.sort(self.search(query))
         score = 0 if isinstance(positions, int) else len(positions)
 
         if len_query<3:

@@ -112,7 +112,7 @@ class StringSearch():
         return len_query*np.max(len_repeat)
 
     def find_tandem(self):
-        tandems = c_tandem._SAIS_Tandem(self.LZ_factorization)
+        tandems = c_tandem._SAIS_Tandem(self.LZ_factorization + ["$"])
         scores = [self.calc_tandem_score(tandem) for tandem in tandems]
         return tandems[np.argmax(scores)]
 

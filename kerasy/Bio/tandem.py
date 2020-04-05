@@ -17,7 +17,7 @@ def _find_tandem_DP(sequence):
 
 def _find_tandem_SAIS(sequence):
     db = StringSearch(sequence, verbose=-1)
-    tandem_lists = c_tandem._SAIS_Tandem(db.LZ_factorization)
+    tandem_lists = c_tandem._SAIS_Tandem(db.LZ_factorization + ["$"])
     scores = [db.calc_tandem_score(tandem) for tandem in tandem_lists]
     max_val = max(scores)
     tandem_lists = [tandem for tandem,score in zip(tandem_lists,scores) if score==max_val]

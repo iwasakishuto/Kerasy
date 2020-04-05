@@ -312,7 +312,7 @@
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-03-18(月)</span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2020-03-18(水)</span></li>
             <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/tandem.py">Bio/tandem.py</a></span></li>
             <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/bioinformatics.html">BioInformatics</a></span></li> -->
         </ul>
@@ -392,8 +392,8 @@
 <li><strong>Set all diagonal elements to zero</strong> so we don't align a character by itself.</li>
 <li>Since both strings are same, we only need to calculate one half of the matrix.</li>
 <li>When calculating the next cell of the matrix, we<ul>
-<li>assign a score of zero for mismatch or gap.</li>
-<li>just increment the score by one for match.</li>
+<li>assign a <strong>score of zero</strong> for mismatch or gap.</li>
+<li>just <strong>increment the score</strong> by one for match.</li>
 </ul>
 </li>
 <li>The scores in this matrix represent the length of the tandem repeat. We repeat the longest tandem repeat in the sequences. If we have multiple repeats of the same length, we repeat all of them.</li>
@@ -404,21 +404,242 @@
 </pre></div>
 
 
-<p>To find the tandem repeats from the suffix array we need to follow the below steps.</p>
+<p>In Kerasy, we use the <span class="math">\(O(n)\)</span> searching method which is introduced in "<a href="http://monge.univ-mlv.fr/~koutcher/PAPERS/KolpakovKucherovFOCS99.pdf">Finding Maximal Repetitions in a Word in Linear Time</a>"</p>
+<p>Since various auxiliary data, theorems, and algorithms are used in this implementation, only the important ones are shown below.</p>
+<h6>s-factorization</h6>
+<p><strong>s-factorization</strong>, or <strong>Lempel-Ziv(LZ77) decomposition</strong> of a string <span class="math">\(S\)</span> is a factorization <span class="math">\(S=f_1\cdots f_n\)</span> where each factor <span class="math">\(f_k\)</span> is either</p>
 <ol>
-<li>We need to build the suffixes from the suffix array.</li>
-<li>Iterate through the suffixes in the order of suffix array and record the common substring for every two consecutive strings in the suffixes.</li>
-<li>From the common substrings we return all those with maximum length as exact tandem repeats.</li>
+<li>a single character if that character does not occur in <span class="math">\(f_1\cdots f_{k-1}\)</span>.</li>
+<li>the longest prefix of the rest of the string which occurs at least twice in <span class="math">\(f_1\cdots f_{ks}\)</span>.</li>
 </ol>
+<p>Most recent efficient linear time algorithms are off-line, running in <span class="math">\(O\left(N\right)\)</span> time for integer alphabets using <span class="math">\(O\left(N\right)\)</span> space. They first construct the <strong>suffix array</strong> of the string, then compute two arrays called <strong>Longest Common Prefix(LCP) array</strong>, and <strong>Longest Previous Factor(LPF) array</strong> from which the <strong>LZ factorization</strong> can be easily computed.</p>
+<h6>Theorem 5 (<a href="#paper1">paper1</a>)</h6>
+<p>Let <span class="math">\(w=u_1u_2\cdots u_k\)</span> be the <em>s-factorization</em> of <span class="math">\(w\)</span>, and let <span class="math">\(r\)</span> be a maximal repetition in <span class="math">\(w\)</span>, we can classify <span class="math">\(r\)</span> into two classes:</p>
+<div class="math">$$
+\begin{aligned}
+    &amp;\begin{cases}
+        \text{initpos}(r)\leq\text{initpos}(u_i)\\
+        \text{initpos}(u_i)\leq\text{endpos}(r) &lt; \text{endpos}(u_i)
+    \end{cases}&amp;\cdots\left(\text{type}1\right)\\
+    &amp;\text{initpos}(u_i) &lt; \text{initpos}(r) &lt; \text{endpos}(r) &lt; \text{endpos}(u_i)&amp;\cdots\left(\text{type}2\right)\\
+\end{aligned}
+$$</div>
+<p>See more detail: <a href="https://arxiv.org/pdf/1211.3642.pdf">Simpler and Faster Lempel Ziv Factorization</a></p>
+<h4>Find repetitions of (type1)</h4>
+<h5>rightmax periodicities</h5>
+<p>Let us focus on maximal repetitions <span class="math">\(r\)</span> which have a <strong><em>period</em></strong> in <span class="math">\(u\)</span>. (<strong>rightmax periodicities</strong>) We need two auxiliary functions:</p>
+<table>
+<thead>
+<tr>
+<th align="center">Name</th>
+<th align="center">Domain</th>
+<th align="center">Definition</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">
+<div class="math">$$LP(i)$$</div>
+</td>
+<td align="center">
+<div class="math">$$2\leq i \leq n+1$$</div>
+</td>
+<td align="center">
+<div class="math">$$LP(i) = \begin{cases}\max\left\{j\mid u[1\ldots j] = u[i\ldots i+j-1]\right\}&amp;\left(2\leq i\leq n\right)\\0 &amp;\left(i=n+1\right)\end{cases}$$</div>
+</td>
+<td align="left"><span class="math">\(LP(i)\)</span> is the length of the longest prefix of <span class="math">\(u\)</span> which is also a prefix of <span class="math">\(u[i\ldots n]\)</span></td>
+</tr>
+<tr>
+<td align="center">
+<div class="math">$$LS(i)$$</div>
+</td>
+<td align="center">
+<div class="math">$$1\leq i \leq n$$</div>
+</td>
+<td align="center">
+<div class="math">$$LS(i) = \max\left\{j\mid t[m-j+1\ldots m] = v[m+i-j+1\ldots m+i]\right\}$$</div>
+</td>
+<td align="left"><span class="math">\(LS(i)\)</span> is the length of the longest suffix of <span class="math">\(t\)</span> which is also a suffix of <span class="math">\(tu[1\ldots i]\)</span>.</td>
+</tr>
+</tbody>
+</table>
+<h6>Theorem 5.1 (<a href="#paper2">paper2</a>)</h6>
+<p>Let</p>
+<ul>
+<li><span class="math">\(m = |t|, n = |u|\)</span></li>
+<li><span class="math">\(j\)</span> is an integer.</li>
+<li><span class="math">\(r\)</span> is a substring of <span class="math">\(tu\)</span> with at least one character in <span class="math">\(t\)</span> and at least <span class="math">\(j\)</span> characters in <span class="math">\(u\)</span>, and with <span class="math">\(|r|\geq2j\)</span>.</li>
+</ul>
+<p>Then, <span class="math">\(r\)</span> is a periodicity with period length <span class="math">\(j\)</span> <font color="red"><b>iff it begins at or after <span class="math">\(t[m-LS(j)+1]\)</span> and ends at or before <span class="math">\(u[j+LP(j+1)]\)</span>.</b></font></p>
+<h6>Proof 5.1 (<a href="#paper2">paper2</a>)</h6>
+<p>Let</p>
+<ul>
+<li><span class="math">\(a &gt; 0\)</span> be the number of characters of <span class="math">\(r\)</span> in <span class="math">\(t\)</span></li>
+<li><span class="math">\(b \geq 0\)</span> be the number of characters of <span class="math">\(r\)</span> in <span class="math">\(u[j+1\ldots n]\)</span></li>
+<li><span class="math">\(i=|r|= a+b+j\)</span></li>
+</ul>
+<p>For <span class="math">\(r\)</span> to be a periodicity with period length <span class="math">\(j\)</span>, <font color="red"><b>it is necessary and sufficient for the first <span class="math">\(i-j\)</span> characters of <span class="math">\(r\)</span> to match the last <span class="math">\(i-j\)</span> characters of <span class="math">\(r\)</span>.</b></font> (<span class="math">\(r[1\ldots a+b]\)</span> matches <span class="math">\(r[1+j\ldots i]\)</span>.)</p>
+<p>This can be broken into two separate conditions:</p>
+<ol>
+<li><span class="math">\(r[1\ldots a]\)</span> matches <span class="math">\(r[1+j\ldots a+j]\)</span></li>
+<li><span class="math">\(r[a+1\ldots a+b]\)</span> matches <span class="math">\(r[a+j+1\ldots i]\)</span></li>
+</ol>
+<p>These condition is equivalent to</p>
+<ol>
+<li>requiring "<span class="math">\(r[1+j\ldots a+j]=r[1+j]\ldots u[j]\)</span> is suffix of <span class="math">\(t\)</span>" is equivalent to requiring "<span class="math">\(r\)</span> to <strong>begin at or after <span class="math">\(t[m-LS(j)+1]\)</span>.</strong>"
+<div class="math">$$\begin{aligned}
+&amp;(a+j)-(1+j)+1\leq LS(j)\\
+\Longleftrightarrow &amp;a\leq LS(j) \\
+\Longleftrightarrow &amp;m-\text{initpos}(r)+1\leq LS(j)\\
+\Longleftrightarrow &amp;\text{initpos}(r)\geq m-LS(j)+1
+\end{aligned}$$</div>
+</li>
+<li>requiring <span class="math">\(r[a+j+1\ldots i]=u[j+1]\ldots r[i]\)</span> is prefix of <span class="math">\(u\)</span>, so this is equivalent to requiring <span class="math">\(r\)</span> to end at or before <span class="math">\(u[j+LP(j+1)]\)</span>
+<div class="math">$$\begin{aligned}
+&amp;i-(a+j+1)+1\leq LP(j+1)\\
+\Longleftrightarrow &amp;b\leq LP(j+1)\\
+\Longleftrightarrow &amp;\text{endpos}(r)-(m+j)\leq LP(j+1)\\
+\Longleftrightarrow &amp;\text{endpos}(r)\leq m+j+LP(j+1)
+\end{aligned}$$</div>
+</li>
+</ol>
+<p>Thus, conditions <span class="math">\(1\)</span> and <span class="math">\(2\)</span> together are equivalent to the requirement stated in Theorem 5.1.</p>
+<h6>Theorem 5.2 (<a href="#paper2">paper2</a>)</h6>
+<p>Let <span class="math">\(j(1\leq j\leq n)\)</span> is an integer. There exists a rightmax periodicity (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span> iff <span class="math">\(LS(j)+LP(j+1)\geq j\)</span>. When this inequality holds, there is exactly one rightmax periodicity with period length <span class="math">\(j\)</span>, and this periodicity occurs at <span class="math">\(t[m-LS(j)+1]\ldots u[j+LP(j+1)]\)</span></p>
+<h6>Proof 5.2 (<a href="#paper2">paper2</a>)</h6>
+<p><strong>If the inequality fails</strong>, then there can be no substring of length <span class="math">\(2j\)</span> or more which meets the beginning and ending requirements of <a href="#Theorem-5.1">Theoreme 5.1</a>, and hence <strong>no periodicity with period length <span class="math">\(j\)</span> occurs with at least one character in <span class="math">\(t\)</span> and at least <span class="math">\(j\)</span> characters in <span class="math">\(u\)</span>.</strong> <font color="red"><b>This implies there are no rightmax periodicities (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span>.</b></font></p>
+<p>On the other hand, if the inequality holds, then <a href="#Theorem-5.1">Theoreme 5.1</a> states that every substring (with length <span class="math">\(2j\)</span> or more) which starts in <span class="math">\(t[m-LS(j)+1\ldots m]\)</span> and ends in <span class="math">\(u[j\ldots j+LP(j+1)]\)</span> is a periodicity with period length <span class="math">\(j\)</span>.</p>
+<p>Moreover, these are the only such periodicities which have at least one character in <span class="math">\(t\)</span> and at least one period length in <span class="math">\(u\)</span>. Of these periodicities, only one is maximal - the one that starts as far left as possible (<span class="math">\(t[m-LS(j)+1]\)</span>) and continues as far right as possible (<span class="math">\(u[j+LP(j+1)]\)</span>).</p>
+<h5>leftmax periodicities</h5>
+<p>As described in the table below, we can find <strong>leftmax periodicities</strong> (type1) symmetrically.</p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>rightmax periodicities</strong></th>
+<th align="center"><strong>leftmax periodicities</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><img alt="rightmax" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/TandemRepeat/rightmax_periodicities.png"></td>
+<td align="center"><img alt="leftmax" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/TandemRepeat/leftmax_periodicities.png"></td>
+</tr>
+<tr>
+<td align="center">maximal repetitions <span class="math">\(r\)</span> which have a <strong><em>period</em></strong> in <font color="red"><span class="math">\(u\)</span></font></td>
+<td align="center">maximal repetitions <span class="math">\(r\)</span> which have a <strong><em>period</em></strong> in <font color="red"><span class="math">\(t\)</span></font></td>
+</tr>
+</tbody>
+</table>
+<h4>Find repetitions of (type2)</h4>
+<p>The task is greatly simplified by the fact that every repetition of type 2 occurs entirely inside some s-factor <span class="math">\(u_i\)</span> and each <span class="math">\(u_i\)</span> has an earlier occurrence in <span class="math">\(w\)</span>.</p>
+<p>Let <span class="math">\(v_i\)</span> be thhe earlier occurrence of <span class="math">\(u_i\)</span>, and let <span class="math">\(\Delta_i = \text{initpos}(u_i) - \text{initpos}(v_i).\)</span> Obiously, each repetition of type2 occurring inside <span class="math">\(u_i\)</span> is a copy of a maximal repetition occurring inside <span class="math">\(v_i\)</span> shifted by <span class="math">\(\Deltai\)</span> to the right.</p>
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
     <li><a href="https://github.com/meghanamadineni/TandemRepeats/blob/master/TandemRepeats.pdf">Study, Analysis, and Implementation of Different Techniques to Find Tandem Repeats.</a></li>
-    <li><a href="http://monge.univ-mlv.fr/~koutcher/PAPERS/KolpakovKucherovFOCS99.pdf">Finding Maximal Repetitions in a Word in Linear Time.</a></li>
+    <li><a href="http://monge.univ-mlv.fr/~koutcher/PAPERS/KolpakovKucherovFOCS99.pdf">Finding Maximal Repetitions in a Word in Linear Time.</a><sup id="paper1">[paper1]</sup></li>
     <li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC169196/pdf/gkg617.pdf">mreps: efficient and flexible detection of tandem repeats in DNA</a></li>
+    <li><a href="https://arxiv.org/pdf/1211.3642.pdf">Simpler and Faster Lempel Ziv Factorization</a></li>
+    <li><a href="http://www-igm.univ-mlv.fr/~mac/REC/text-algorithms.pdf">M. Crochemore and W. Rytter. Text algorithms. OxfordUniversity Pres</a></li>
+    <li><a href="https://www.sciencedirect.com/science/article/pii/0166218X89900516?via%3Dihub">M. G. Main. Detecting leftmost maximal periodicities.</a><sup id="paper2">[paper2]</sup></li>
+    <li><a href="https://www.sciencedirect.com/science/article/abs/pii/019667748490021X">An O(n log n) algorithm for finding all repetitions in a string</a></li>
   </ul>
 </div>
 
+<hr>
+<h3>terminology</h3>
+<table>
+<thead>
+<tr>
+<th align="center">Name</th>
+<th align="center">symbol</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">word</td>
+<td align="center">
+<div class="math">$$w$$</div>
+</td>
+<td align="left">
+<div class="math">$$w = a_1a_2\ldots a_n$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">subword</td>
+<td align="center">
+<div class="math">$$w[i\ldots j]$$</div>
+</td>
+<td align="left">
+<div class="math">$$w[i\ldots j] = a_i\ldots a_j$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">position</td>
+<td align="center">
+<div class="math">$$\pi$$</div>
+</td>
+<td align="left">Each position <span class="math">\(\pi\)</span> in <span class="math">\(w\)</span> defines a factorization <span class="math">\(w = w_1w_2\)</span> where <span class="math">\(\mid w_1\mid=\pi\)</span>. A position in a word <span class="math">\(w = a_1a_2\ldots a_n\)</span> is an integer between <span class="math">\(0\)</span> and <span class="math">\(n\)</span>, and the position of letter <span class="math">\(a_i\)</span> in <span class="math">\(w\)</span> is <span class="math">\(i-1\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><em>initpos</em>, <em>endpos</em></td>
+<td align="center">
+<div class="math">$$initpos(v), endpos(v)$$</div>
+</td>
+<td align="left">If <span class="math">\(v=w[i\ldots j]\)</span>, we denote <span class="math">\(initpos(v) = i-1\)</span> and <span class="math">\(endpos(v)=j\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><em>cross</em></td>
+<td align="center"></td>
+<td align="left">We say that subword <span class="math">\(v=w[i\ldots j]\)</span> <strong>crosses</strong> a position <span class="math">\(\pi\)</span> in <span class="math">\(w\)</span>, if <span class="math">\(i\leq\pi&lt;j\)</span></td>
+</tr>
+<tr>
+<td align="center"><em>root</em></td>
+<td align="center"><span class="math">\(u\)</span></td>
+<td align="left">If <span class="math">\(w\)</span> is a subword of <span class="math">\(u^n\)</span> for some natural <span class="math">\(n\)</span>, <span class="math">\(\mid u \mid\)</span> is called a <strong><em>period</em></strong> of <span class="math">\(w\)</span>, and word <span class="math">\(u\)</span> is a <strong><em>root</em></strong> of <span class="math">\(w\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><strong><em>period</em></strong></td>
+<td align="center">
+<div class="math">$$p$$</div>
+</td>
+<td align="left">smallest positive integer such that <span class="math">\(a_i=a_{i+p}\)</span> for all <span class="math">\(i\)</span>, provided <span class="math">\(1\leq i, i+p\leq n\)</span>.</td>
+</tr>
+<tr>
+<td align="center">minimal period</td>
+<td align="center">
+<div class="math">$$p(w)$$</div>
+</td>
+<td align="left">Each word <span class="math">\(w\)</span> has the <strong>minimal period <span class="math">\(p(w)\)</span></strong> and call <strong><em>the</em></strong> period of <span class="math">\(w\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><em>exponent</em></td>
+<td align="center">
+<div class="math">$$e(w)$$</div>
+</td>
+<td align="left">The ratio <span class="math">\(\frac{\mid w\mid}{p(w)}\)</span> is called the <em>exponent</em> of <span class="math">\(w\)</span> and denoted <span class="math">\(e(w)\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><em>primitive</em></td>
+<td align="center"></td>
+<td align="left">a root <span class="math">\(u\)</span> of <span class="math">\(w\)</span> such that <span class="math">\(\mid u\mid = p(w)\)</span>, is <strong><em>primitive</em></strong>, that is <span class="math">\(u\)</span> cannot be written as <span class="math">\(v^k\)</span> for <span class="math">\(k\geq2\)</span>.</td>
+</tr>
+<tr>
+<td align="center"><em>repetition</em></td>
+<td align="center">
+<div class="math">$$r$$</div>
+</td>
+<td align="left">A <strong><em>repetition</em></strong> in <span class="math">\(w\)</span> is any subword occurrence <span class="math">\(r=w[i\ldots j]\)</span> with <span class="math">\(e(r)\geq2\)</span></td>
+</tr>
+<tr>
+<td align="center">maximal repetition</td>
+<td align="center"></td>
+<td align="left">A <strong><em>maximal repetition</em></strong> in <span class="math">\(w\)</span> is a repetition <span class="math">\(r=w[i\ldots j]\)</span> such that <span class="math">\(p\left(w[i\ldots j]\right) &lt; p\left(w[i-1\ldots j]\right)\)</span> whenever <span class="math">\(i &gt; 1\)</span>, and <span class="math">\(p\left(w[i\ldots j]\right) &lt; p\left(w[i\ldots j+1]\right)\)</span> whenever <span class="math">\(j &lt; n\)</span>.</td>
+</tr>
+</tbody>
+</table>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",

@@ -54,6 +54,48 @@ def get_file(fname, origin, cache_subdir='datasets', file_hash=None):
             raise
     return fpath
 
+def get_varname(var, scope_=globals()):
+    for varname,val in scope_.items():
+        if id(val)==id(var):
+            return varname
+
+def disp_var_globals(*varnames, head_=True, align_=True, scope_=globals()):
+    """
+    def func():
+        a = "hoge"
+        b = 123
+        c = [1,"1"]
+        disp_var_globals("a","b","c",scope=locals())
+
+    func()
+    >>> a: hoge
+    >>> b: 123
+    >>> c: [1, '1']
+    """
+    if head_: print(f"#=== VARIABLE INFO ===")
+    digit = max([len(e) for e in varnames]) if align_ else 1
+    for var in varnames:
+        print(f"{var:<{digit}}: {scope_.get(var)}")
+
+def disp_val_globals(*values, head_=True, align_=True, scope_=globals()):
+    """
+    def func():
+        a = "hoge"
+        b = 123
+        c = [1,"1"]
+        disp_val_globals(a,b,c,scope=locals())
+
+    func()
+    >>> a: hoge
+    >>> b: 123
+    >>> c: [1, '1']
+    """
+    if head_: print(f"#=== VARIABLE INFO ===")
+    names = [get_varname(val, scope_=scope_) for val in values]
+    digit = max([len(e) for e in names]) if align_ else 1
+    for name,val in zip(names, values):
+        print(f"{name:<{digit}}: {val}")
+
 def get_uid(prefix=""):
     _UID_PREFIXES[prefix] += 1
     return _UID_PREFIXES[prefix]

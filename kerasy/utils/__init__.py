@@ -26,6 +26,9 @@ from .deep_utils import get_params_size
 from .deep_utils import print_summary
 
 from .generic_utils import flatten_dual
+from .generic_utils import get_varname
+from .generic_utils import disp_var_globals
+from .generic_utils import disp_val_globals
 from .generic_utils import get_file
 from .generic_utils import priColor
 from .generic_utils import handleKeyError

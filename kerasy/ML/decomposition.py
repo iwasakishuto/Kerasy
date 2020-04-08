@@ -6,6 +6,7 @@ from ..utils import flush_progress_bar
 from ..utils import pairwise_euclidean_distances
 
 from ._kernel import kernel_handler
+from ..clib import c_decomposition
 
 class PCA():
     def __init__(self, n_components=None):
@@ -108,7 +109,7 @@ class tSNE():
                  eta = 500,
                  min_gain = 0.1,
                  tol = 1e-5,
-                 prec_max_iter = 50, 
+                 prec_max_iter = 50,
                  random_state = None):
         self.initial_momentum = initial_momentum
         self.final_momoentum = final_momoentum
@@ -232,41 +233,54 @@ class tSNE():
             KL = np.sum(P * np.log(P / Q))
             flush_progress_bar(epoch, epochs, metrics={"KL(P||Q)": KL}, verbose=verbose)
             # Stop lying about P-values
-            if epoch == 100: 
+            if epoch == 100:
                 P = P / 4.
         return Y
 
 class UMAP():
-    def __init__(self, metric="euclidean", metric_kwds=None, min_dist=0.1, a=None, b=None, random_state=None, sigma_iter=20, sigma_tol=1e-5, sigma_lower=0, sigma_upper=1e3):
+    """ Uniform Manifold Approximation and Projection
+    Finds a low dimensional embedding of the data that approximates an underlying manifold.
+    ~~~
+    @params metric      : The metric to use to compute distances in high dimensional space.
+    @params metric_kwds : The parameters of metrics.
+    @params min_dist    : The effective minimum distance between embedded points.
+                          Smaller values will result in a more clustered/clumped
+                          embedding where nearby points on the manifold are drawn
+                          closer together, while larger values will result on a
+                          more even dispersal of points.
+    @params spread      : The effective scale of embedded points.
+    """
+    def __init__(self, metric="euclidean", metric_kwds=None, min_dist=0.1, spread=1.0, a=None, b=None, random_state=None, sigma_iter=40, sigma_init=1.0, sigma_tol=1e-5, sigma_lower=0, sigma_upper=np.inf):
         self.metric=metric
         self.metric_kwds=metric_kwds
         self.min_dist=min_dist
         self.sigma_iter  = sigma_iter
+        self.sigma_init  = sigma_init
         self.sigma_lower = sigma_lower
         self.sigma_upper = sigma_upper
         self.sigma_tol   = sigma_tol
+        self.spread = spread
         self.a=a
         self.b=b
         self.random_state=random_state
         self.history = []
-        
+
     def fit_transform(self, X, n_components=2, n_neighbors=15, epochs=1, learning_rate=1, verbose=1):
         self.n_neighbors=n_neighbors
         self.n_components=n_components
-        self.history = []
 
         n_samples, n_features = X.shape
-        x_distances = pairwise_euclidean_distances(X)
-        rhos = np.partition(x_distances, kth=1, axis=1)[:,1]
-        # Probabilities in High dimensional space.
-        sigmas = self.adjustNeighbors(x_distances, rhos, n_neighbors)
-        # diagonal parts of probs are all 1 (=exp(0)).
-        probs = np.exp(-np.maximum(x_distances-rhos, 0)/sigmas).T
+        x_distances = pairwise_euclidean_distances(X, squared=False)
+        # rhos = np.partition(x_distances, kth=1, axis=1)[:,1]
+        # # Probabilities in High dimensional space.
+        # sigmas = self.adjustNeighbors(x_distances, rhos, n_neighbors)
+        sigmas, rhos = self._find_sigmas(x_distances)
+        probs = np.exp(-np.maximum(x_distances-rhos[:,None], 0)/sigmas[:,None]).T
         # P's diagonal parts are all 1 (= 1+1-1).
         P = probs + probs.T - np.multiply(probs, probs.T)
         # Probabilities in Low dimensional space.
-        if self.a is None or self.b is None: 
-            self.adjustAB()
+        if self.a is None or self.b is None:
+            self._find_ab_params()
         a,b = (self.a, self.b)
         # TODO: Initialize the coordinates of low-dimensional embeddings with "Graph Laplacian."
         y = np.random.RandomState(self.random_state).normal(size=(n_samples, n_components))
@@ -275,10 +289,9 @@ class UMAP():
             Y = np.expand_dims(y, 1) - np.expand_dims(y, 0)
             y_squared_distances = pairwise_euclidean_distances(y, squared=True)
             Q = 1/(1 + a*y_squared_distances**b)
-            
+
             # Calculate the Cross Entropy.
             CE = np.sum( -P*np.log(Q + 1e-4) - (1-P)*np.log(1-Q+1e-4) )
-            self.history.append(CE)
 
             # Calculate the Cross Entropy's gradients.
             # adij^{2(b-1)}P
@@ -287,13 +300,50 @@ class UMAP():
             second_term = np.dot(1-P, np.power(1e-3+y_squared_distances, -1))
             np.fill_diagonal(second_term, 0) # Calibrating the numerical errors.
             second_term = second_term / np.sum(second_term, axis=1, keepdims=True)
-            y_gradients = 2*b*np.sum(np.expand_dims(first_term-second_term, 2)*np.expand_dims(Q, 2)*Y, axis=1) 
-            
+            y_gradients = 2*b*np.sum(np.expand_dims(first_term-second_term, 2)*np.expand_dims(Q, 2)*Y, axis=1)
+
             # Update TODE: Implement SGD.
             y -= learning_rate * y_gradients
             flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
         if verbose: print()
+        self.sigmas = sigmas
         return y
+
+    def _find_sigmas(self, distances):
+        """
+        @params distances : shape=(n_samples, n_neighbors)
+        """
+        n_neighbors = self.n_neighbors
+        # (n+1) Nearest samples (Including myself.)
+        nn_with_self = np.partition(distances, kth=n_neighbors, axis=1)[:,:n_neighbors+1]
+        # n Nearest samples.
+        nn = np.ascontiguousarray(np.partition(nn_with_self, kth=1, axis=1)[:,1:])
+        # Nearest sample.
+        rhos = np.asarray(nn[:,0], order="c")
+
+        # Buffer.
+        sigmas = np.zeros_like(rhos)
+        c_decomposition.binary_sigma_search(
+            distances=nn, rhos=rhos, sigmas=sigmas,
+            n_neighbors=n_neighbors, max_iter=self.sigma_iter,
+            init=self.sigma_init, lower=self.sigma_lower, upper=self.sigma_upper,
+            tolerance=self.sigma_tol
+        )
+        return sigmas, rhos
+
+    def _find_ab_params(self):
+        """
+        Fit a, b params for the differentiable curve used in lower dimensional
+        fuzzy simplicial complex construction.
+        TODO: Implement `scipy.optimize.curve_fit` by myself.
+
+        f(x) = (1+a*x^{2b})^{-1} → 1 if x<min_dist else e^{-x}-min_dist
+        """
+        curve = lambda x,a,b: 1.0/(1.0 + a * x ** (2 * b))
+        X = np.linspace(0,3*self.spread,300)
+        Y = np.where(X<self.min_dist, 1, np.exp(-(X-self.min_dist)/self.spread))
+        (self.a, self.b) , _ = optimize.curve_fit(curve, X, Y)
+
 
     @staticmethod
     def sigma2num_neighbors(sigma, distance, rho):
@@ -301,8 +351,8 @@ class UMAP():
         # High dimensional probability p_{i|j}
         prob = np.exp(- np.maximum(distance-rho, 0)/sigma)
         k = np.power(2, np.sum(prob))
-        return k        
-    
+        return k
+
     def adjustNeighbors(self, distances, rhos, n_neighbors):
         """
         @params distances  : shape=(N,N) distance matrix.
@@ -326,14 +376,3 @@ class UMAP():
                     break
             sigmas[i] = sigma
         return sigmas
-    
-    def adjustAB(self):
-        """
-        TODO: Implement `scipy.optimize.curve_fit` by myself.
-        f(x) = (1+a*x^{2b})^{-1} → 1 if x<min_dist else e^{-x}-min_dist 
-        """
-        func = lambda x,a,b: 1/(1+a*x**(2*b))
-        X = np.linspace(0,3,300)
-        Y = np.where(X<self.min_dist, 1, np.exp(-X+self.min_dist))
-        (a,b) , _ = optimize.curve_fit(func, X, Y)
-        self.a=a; self.b=b

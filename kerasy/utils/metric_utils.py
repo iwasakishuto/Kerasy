@@ -1,6 +1,7 @@
 """Metric-related utilities."""
 
 import numpy as np
+from scipy.sparse import issparse
 
 from .generic_utils import handleKeyError
 from .np_utils import CategoricalEncoder
@@ -100,13 +101,39 @@ PAIRED_DISTANCES = {
     'cityblock': paired_manhattan_distances,
 }
 
+def _return_float_dtype(X, Y):
+    """
+    1. If dtype of X and Y is float32, then dtype float32 is returned.
+    2. Else dtype float is returned.
+    """
+    if not issparse(X) and not isinstance(X, np.ndarray):
+        X = np.asarray(X)
+
+    if Y is None:
+        Y_dtype = X.dtype
+    elif not issparse(Y) and not isinstance(Y, np.ndarray):
+        Y = np.asarray(Y)
+        Y_dtype = Y.dtype
+    else:
+        Y_dtype = Y.dtype
+
+    if X.dtype == Y_dtype == np.float32:
+        dtype = np.float32
+    else:
+        dtype = np.float
+
+    return X, Y, dtype
+
 # Pairwise Distances
 def check_pairwise_array(X,Y=None):
     """ Arrange for the pairwise distance.
     @param X: shape=(N,D)
     """
     if Y is None:
-        return X,X
+        Y = X
+    X, Y, dtype_float = _return_float_dtype(X, Y)
+    X = np.array(X, dtype=dtype_float)
+    Y = np.array(Y, dtype=dtype_float)
 
     if X.ndim==1: X=X.reshape(1,-1)
     if Y.ndim==1: Y=Y.reshape(1,-1)
@@ -148,11 +175,12 @@ def pairwise_euclidean_distances(X,Y=None,squared=False):
     # ||a - b||^2 = ||a||^2 + ||b||^2 - 2 <a, b>
     distances = np.expand_dims(Xnorm, axis=1) + np.expand_dims(Ynorm, axis=0) - 2*X.dot(Y.T)
     distances = np.maximum(distances, 0.0) # for numerical errors.
-
+    if Y is X:
+        np.fill_diagonal(a=distances, val=0.)
     if not squared:
-        mask = np.equal(distances, 0) # for avoid the gradient of sqrt is infinite,
+        mask = np.equal(distances, 0.) # for avoid the gradient of sqrt is infinite,
         distances += mask*1e-16 # add a small epsilon where distances == 0.0
-        distances = np.sqrt(distances)
+        distances = np.sqrt(distances, out=distances)
         distances = distances * np.logical_not(mask) # Correct the epsilon added
 
     return distances

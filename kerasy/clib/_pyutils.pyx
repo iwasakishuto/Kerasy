@@ -30,7 +30,7 @@ cdef floating euclidean_distance(floating* x, floating* y, int n_features) nogil
     result = 0
     cdef int i
     for i in range(n_features):
-        diff = (x[i] - y[i])
+        diff = x[i]-y[i]
         result += diff * diff
     return sqrt(result)
 

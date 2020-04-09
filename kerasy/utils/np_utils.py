@@ -86,6 +86,21 @@ def normalize(arr, axis=None):
     else:
         arr /= np.expand_dims(arr.sum(axis), axis)
 
+def standardize(arr, axis=None):
+    """ Inplace Method
+    Standarzes the input array so that it sums to 1 along with `axis`.
+    @params arr : Non-standarzed Input array.
+    @params axis: Dimension along which normalization is performed.
+    """
+    max = arr.max(axis)
+    min = arr.min(axis)
+    if axis is None:
+        arr -= min
+        arr /= (max-min)
+    else:
+        arr -= np.expand_dims(min, axis=axis)
+        arr /= np.expand_dims((max-min), axis=axis)
+
 def log_normalize(arr, axis=None):
     """ Inplace Method
     Normalizes the input array so that ``sum(exp(a)) == 1``.

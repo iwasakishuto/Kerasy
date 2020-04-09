@@ -6,6 +6,14 @@
 from numpy.math cimport expl, logl, log1pl, isinf, fabsl, INFINITY
 from libc.math import sqrt, ceil
 
+cdef inline double clip(double val, v_min, v_max):
+    if val > v_max:
+        return v_max
+    elif val < v_min:
+        return v_min
+    else:
+        return val
+
 # np.argmax(X)
 cdef inline int c_argmax(double[:] X) nogil:
     cdef double X_max = -INFINITY

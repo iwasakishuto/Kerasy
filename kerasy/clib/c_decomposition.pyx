@@ -8,6 +8,24 @@ from numpy.math cimport INFINITY
 
 from cython cimport floating
 
+from ..utils import flush_progress_bar
+from _cutils cimport clip
+
+cdef tau_rand_int(np.ndarray[np.int64_t, ndim=1, mode='c'] state):
+    """A fast (pseudo)-random number generator.
+    state: The internal state of the rng. array of int64, shape (3,)
+    """
+    state[0] = (((state[0] & 4294967294) << 12) & 0xFFFFFFFF) ^ (
+        (((state[0] << 13) & 0xFFFFFFFF) ^ state[0]) >> 19
+    )
+    state[1] = (((state[1] & 4294967288) << 4) & 0xFFFFFFFF) ^ (
+        (((state[1] << 2) & 0xFFFFFFFF) ^ state[1]) >> 25
+    )
+    state[2] = (((state[2] & 4294967280) << 17) & 0xFFFFFFFF) ^ (
+        (((state[2] << 3) & 0xFFFFFFFF) ^ state[2]) >> 11
+    )
+    return state[0] ^ state[1] ^ state[2]
+
 def binary_sigma_search(
         np.ndarray[floating, ndim=2, mode='c'] distances,
         np.ndarray[floating, ndim=1, mode='c'] rhos,
@@ -87,3 +105,68 @@ def compute_membership_strengths(
             rows[i*n_neighbors + j] = i
             cols[i*n_neighbors + j] = knn_indices[i,j]
             vals[i*n_neighbors + j] = val
+
+def optimize_layout(
+    np.ndarray[floating,   ndim=2, mode='c'] head_embedding, tail_embedding,
+    np.ndarray[np.int32_t, ndim=1, mode='c'] head, tail,
+    np.ndarray[floating,   ndim=1, mode='c'] epochs_per_sample,
+    np.ndarray[np.int64_t, ndim=1, mode='c'] rng_state,
+    int epochs, n_vertices, float a, b,
+    float gamma=1.0, initial_alpha=1.0, negative_sample_rate=5.0, int verbose=1):
+
+    cdef int i,j,k,p
+    cdef int dim = head_embedding.shape[1]
+    cdef int move_other = head_embedding.shape[0] == tail_embedding.shape[0]
+    cdef float alpha = initial_alpha
+
+    cdef np.ndarray[floating, ndim=1, mode='c'] epochs_per_negative_sample = epochs_per_sample / negative_sample_rate
+    cdef np.ndarray[floating, ndim=1, mode='c'] epoch_of_next_negative_sample = epochs_per_negative_sample.copy()
+    cdef np.ndarray[floating, ndim=1, mode='c'] epoch_of_next_sample = epochs_per_sample.copy()
+
+    for epoch in range(epochs):
+        for i in range(epochs_per_sample.shape[0]):
+            if epoch_of_next_sample[i] <= epochs:
+                j = head[i]
+                k = tail[i]
+                current = head_embedding[j]
+                other = tail_embedding[k]
+                dist_squared = sum((current-other)**2)
+
+                if dist_squared > 0.0:
+                    grad_coeff = -2.0 * a * b * pow(dist_squared, b-1.0)
+                    grad_coeff /= a*pow(dist_squared, b)+1.0
+                else:
+                    grad_coeff = 0.0
+
+                for d in range(dim):
+                    grad_d = clip(val=grad_coeff*(current[d]-other[d]), v_min=-4.0, v_max=4.0)
+                    current[d] += grad_d * alpha
+                    if move_other:
+                        other[d] += -grad_d * alpha
+                epoch_of_next_sample[i] += epochs_per_sample[i]
+                n_neg_samples = int((epochs-epoch_of_next_negative_sample[i])/epochs_per_negative_sample[i])
+
+                for p in range(n_neg_samples):
+                    k = tau_rand_int(rng_state) % n_vertices
+                    other = tail_embedding[k]
+                    dist_squared = sum((current-other)**2)
+
+                    if dist_squared > 0.0:
+                        grad_coeff = 2.0 * gamma * b
+                        grad_coeff /= (0.001 + dist_squared) * (a * pow(dist_squared, b) + 1)
+                    elif j == k:
+                        continue
+                    else:
+                        grad_coeff = 0.0
+
+                    for d in range(dim):
+                        if grad_coeff > 0.0:
+                            grad_d = clip(val=grad_coeff*(current[d]-other[d]), v_min=-4.0, v_max=4.0)
+                        else:
+                            grad_d = 4.0
+                        current[d] += grad_d * alpha
+
+                epoch_of_next_negative_sample[i] += n_neg_samples*epochs_per_negative_sample[i]
+        alpha = initial_alpha*(1.0-(float(epoch)/float(epochs)))
+        flush_progress_bar(epoch, epochs, verbose=verbose)
+    if verbose>0: print

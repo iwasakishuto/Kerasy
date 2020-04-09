@@ -1,9 +1,11 @@
 #coding: utf-8
 import numpy as np
-from scipy import optimize
+import scipy as sp
 
 from ..utils import flush_progress_bar
 from ..utils import pairwise_euclidean_distances
+from ..utils import standardize
+from ..utils import handle_random_state
 
 from ._kernel import kernel_handler
 from ..clib import c_decomposition
@@ -237,6 +239,10 @@ class tSNE():
                 P = P / 4.
         return Y
 
+
+INT32_MIN = np.iinfo(np.int32).min + 1
+INT32_MAX = np.iinfo(np.int32).max - 1
+
 class UMAP():
     """ Uniform Manifold Approximation and Projection
     Finds a low dimensional embedding of the data that approximates an underlying manifold.
@@ -262,8 +268,7 @@ class UMAP():
         self.spread = spread
         self.a=a
         self.b=b
-        self.random_state=random_state
-        self.history = []
+        self.rnd=handle_random_state(random_state)
 
     def fit_transform(self, X, n_components=2, n_neighbors=15, epochs=1, learning_rate=1, verbose=1):
         self.n_neighbors=n_neighbors
@@ -276,52 +281,70 @@ class UMAP():
         # knn_dists = np.asarray([[x_distances[i,idx] for idx in row_indices] for i,row_indices in enumerate(knn_indices)])
         knn_dists = np.asarray(np.partition(x_distances, kth=n_neighbors, axis=1)[:,:n_neighbors], dtype=float, order="c")
         rhos = np.asarray(np.partition(knn_dists, kth=1, axis=1)[:,1], dtype=float, order="c")
-
         # Binary search to adjust sigmas (normalization factor) value
         sigmas = self._find_sigmas(distances=knn_dists, rhos=rhos)
+        graph = self.compute_membership_strengths(knn_indices, knn_dists, sigmas, rhos)
+        graph, epochs_per_sample = self.compress_graph_and_make_epochs_per_sample(graph, epochs)
 
+        if self.a is None or self.b is None:
+            self._find_ab_params()
+        a,b = (self.a, self.b)
+        embeddings = self.rnd.normal(size=(n_samples, n_components))
+        standardize(embeddings, axis=1)
+        embeddings = (10.0*embeddings).astype(float, order="C")
+        rng_state = self.rnd.randint(INT32_MIN, INT32_MAX, 3).astype(np.int64)
+
+        self.x_distances = x_distances
         self.knn_indices = knn_indices
         self.knn_dists = knn_dists
         self.rhos = rhos
         self.sigmas = sigmas
+        self.graph = graph
+        self.epochs_per_sample = epochs_per_sample
+        self.embeddings = embeddings
+        self.rng_state = rng_state
 
-        graphs = self.compute_membership_strengths(knn_indices, knn_dists, sigmas, rhos)
+        c_decomposition.optimize_layout(
+            head_embedding=embeddings, tail_embedding=embeddings,
+            head=graph.row, tail=graph.col, epochs_per_sample=epochs_per_sample,
+            rng_state=rng_state, epochs=epochs, n_vertices=graph.shape[1], a=a, b=b,
+            gamma=1.0, initial_alpha=1.0, negative_sample_rate=5.0, verbose=verbose
+        )
+        return embeddings
 
-        self.graphs = graphs
-
-        probs = np.exp(-np.maximum(x_distances-rhos[:,None], 0)/sigmas[:,None]).T
-        # P's diagonal parts are all 1 (= 1+1-1).
-        P = probs + probs.T - np.multiply(probs, probs.T)
-        # Probabilities in Low dimensional space.
-        if self.a is None or self.b is None:
-            self._find_ab_params()
-        a,b = (self.a, self.b)
-
-        # TODO: Initialize the coordinates of low-dimensional embeddings with "Graph Laplacian."
-        y = np.random.RandomState(self.random_state).normal(size=(n_samples, n_components))
-        for epoch in range(epochs):
-            # Yij = yi - yj
-            Y = np.expand_dims(y, 1) - np.expand_dims(y, 0)
-            y_squared_distances = pairwise_euclidean_distances(y, squared=True)
-            Q = 1/(1 + a*y_squared_distances**b)
-
-            # Calculate the Cross Entropy.
-            CE = np.sum( -P*np.log(Q + 1e-4) - (1-P)*np.log(1-Q+1e-4) )
-
-            # Calculate the Cross Entropy's gradients.
-            # adij^{2(b-1)}P
-            first_term = a*P*(1e-8+y_squared_distances)**(b-1)
-            # 1-P(X) / dij^2
-            second_term = np.dot(1-P, np.power(1e-3+y_squared_distances, -1))
-            np.fill_diagonal(second_term, 0) # Calibrating the numerical errors.
-            second_term = second_term / np.sum(second_term, axis=1, keepdims=True)
-            y_gradients = 2*b*np.sum(np.expand_dims(first_term-second_term, 2)*np.expand_dims(Q, 2)*Y, axis=1)
-
-            # Update TODE: Implement SGD.
-            y -= learning_rate * y_gradients
-            flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
-        if verbose: print()
-        return y
+        # probs = np.exp(-np.maximum(x_distances-rhos[:,None], 0)/sigmas[:,None]).T
+        # # P's diagonal parts are all 1 (= 1+1-1).
+        # P = probs + probs.T - np.multiply(probs, probs.T)
+        # # Probabilities in Low dimensional space.
+        # if self.a is None or self.b is None:
+        #     self._find_ab_params()
+        # a,b = (self.a, self.b)
+        #
+        # # TODO: Initialize the coordinates of low-dimensional embeddings with "Graph Laplacian."
+        # y = np.random.RandomState(self.random_state).normal(size=(n_samples, n_components))
+        # for epoch in range(epochs):
+        #     # Yij = yi - yj
+        #     Y = np.expand_dims(y, 1) - np.expand_dims(y, 0)
+        #     y_squared_distances = pairwise_euclidean_distances(y, squared=True)
+        #     Q = 1/(1 + a*y_squared_distances**b)
+        #
+        #     # Calculate the Cross Entropy.
+        #     CE = np.sum( -P*np.log(Q + 1e-4) - (1-P)*np.log(1-Q+1e-4) )
+        #
+        #     # Calculate the Cross Entropy's gradients.
+        #     # adij^{2(b-1)}P
+        #     first_term = a*P*(1e-8+y_squared_distances)**(b-1)
+        #     # 1-P(X) / dij^2
+        #     second_term = np.dot(1-P, np.power(1e-3+y_squared_distances, -1))
+        #     np.fill_diagonal(second_term, 0) # Calibrating the numerical errors.
+        #     second_term = second_term / np.sum(second_term, axis=1, keepdims=True)
+        #     y_gradients = 2*b*np.sum(np.expand_dims(first_term-second_term, 2)*np.expand_dims(Q, 2)*Y, axis=1)
+        #
+        #     # Update TODE: Implement SGD.
+        #     y -= learning_rate * y_gradients
+        #     flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
+        # if verbose: print()
+        # return y
 
     def _find_sigmas(self, distances, rhos=None):
         """
@@ -352,18 +375,32 @@ class UMAP():
         )
 
         n_samples = sigmas.shape[0]
-        result = scipy.sparse.coo_matrix(
+        graph = sp.sparse.coo_matrix(
             (vals, (rows, cols)), shape=(n_samples, n_samples)
         )
-        result.eliminate_zeros()
+        graph.eliminate_zeros()
 
         if apply_set_operations:
-            transpose = result.transpose()
-            pfi = result.multiply(transpose) # pure fuzzy intersection
-            pfu = result+transpose-pfi # pure fuzzy union
-            result = set_op_mix_ratio*pfu + (1.0-set_op_mix_ratio)*pfi
-        result.eliminate_zeros()
-        return result
+            transpose = graph.transpose()
+            pfi = graph.multiply(transpose) # pure fuzzy intersection
+            pfu = graph+transpose-pfi # pure fuzzy union
+            graph = set_op_mix_ratio*pfu + (1.0-set_op_mix_ratio)*pfi
+        graph.eliminate_zeros()
+        return graph
+
+    def compress_graph_and_make_epochs_per_sample(self, graph, epochs):
+        graph = graph.tocoo()  # Convert matrix to COOrdinate format.
+        graph.sum_duplicates() # Eliminate duplicate matrix entries by adding them together
+        # graph.weights means the weight, so delete the data which sould not be optimized.
+        graph.data[graph.data < (graph.data.max() / float(epochs))] = 0.0
+        graph.eliminate_zeros()
+        # Given a set of weights and number of epochs generate the number of
+        # epochs per sample for each weight.
+        weights = graph.data
+        n_samples = epochs*(weights / weights.max())
+        epochs_per_sample = np.full(shape=(weights.shape[0]), fill_value=-1.0, dtype=float)
+        epochs_per_sample[n_samples > 0] = float(epochs) / n_samples[n_samples > 0]
+        return graph, epochs_per_sample
 
     def _find_ab_params(self):
         """
@@ -376,7 +413,7 @@ class UMAP():
         curve = lambda x,a,b: 1.0/(1.0 + a * x ** (2 * b))
         X = np.linspace(0,3*self.spread,300)
         Y = np.where(X<self.min_dist, 1, np.exp(-(X-self.min_dist)/self.spread))
-        (self.a, self.b) , _ = optimize.curve_fit(curve, X, Y)
+        (self.a, self.b), _ = sp.optimize.curve_fit(curve, X, Y)
 
     @staticmethod
     def sigma2num_neighbors(sigma, distance, rho):

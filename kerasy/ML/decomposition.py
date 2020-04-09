@@ -268,13 +268,27 @@ class UMAP():
     def fit_transform(self, X, n_components=2, n_neighbors=15, epochs=1, learning_rate=1, verbose=1):
         self.n_neighbors=n_neighbors
         self.n_components=n_components
-
         n_samples, n_features = X.shape
+
         x_distances = pairwise_euclidean_distances(X, squared=False)
-        # rhos = np.partition(x_distances, kth=1, axis=1)[:,1]
-        # # Probabilities in High dimensional space.
-        # sigmas = self.adjustNeighbors(x_distances, rhos, n_neighbors)
-        sigmas, rhos = self._find_sigmas(x_distances)
+        # n_neighbors Nearest Neighbor samples (Including myself.)
+        knn_indices = np.asarray(np.argpartition(x_distances, kth=n_neighbors, axis=1)[:,:n_neighbors], dtype=np.int32, order="c")
+        # knn_dists = np.asarray([[x_distances[i,idx] for idx in row_indices] for i,row_indices in enumerate(knn_indices)])
+        knn_dists = np.asarray(np.partition(x_distances, kth=n_neighbors, axis=1)[:,:n_neighbors], dtype=float, order="c")
+        rhos = np.asarray(np.partition(knn_dists, kth=1, axis=1)[:,1], dtype=float, order="c")
+
+        # Binary search to adjust sigmas (normalization factor) value
+        sigmas = self._find_sigmas(distances=knn_dists, rhos=rhos)
+
+        self.knn_indices = knn_indices
+        self.knn_dists = knn_dists
+        self.rhos = rhos
+        self.sigmas = sigmas
+
+        graphs = self.compute_membership_strengths(knn_indices, knn_dists, sigmas, rhos)
+
+        self.graphs = graphs
+
         probs = np.exp(-np.maximum(x_distances-rhos[:,None], 0)/sigmas[:,None]).T
         # P's diagonal parts are all 1 (= 1+1-1).
         P = probs + probs.T - np.multiply(probs, probs.T)
@@ -282,6 +296,7 @@ class UMAP():
         if self.a is None or self.b is None:
             self._find_ab_params()
         a,b = (self.a, self.b)
+
         # TODO: Initialize the coordinates of low-dimensional embeddings with "Graph Laplacian."
         y = np.random.RandomState(self.random_state).normal(size=(n_samples, n_components))
         for epoch in range(epochs):
@@ -306,30 +321,49 @@ class UMAP():
             y -= learning_rate * y_gradients
             flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
         if verbose: print()
-        self.sigmas = sigmas
         return y
 
-    def _find_sigmas(self, distances):
+    def _find_sigmas(self, distances, rhos=None):
         """
         @params distances : shape=(n_samples, n_neighbors)
         """
-        n_neighbors = self.n_neighbors
-        # (n+1) Nearest samples (Including myself.)
-        nn_with_self = np.partition(distances, kth=n_neighbors, axis=1)[:,:n_neighbors+1]
-        # n Nearest samples.
-        nn = np.ascontiguousarray(np.partition(nn_with_self, kth=1, axis=1)[:,1:])
-        # Nearest sample.
-        rhos = np.asarray(nn[:,0], order="c")
-
+        if rhos is None:
+            rhos = np.asarray(np.partition(distances, kth=1, axis=1)[:,1], dtype=float, order="c")
         # Buffer.
         sigmas = np.zeros_like(rhos)
         c_decomposition.binary_sigma_search(
-            distances=nn, rhos=rhos, sigmas=sigmas,
-            n_neighbors=n_neighbors, max_iter=self.sigma_iter,
+            distances=distances, rhos=rhos, sigmas=sigmas,
+            n_neighbors=self.n_neighbors, max_iter=self.sigma_iter,
             init=self.sigma_init, lower=self.sigma_lower, upper=self.sigma_upper,
             tolerance=self.sigma_tol
         )
-        return sigmas, rhos
+        return sigmas
+
+    def compute_membership_strengths(self, knn_indices, knn_dists, sigmas, rhos, apply_set_operations=True, set_op_mix_ratio=1.0):
+        # n_samples * n_neighbors
+        data_size = knn_indices.size
+        rows = np.zeros(data_size, dtype=np.int32)
+        cols = np.zeros(data_size, dtype=np.int32)
+        vals = np.zeros(data_size, dtype=float)
+        c_decomposition.compute_membership_strengths(
+            knn_indices=knn_indices, knn_dists=knn_dists,
+            sigmas=sigmas, rhos=rhos,
+            rows=rows, cols=cols, vals=vals,
+        )
+
+        n_samples = sigmas.shape[0]
+        result = scipy.sparse.coo_matrix(
+            (vals, (rows, cols)), shape=(n_samples, n_samples)
+        )
+        result.eliminate_zeros()
+
+        if apply_set_operations:
+            transpose = result.transpose()
+            pfi = result.multiply(transpose) # pure fuzzy intersection
+            pfu = result+transpose-pfi # pure fuzzy union
+            result = set_op_mix_ratio*pfu + (1.0-set_op_mix_ratio)*pfi
+        result.eliminate_zeros()
+        return result
 
     def _find_ab_params(self):
         """
@@ -343,7 +377,6 @@ class UMAP():
         X = np.linspace(0,3*self.spread,300)
         Y = np.where(X<self.min_dist, 1, np.exp(-(X-self.min_dist)/self.spread))
         (self.a, self.b) , _ = optimize.curve_fit(curve, X, Y)
-
 
     @staticmethod
     def sigma2num_neighbors(sigma, distance, rho):

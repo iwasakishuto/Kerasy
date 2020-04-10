@@ -125,11 +125,13 @@ def optimize_layout(
 
     for epoch in range(epochs):
         for i in range(epochs_per_sample.shape[0]):
-            if epoch_of_next_sample[i] <= epochs:
+            if epoch_of_next_sample[i] <= epoch:
                 j = head[i]
                 k = tail[i]
+
                 current = head_embedding[j]
                 other = tail_embedding[k]
+
                 dist_squared = sum((current-other)**2)
 
                 if dist_squared > 0.0:
@@ -143,8 +145,9 @@ def optimize_layout(
                     current[d] += grad_d * alpha
                     if move_other:
                         other[d] += -grad_d * alpha
+
                 epoch_of_next_sample[i] += epochs_per_sample[i]
-                n_neg_samples = int((epochs-epoch_of_next_negative_sample[i])/epochs_per_negative_sample[i])
+                n_neg_samples = int( (epoch-epoch_of_next_negative_sample[i]) / epochs_per_negative_sample[i] )
 
                 for p in range(n_neg_samples):
                     k = tau_rand_int(rng_state) % n_vertices
@@ -153,7 +156,7 @@ def optimize_layout(
 
                     if dist_squared > 0.0:
                         grad_coeff = 2.0 * gamma * b
-                        grad_coeff /= (0.001 + dist_squared) * (a * pow(dist_squared, b) + 1)
+                        grad_coeff /= (0.001+dist_squared)*(a*pow(dist_squared, b) + 1)
                     elif j == k:
                         continue
                     else:

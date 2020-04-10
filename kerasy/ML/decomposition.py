@@ -268,9 +268,11 @@ class UMAP():
         self.spread = spread
         self.a=a
         self.b=b
-        self.rnd=handle_random_state(random_state)
+        self.random_state=random_state
+        self.rnd = handle_random_state(random_state)
 
-    def fit_transform(self, X, n_components=2, n_neighbors=15, epochs=1, learning_rate=1, verbose=1):
+    def fit_transform(self, X, n_components=2, n_neighbors=15, init="random", epochs=200, init_lr=1.0, verbose=1):
+        self.rnd = handle_random_state(self.random_state)
         self.n_neighbors=n_neighbors
         self.n_components=n_components
         n_samples, n_features = X.shape
@@ -285,30 +287,15 @@ class UMAP():
         sigmas = self._find_sigmas(distances=knn_dists, rhos=rhos)
         graph = self.compute_membership_strengths(knn_indices, knn_dists, sigmas, rhos)
         graph, epochs_per_sample = self.compress_graph_and_make_epochs_per_sample(graph, epochs)
-
         if self.a is None or self.b is None:
-            self._find_ab_params()
-        a,b = (self.a, self.b)
-        embeddings = self.rnd.normal(size=(n_samples, n_components))
-        standardize(embeddings, axis=1)
-        embeddings = (10.0*embeddings).astype(float, order="C")
+            self.a, self.b = self._find_ab_params()
+        embeddings = self._init_embeddings(X=X, init=init, n_components=n_components, graph=graph)
         rng_state = self.rnd.randint(INT32_MIN, INT32_MAX, 3).astype(np.int64)
-
-        self.x_distances = x_distances
-        self.knn_indices = knn_indices
-        self.knn_dists = knn_dists
-        self.rhos = rhos
-        self.sigmas = sigmas
-        self.graph = graph
-        self.epochs_per_sample = epochs_per_sample
-        self.embeddings = embeddings
-        self.rng_state = rng_state
-
         c_decomposition.optimize_layout(
             head_embedding=embeddings, tail_embedding=embeddings,
             head=graph.row, tail=graph.col, epochs_per_sample=epochs_per_sample,
-            rng_state=rng_state, epochs=epochs, n_vertices=graph.shape[1], a=a, b=b,
-            gamma=1.0, initial_alpha=1.0, negative_sample_rate=5.0, verbose=verbose
+            rng_state=rng_state, epochs=epochs, n_vertices=graph.shape[1], a=self.a, b=self.b,
+            gamma=1.0, initial_alpha=init_lr, negative_sample_rate=5.0, verbose=verbose
         )
         return embeddings
 
@@ -345,6 +332,40 @@ class UMAP():
         #     flush_progress_bar(epoch, epochs, metrics={"CE(P,Q)": CE}, verbose=verbose)
         # if verbose: print()
         # return y
+
+    def _init_embeddings(self, X, init, n_components, graph):
+        """ Initialize the embeddings. """
+        n_samples = graph.shape[0]
+        if hasattr(init, '__array__'):
+            embeddings = np.asarray(init, dtype=float, order="C")
+            em_samples, em_components = init.shape
+            if em_samples!=n_samples or em_components!=n_components:
+                raise ValueError(
+                    f"If init is array, init.shape should be equal to \
+                      (n_samples, n_components) but init.shape=\
+                      ({em_samples}, {em_components} and n_samples={n_samples}, \
+                      n_components={n_components}"
+                )
+        elif isinstance(init, str):
+            if init == "random":
+                embeddings = self.rnd.uniform(low=-10.0, high=10.0, size=(n_samples, n_components))
+            elif init == "spectral":
+                initialization = self.spectral_layout(X, graph, n_components)
+                # We add a little noise to avoid local minima for optimization to come
+                noise = self.rnd.normal(scale=0.0001, size=[n_samples, n_components]).astype(np.float32)
+                expansion = 10.0/np.abs(initialisation).max()
+                embedding = (initialization*expansion).astype(np.float32) + noise
+            else:
+                handleKeyError(lst=["random", "spectral"], init=init)
+
+            standardize(embeddings, axis=0)
+            embeddings = (10.0*embeddings).astype(float, order="C")
+        else:
+            raise ValueError(f"the `init` parameter should be 'random', or 'spectral', or an array.shape=({n_samples}, {n_components})")
+        return embeddings
+
+    def spectral_layout(self, X, graph, n_components):
+        return
 
     def _find_sigmas(self, distances, rhos=None):
         """
@@ -413,7 +434,8 @@ class UMAP():
         curve = lambda x,a,b: 1.0/(1.0 + a * x ** (2 * b))
         X = np.linspace(0,3*self.spread,300)
         Y = np.where(X<self.min_dist, 1, np.exp(-(X-self.min_dist)/self.spread))
-        (self.a, self.b), _ = sp.optimize.curve_fit(curve, X, Y)
+        (a, b), _ = sp.optimize.curve_fit(curve, X, Y)
+        return (a,b)
 
     @staticmethod
     def sigma2num_neighbors(sigma, distance, rho):

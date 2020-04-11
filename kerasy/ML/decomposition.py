@@ -243,6 +243,7 @@ class tSNE():
 INT32_MIN = np.iinfo(np.int32).min + 1
 INT32_MAX = np.iinfo(np.int32).max - 1
 
+# Ref: https://umap-learn.readthedocs.io/en/latest/
 class UMAP():
     """ Uniform Manifold Approximation and Projection
     Finds a low dimensional embedding of the data that approximates an underlying manifold.

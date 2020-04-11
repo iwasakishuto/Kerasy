@@ -365,7 +365,7 @@ class UMAP():
         return embeddings
 
     def spectral_layout(self, X, graph, n_components):
-        return
+        raise NotImplementedError("spectral initialization is not implemented.")
 
     def _find_sigmas(self, distances, rhos=None):
         """

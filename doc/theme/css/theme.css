@@ -12,6 +12,17 @@
   box-sizing: border-box
 }
 
+/* Added by Shuto Iwasaki.*/
+/* Sidebar Scroll */
+.wy-menu.wy-menu-vertical {
+    /* width: 320px; */
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+    position: relative;
+}
+/*Added by Shuto Iwasaki.*/
+
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
   display: block
 }

@@ -8,13 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Shuto" />
     <meta name="twitter:card" content="summary">
-    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/MachineLearning/Principal Component Analysis/index.html" />
-    <meta property="og:title" content="Principal Component Analysis">
-    <meta property="og:description" content="Brief explanation of Principal Component Analysis and introduction of modules that can be used in Kerasy">
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/MachineLearning/Decomposition/index.html" />
+    <meta property="og:title" content="Decomposition">
+    <meta property="og:description" content="Brief explanation of Decomposition and introduction of modules that can be used in Kerasy">
     <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
     <meta property="og:type" content="article" />
 
-    <title>Principal Component Analysis - Kerasy Documentation</title>
+    <title>Decomposition - Kerasy Documentation</title>
     <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
@@ -24,9 +24,9 @@
 
     <script>
       // Current page data
-      var mkdocs_page_name = "Principal Component Analysis";
-      var mkdocs_page_input_path = "MachineLearning/Principal Component Analysis.md";
-      var mkdocs_page_url = "/Kerasy/MachineLearning/Principal Component Analysis/";
+      var mkdocs_page_name = "Decomposition";
+      var mkdocs_page_input_path = "MachineLearning/Decomposition.md";
+      var mkdocs_page_url = "/Kerasy/MachineLearning/Decomposition/";
     </script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
@@ -159,6 +159,21 @@
           
 
 
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Decomposition
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
+        
+          
+
+
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../sampling/">sampling</a>
   </li>
@@ -176,21 +191,6 @@
   <li class="navtree toctree-l2 inactive">
     <a class="" href="../HMM/">HMM</a>
   </li>
-        
-          
-
-
-  
-    
-    <li class="navtree toctree-l2 page current">
-      <a class="current" href="./">
-        Principal Component Analysis
-          <span class="toctree-expand"></span>
-      </a>
-    </li>
-    
-
-  
         
           
 
@@ -291,7 +291,7 @@
         
       
     
-    <li>Principal Component Analysis</li>
+    <li>Decomposition</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
@@ -307,7 +307,7 @@
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Principal Component Analysis</h3>
+          <h3>Decomposition</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -450,6 +450,89 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
   </ul>
 </div>
 
+<h4>tSNE vs. UMAP</h4>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">tSNE</th>
+<th align="center">UMAP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"></td>
+<td align="center"><strong>pure Machine Learning semi-empirical algorithm</strong></td>
+<td align="center"><strong>based on solid mathematical principles</strong></td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">Preserves <strong>Only Local</strong> Structure</td>
+<td align="center">Preserves <strong>Global</strong> Structure</td>
+</tr>
+<tr>
+<td align="center">probability in <strong>high-dimensional space</strong></td>
+<td align="center">
+<div class="math">$$p_{j\mid i} = \frac{\exp\left(-\|x_i-x_j\|^2/2\sigma_i^2\right)}{\sum_{k\neq i}\exp\left(-\|x_i-x_k\|^2/2\sigma_i^2\right)}$$</div>
+</td>
+<td align="center">
+<div class="math">$$p_{i\mid j} = \exp\left(-\frac{d(x_i,x_j)-\rho_i}{\sigma_i}\right), \quad \rho_i = \min_{j\neq i}\left\{d(x_i,x_j)\right\}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">joint probability in <strong>high-dimensional space</strong></td>
+<td align="center">
+<div class="math">$$p_{ij}=\frac{p_{i\mid j}+p_{j\mid i}}{2N}$$</div>
+</td>
+<td align="center">
+<div class="math">$$p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center"></td>
+<td align="center">
+<div class="math">$$\text{Perplexity} = 2^{-\sum_j p_{j\mid i}\log_2p_{j\mid i}}$$</div>
+</td>
+<td align="center"><strong>number of nearest neighbors</strong><div class="math">$$k = 2^{\sum_jp_{i\mid j}}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">probability in <strong>low-dimensional space</strong></td>
+<td align="center">
+<div class="math">$$q_{ij}=\frac{\left(1 + \|y_i-y_j\|^2\right)^{-1}}{\sum_{k\neq i}\left(1 + \|y_i-y_k\|^2\right)^{-1}}$$</div>
+</td>
+<td align="center">
+<div class="math">$$q_{ij} = \left(1 + a(y_i-y_j)^{2b}\right)^{-1}$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">loss function</td>
+<td align="center"><span class="math">\(\mathrm{KL}(P_i\|Q_i) = \sum_i\sum_jp_{j\mid i}\log\frac{p_{j\mid i}}{q_{j\mid i}}\)</span></td>
+<td align="center">
+<div class="math">$$\mathrm{CE}(X,Y) = \sum_i\sum_j\left[p_{ij}(X)\log\left(\frac{p_{ij}(X)}{q_{ij}(Y)}\right) + \left(1-p_{ij}(X)\right)\log\left(\frac{1-p_{ij}(X)}{1-q_{ij}(Y)}\right)\right]$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">Optimization</td>
+<td align="center"><strong>Gradient Descent</strong></td>
+<td align="center"><strong>Stochastic Gradient Descent</strong></td>
+</tr>
+<tr>
+<td align="center">Gradients</td>
+<td align="center">
+<div class="math">$$\frac{\partial\mathrm{KL}}{\partial y_i} = 4\sum_j(p_{ij}-q_{ij})(y_i-y_j)\left(1 + \|y_i-y_j\|^2\right)^{-1}$$</div>
+</td>
+<td align="center">
+<div class="math">$$\frac{\partial\mathrm{CE}}{\partial y_i} = \sum_j\left[\frac{2abd_{ij}^{2(b-1)}P(X)}{1 + ad_{ij}^{2b}}-\frac{2b(1-P(X))}{d_{ij}^2\left(1 + ad_{ij}^{2b}\right)}\right](y_i-y_j)$$</div>
+</td>
+</tr>
+<tr>
+<td align="center">Initial low-dimensional coordinates</td>
+<td align="center"><strong>Random Normal Initialization</strong></td>
+<td align="center"><strong>Graph Laplacian</strong></td>
+</tr>
+</tbody>
+</table>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -522,10 +605,10 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../EM algorithm/" class="btn btn-neutral float-right" title="EM algorithm">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../sampling/" class="btn btn-neutral float-right" title="sampling">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../HMM/" class="btn btn-neutral" title="HMM"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../DeepLearning/Initializers/" class="btn btn-neutral" title="Initializers"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -551,10 +634,10 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../HMM/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../../DeepLearning/Initializers/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../EM algorithm/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../sampling/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

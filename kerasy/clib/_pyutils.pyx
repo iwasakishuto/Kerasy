@@ -9,6 +9,8 @@ cimport cython
 from cython cimport floating
 from libc.math cimport sqrt
 from libc.stdio cimport printf
+from libcpp.vector cimport vector
+from libcpp.pair cimport pair
 from scipy.linalg.cython_blas cimport sdot, ddot
 
 ctypedef np.float64_t DOUBLE
@@ -52,3 +54,28 @@ def paired_euclidean_distances(
     for idx in range(n_samples):
         distances[idx] = euclidean_distance(X_p+idx*n_features, Y_p+idx*n_features, n_features)
     return distances
+
+def extract_continuous_area(np.ndarray[INT, ndim=1, mode='c'] bool_arr):
+    """
+    ex.)
+    @params bool_arr = [T, F,F,F, T,T,T, F,F,F, T,T]
+    @return start_and_length = [[0,1],[4,3],[10,2]]
+    """
+    cdef pair[int, int] p
+    cdef vector[pair[int, int]] start_and_length
+
+    cdef int len = 0
+    cdef int val
+    for i,val in enumerate(bool_arr):
+        if len>0:
+            if val:
+                len+=1
+            else:
+                p.second = len
+                start_and_length.push_back(p)
+                len = 0
+        elif val:
+            len = 1
+            p.first = i
+
+    return start_and_length

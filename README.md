@@ -56,3 +56,18 @@ $ mkdocs build # MkDocs-src(.md) → site (.html)
 6. Move `MkDocs/site` to `doc`.
 
 **※ A program that performs these operations collectively is [`GithubKerasy.sh`](https://github.com/iwasakishuto/iwasakishuto.github.io/blob/master/ShellScripts/GithubKerasy.sh).**
+
+## Upload to PyPI
+
+Create your account : [https://pypi.org/](https://pypi.org/)
+
+```sh
+# [Library packaging]
+# Normal
+$ python setup.py sdist
+# wheel version.
+# $ python setup.py bdist_wheel
+
+# [Upload to PyPI]
+$ twine upload dist/*
+```

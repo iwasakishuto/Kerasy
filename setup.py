@@ -1,52 +1,49 @@
-import platform
-from setuptools import setup
+# coding: utf-8
+# ref: https://packaging.python.org/tutorials/packaging-projects/
 
-DISTNAME = 'kerasy'
-LICENSE = None
-DESCRIPTION = 'A set of python modules for machine learning and data mining especially in the biological field.'
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
-MAINTAINER = 'Shuto Iwasaki'
-MAINTAINER_EMAIL = 'cabernet.rock@gmail.com'
-URL = 'https://iwasakishuto.github.io/Kerasy/doc'
-DOWNLOAD_URL
-PROJECT_URLS = {
-    'Documentation': 'https://iwasakishuto.github.io/Kerasy/doc/index.html',
-    'Source Code': 'https://github.com/iwasakishuto/Kerasy'
-}
+import setuptools
 
 VERSION = "0.0.0"
-
-# import kerasy
-# VERSION = kerasy.__version__
-
-if platform.python_implementation() == 'PyPy':
-    SCIPY_MIN_VERSION = '1.1.0'
-    NUMPY_MIN_VERSION = '1.14.0'
-else:
-    SCIPY_MIN_VERSION = '0.19.1'
-    NUMPY_MIN_VERSION = '1.13.3'
-
-JOBLIB_MIN_VERSION = '0.11'
+DESCRIPTION = \
+'A set of python modules for machine learning and data mining \
+especially in the biological field.'
+with open('README.md') as f:
+    LONG_DESCRIPTION = f.read()
 
 def setup_package():
-    metadata = dict(name=DISTNAME,
-                    maintainer=MAINTAINER,
-                    maintainer_email=MAINTAINER_EMAIL,
-                    description=DESCRIPTION,
-                    license=LICENSE,
-                    url=URL,
-                    download_url=DOWNLOAD_URL,
-                    project_urls=PROJECT_URLS,
-                    version=VERSION,
-                    long_description=LONG_DESCRIPTION,
-                    python_requires=">=3.6",
-                    install_requires=[
-                        'numpy>={}'.format(NUMPY_MIN_VERSION),
-                        'scipy>={}'.format(SCIPY_MIN_VERSION),
-                        'joblib>={}'.format(JOBLIB_MIN_VERSION)
-                    ])
-    setup(**metadata)
+    metadata = dict(
+        name='kerasy',
+        version=VERSION,
+        description=DESCRIPTION,
+        long_description=LONG_DESCRIPTION,
+        author='Shuto Iwasaki',
+        author_email='cabernet.rock@gmail.com',
+        license='MIT',
+        url='https://iwasakishuto.github.io/Kerasy/doc',
+        project_urls={
+            'Documentation': 'https://iwasakishuto.github.io/Kerasy/doc/index.html',
+            'Source Code': 'https://github.com/iwasakishuto/Kerasy',
+        },
+        packages=setuptools.find_packages(),
+        python_requires=">=3.6",
+        install_requires=[
+            'numpy>=1.15.1',
+            'scipy>=1.4.1',
+            'seaborn>=0.10.0',
+            'Cython>=0.28.5',
+        ],
+        classifiers=[
+            'Development Status :: 3 - Alpha',
+            'Intended Audience :: Science/Research',
+            'License :: OSI Approved :: MIT License',
+            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 3.6',
+            'Topic :: Scientific/Engineering :: Bio-Informatics',
+            'Topic :: Software Development :: Libraries',
+            'Topic :: Software Development :: Libraries :: Python Modules',
+        ],
+    )
+    setuptools.setup(**metadata)
 
 if __name__ == "__main__":
     setup_package()

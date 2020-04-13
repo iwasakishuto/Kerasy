@@ -10,3 +10,4 @@ pelican
 MkDocs
 
 pelican2mkdocs.py
+checkLibs.py

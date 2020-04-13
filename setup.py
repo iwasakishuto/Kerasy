@@ -7,15 +7,12 @@ VERSION = "0.0.0"
 DESCRIPTION = \
 'A set of python modules for machine learning and data mining \
 especially in the biological field.'
-with open('README.md') as f:
-    LONG_DESCRIPTION = f.read()
 
 def setup_package():
     metadata = dict(
         name='kerasy',
         version=VERSION,
         description=DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
         author='Shuto Iwasaki',
         author_email='cabernet.rock@gmail.com',
         license='MIT',

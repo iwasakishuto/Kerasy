@@ -11,3 +11,7 @@ MkDocs
 
 pelican2mkdocs.py
 checkLibs.py
+
+# PyPI
+dist/*
+kerasy.egg-info/*

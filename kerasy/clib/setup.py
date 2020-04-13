@@ -27,7 +27,7 @@ if __name__ == "__main__":
     p = Path()
     for fn in p.glob("*.pyx"):
         fn = str(fn)
-        print(fn)
+        print(f"* \033[34m{fn}\033[0m")
         name = fn.split(".")[0]
         extentions.append(
             Extension(

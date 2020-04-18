@@ -691,7 +691,7 @@ class BinomialHMM(BaseHMM):
     def _Mstep(self, statistics):
         super()._Mstep(statistics)
 
-        if 'e' in self.up_params:
+        if 'θ' in self.up_params:
             A,B = statistics['observation']
             self.thetas = A/(A+B)
 
@@ -941,7 +941,7 @@ class MSSHMM(BaseHMM):
     def _Mstep(self, statistics):
         super()._Mstep(statistics)
 
-        if 'e' in self.up_params:
+        if 'θ' in self.up_params:
             A,B = statistics['observation']
             self.theta = A/(A+B)
 

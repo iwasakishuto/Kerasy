@@ -133,23 +133,23 @@ class TreeAnalysis():
 
 class DecisionTreeClassifier():
     def __init__(self, criterion="gini", max_depth=None, random_state=None):
-        self.tree          = None
+        self.root          = None
         self.criterion     = criterion
         self.max_depth     = max_depth
         self.random_state  = random_state
-        self.tree_analysis = TreeAnalysis()
+        self.root_analysis = TreeAnalysis()
 
     def fit(self, x_train, y_train):
         num_samples, num_features = x_train.shape
         ini_classes = np.unique(y_train)
-        self.tree = Node(criterion=self.criterion, max_depth=self.max_depth, random_state=self.random_state)
-        self.tree.split_node(x_train=x_train, y_train=y_train, depth=0, ini_classes=ini_classes)
-        self.feature_importances_ = self.tree_analysis.get_feature_importances(node=self.tree, num_features=num_features)
+        self.root = Node(criterion=self.criterion, max_depth=self.max_depth, random_state=self.random_state)
+        self.root.split_node(x_train=x_train, y_train=y_train, depth=0, ini_classes=ini_classes)
+        self.feature_importances_ = self.root_analysis.get_feature_importances(node=self.root, num_features=num_features)
         self.num_features = num_features
         self.ini_classes = ini_classes
 
     def predict(self, x_train):
-        predictions = np.asarray([self.tree.predict(x) for x in x_train])
+        predictions = np.asarray([self.root.predict(x) for x in x_train])
         return predictions
 
     def score(self, x_train, y_train):
@@ -169,7 +169,7 @@ class DecisionTreeClassifier():
         if out_file is not None:
             ext = os.path.splitext(os.path.basename(out_file))[-1]
             if ext==".png":
-                return exporter.write_png(self.tree, path=out_file)
+                return exporter.write_png(self.root, path=out_file)
             elif ext==".dot":
-                return exporter.export(self.tree, out_file=out_file)
-        return exporter.export(self.tree, out_file=None)
+                return exporter.export(self.root, out_file=out_file)
+        return exporter.export(self.root, out_file=None)

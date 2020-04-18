@@ -1,10 +1,10 @@
 # coding: utf-8
-import os
 import numpy as np
 
 from ..utils import handleKeyError
 from ..utils import flatten_dual
 from ..utils import ItemsetTreeDOTexporter
+from ..utils import DOTexporterHandler
 
 ITEM_MINING_METHODS = ["all", "closed"]
 
@@ -39,7 +39,7 @@ class Node():
         self.itemset = itemset
         self.freq = freq # (=len(database))
         self.tail = tail
-        self.sons = []
+        self.children = []
 
     def _recurse_all(self, database, threshold, num_items):
         """ Find ALL closed Itemsets. """
@@ -48,9 +48,9 @@ class Node():
             next_data = database[database[:,i]==1,:]
             freq = len(next_data)
             if freq >= threshold:
-                son = Node(itemset=next_itemset, freq=freq, tail=i)
-                son._recurse_all(next_data, threshold, num_items)
-                self.sons.append(son)
+                child = Node(itemset=next_itemset, freq=freq, tail=i)
+                child._recurse_all(next_data, threshold, num_items)
+                self.children.append(child)
 
     def _recurse_closed(self, database, threshold, num_items):
         """ Find ONLY closed Itemsets. """
@@ -60,13 +60,13 @@ class Node():
             if freq >= threshold:
                 add_itemset = i+np.where(np.all(next_data[:,i:], axis=0))[0]
                 next_itemset = self.itemset + add_itemset.tolist()
-                son = Node(itemset=next_itemset, freq=freq, tail=max(add_itemset))
-                son._recurse_closed(next_data, threshold, num_items)
-                self.sons.append(son)
+                child = Node(itemset=next_itemset, freq=freq, tail=max(add_itemset))
+                child._recurse_closed(next_data, threshold, num_items)
+                self.children.append(child)
 
 class FrequentSet():
     def __init__(self, threshold):
-        self.tree = None
+        self.root = None
         self.threshold = threshold
         self.freq_sets = []
 
@@ -77,18 +77,18 @@ class FrequentSet():
         method = method.lower()
         handleKeyError(lst=ITEM_MINING_METHODS, method=method)
         num_transactions, num_items = database.shape
-        self.tree = Node(itemset=[], freq=num_transactions, tail=-1)
-        self.tree.__getattribute__({
+        self.root = Node(itemset=[], freq=num_transactions, tail=-1)
+        self.root.__getattribute__({
             "all"    : "_recurse_all",
             "closed" : "_recurse_closed",
         }[method]).__call__(database, self.threshold, num_items)
         self.num_items = num_items
-        self.all = self.get_itemsets(self.tree)
+        self.all = self.get_itemsets(self.root)
 
     def get_itemsets(self, node):
         freq_sets = [node.itemset]
-        for son in node.sons:
-            freq_sets.extend(self.get_itemsets(node=son))
+        for child in node.children:
+            freq_sets.extend(self.get_itemsets(node=child))
         return freq_sets
 
     def export_graphviz(self, out_file=None, feature_names=None,
@@ -100,10 +100,4 @@ class FrequentSet():
             cmap=cmap, class_names=class_names,
             filled=filled, rounded=rounded, precision=precision
         )
-        if out_file is not None:
-            ext = os.path.splitext(os.path.basename(out_file))[-1]
-            if ext==".png":
-                return exporter.write_png(self.tree, path=out_file)
-            elif ext==".dot":
-                return exporter.export(self.tree, out_file=out_file)
-        return exporter.export(self.tree, out_file=None)
+        return DOTexporterHandler(exporter, root=self.root, out_file=out_file)

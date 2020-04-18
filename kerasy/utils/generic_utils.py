@@ -126,12 +126,17 @@ def handleKeyError(lst, msg_="", **kwargs):
         lst = ', '.join([f"'{e}'" for e in lst])
         raise KeyError(f"Please chose the argment `{k}` from {lst}.\n{msg_}")
 
-def handleTypeError(type_, message_="", **kwargs):
+def handleTypeError(types, msg_="", **kwargs):
+    type2str = lambda t: re.sub(r"<class '(.*?)'>", r"\033[34m\1\033[0m", str(t))
     k,v = kwargs.popitem()
-    if not isinstance(v, type_):
-        str_true_type  = re.sub(r"<class '(.*?)'>", r"\1", str(type_))
-        srt_false_type = re.sub(r"<class '(.*?)'>", r"\1", str(type(v)))
-        raise TypeError(f"`{k}` must be {str_true_type}, not {srt_false_type}")
+    if not any([isinstance(v,t) for t in types]):
+        str_true_types  = ', '.join([type2str(t) for t in types])
+        srt_false_type = type2str(type(v))
+        if len(types)==1:
+            err_msg = f"must be {str_true_types}"
+        else:
+            err_msg = f"must be one of {str_true_types}"
+        raise TypeError(f"`{k}` {err_msg}, not {srt_false_type}.\n{msg_}")
 
 def urlDecorate(url, addDate=True):
     """ Decorate URL like Wget. (Add datetime information and coloring url to blue.) """
@@ -208,7 +213,7 @@ def format_spec_create(width, align=">", sign="", zero_padding=False,
     if len(fmt)>0:
         handleKeyError(lst=f_types, fmt=fmt[-1])
     zero = "0" if zero_padding else ""
-    handleTypeError(type_=int, width=width)
+    handleTypeError(types=[int], width=width)
     return lambda fill : f"{fill:{align}{sign}{zero}{width}{grouping_option}{fmt}}"
 
 def print_func_create(width, align=">", sign="", zero_padding=False,

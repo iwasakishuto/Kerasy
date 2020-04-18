@@ -1,5 +1,8 @@
 # coding: utf-8
+import os
+
 from .generic_utils import handleKeyError
+from .generic_utils import handleTypeError
 from .vis_utils import mk_color_dict
 from .vis_utils import chooseTextColor
 from .vis_utils import rgb2hex
@@ -7,7 +10,18 @@ from .vis_utils import rgb2hex
 BLACK_hex = "#000000"
 WHITE_hex = "#FFFFFF"
 
-TREE_STRUCTURES = ["lr", "sons"]
+TREE_STRUCTURES = ["lr", "children"]
+
+def DOTexporterHandler(exporter, root, out_file=None):
+    if out_file is not None:
+        ext = os.path.splitext(os.path.basename(out_file))[-1]
+        if ext==".png":
+            return exporter.write_png(root, path=out_file)
+        elif ext==".dot":
+            return exporter.export(root, out_file=out_file)
+    else:
+        return exporter.export(root, out_file=None)
+
 
 class BaseTreeDOTexporter():
     def __init__(self, feature_names=None, class_names=None, cmap="jet",
@@ -68,7 +82,7 @@ class BaseTreeDOTexporter():
     def recurse(self, node, par_node_id=None):
         {
             "lr"   : self._recurse_lr,
-            "sons" : self._recurse_sons,
+            "children" : self._recurse_children,
         }[self.tree_structure](node=node, par_node_id=par_node_id)
 
     def _recurse_lr(self, node, par_node_id=None):
@@ -82,14 +96,26 @@ class BaseTreeDOTexporter():
         if node.right is not None:
             self._recurse_lr(node.right, my_node_id)
 
-    def _recurse_sons(self, node, par_node_id=None):
+    def _recurse_children(self, node, par_node_id=None):
         my_node_id = self.node_id
         self.node_id += 1
         self._add_node_info(node=node, node_id=my_node_id)
         if par_node_id is not None:
             self._add_par_chil_info(son_id=my_node_id, par_id=par_node_id)
-        for son in node.sons:
-            self._recurse_sons(son, my_node_id)
+
+        children = node.children
+        if isinstance(children, list):
+            for child in children:
+                self._recurse_children(child, my_node_id)
+        elif isinstance(children, dict):
+            for child in children.values():
+                self._recurse_children(child, my_node_id)
+        else:
+            handleTypeError(
+                types=[list, dict], children=children,
+                msg_="Please check the type of `nodel.children`"
+            )
+
 
     def export(self, node, out_file=None):
         self._initialize()
@@ -152,12 +178,22 @@ class DecisionTreeDOTexporter(BaseTreeDOTexporter):
             self.headlabeled = not self.headlabeled
         super()._add_par_chil_info(son_id=son_id, par_id=par_id, arrow_info_=arrow_info_)
 
+class NaiveTrieDOTexporter(BaseTreeDOTexporter):
+    def __init__(self, filled=True, rounded=True, precision=3):
+        super().__init__(feature_names=None, class_names=None,
+                         filled=filled, rounded=rounded, precision=precision,
+                         tree_structure="children")
+
+    def _add_node_info(self, node, node_id):
+        label = node.value
+        super()._add_node_info(node_id=node_id, label_=label)
+
 class ItemsetTreeDOTexporter(BaseTreeDOTexporter):
     def __init__(self, class_names, cmap="jet",
                  filled=True, rounded=True, precision=3):
         super().__init__(feature_names=None, class_names=class_names,
                          cmap=cmap, filled=filled, rounded=rounded,
-                         precision=precision, tree_structure="sons")
+                         precision=precision, tree_structure="children")
 
     def _add_node_info(self, node, node_id):
         # label info.

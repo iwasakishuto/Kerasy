@@ -97,8 +97,10 @@ from .training_utils import make_batches
 from .training_utils import train_test_split
 from .training_utils import iter_from_variable_len_samples
 
+from .tree_utils import DOTexporterHandler
 from .tree_utils import DecisionTreeDOTexporter
 from .tree_utils import ItemsetTreeDOTexporter
+from .tree_utils import NaiveTrieDOTexporter
 
 from .vis_utils import rgb2hex, rgba2rgb, hex2rgb
 from .vis_utils import chooseTextColor

@@ -18,6 +18,9 @@ class Node():
         self.value = value
         self.children = {}
 
+    def __iter__(self):
+        return iter(self.children.values())
+
     def add(self, child):
         self.children.update({child.value: child})
 
@@ -33,6 +36,14 @@ class NaiveTrie():
                 self.build(self.root, words)
             else:
                 handleTypeError(types=[list, str], words=words)
+
+    def __contains__(self, word):
+        node = self.root
+        for w in word:
+            node = node.children.get(w)
+            if node is None:
+                return False
+        return True
 
     def build(self, node, word):
         for w in word:

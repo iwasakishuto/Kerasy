@@ -1,9 +1,9 @@
 # coding: utf-8
 # ref: https://packaging.python.org/tutorials/packaging-projects/
 
+import kerasy
 import setuptools
 
-VERSION = "0.0.0"
 DESCRIPTION = \
 'A set of python modules for machine learning and data mining \
 especially in the biological field.'
@@ -11,7 +11,7 @@ especially in the biological field.'
 def setup_package():
     metadata = dict(
         name='kerasy',
-        version=VERSION,
+        version=kerasy.__version__,
         description=DESCRIPTION,
         author='Shuto Iwasaki',
         author_email='cabernet.rock@gmail.com',
@@ -28,6 +28,8 @@ def setup_package():
             'scipy>=1.4.1',
             'seaborn>=0.10.0',
             'Cython>=0.28.5',
+            'pydotplus>=2.0.2',
+            'bitarray>=0.8.1',
         ],
         classifiers=[
             'Development Status :: 3 - Alpha',

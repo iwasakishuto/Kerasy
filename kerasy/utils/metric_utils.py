@@ -1,5 +1,4 @@
-"""Metric-related utilities."""
-
+# coding: utf-8
 import numpy as np
 from scipy.sparse import issparse
 

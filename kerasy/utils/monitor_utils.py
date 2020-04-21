@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 import sys
 from collections import deque
 from .progress_utils import flush_progress_bar

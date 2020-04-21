@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import absolute_import
 import os
 
@@ -6,6 +7,7 @@ UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 from . import bio_utils
 from . import deep_utils
 from . import generic_utils
+from . import hash_utils
 from . import metric_utils
 from . import model_select_utils
 from . import monitor_utils
@@ -44,6 +46,10 @@ from .generic_utils import fout_args
 from .generic_utils import format_spec_create
 from .generic_utils import print_func_create
 from .generic_utils import Table
+
+from .hash_utils import optimize_hash_func
+from .hash_utils import optimize_bit_format
+from .hash_utils import make_hashfuncs
 
 from .metric_utils import norm_vectors
 from .metric_utils import normalize_vectors

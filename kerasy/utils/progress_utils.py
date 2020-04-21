@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding: utf-8
 import sys
 import time
 import numpy as np
@@ -20,19 +20,19 @@ def flush_progress_bar(it, max_iter, metrics={}, barname="", verbose=1, **kwargs
         1  = progress bar and metrics
         2  = progress plot
     @params metric  : {(str): (float, int)}
-    @params barname : (str) 
+    @params barname : (str)
     """
-    if verbose<0: 
+    if verbose<0:
         return
     elif verbose>1:
         flush_progress_plot(it, max_iter, metrics=metrics, **kwargs)
     else:
         global INITIAL_TIME
-        if it == 0: 
+        if it == 0:
             INITIAL_TIME = time.time()
         if len(barname)>0 and barname[-1]!=" ":
             barname = barname + " "
-        
+
         it+=1
         digit = len(str(max_iter))
         rate  = it/max_iter
@@ -53,10 +53,10 @@ def flush_progress_plot(it, max_iter, ncols_max=3, metrics={}, **kwargs):
     """
     num_values=len(metrics)
     ncols, nrows, figsize = measureCanvas(num_values, ncols_max=ncols_max, figinches=(6,4))
-    
+
     fig,axes = plt.subplots(nrows=nrows, ncols=ncols)
     fig.set_size_inches(*figsize)
-    
+
     it+=1
     global VALUES
     for i, (k,v) in enumerate(metrics.items()):

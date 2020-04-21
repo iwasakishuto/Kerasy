@@ -1,4 +1,4 @@
-"""Numpy-related utilities."""
+# coding: utf-8
 import numpy as np
 from scipy import linalg
 from scipy.special import logsumexp

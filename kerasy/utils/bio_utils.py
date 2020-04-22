@@ -4,9 +4,16 @@ from __future__ import absolute_import
 import numpy as np
 from .generic_utils import priColor
 
+NUCLEIC_ACIDS_CREATOR = {
+    "DNA" : ["A","C","G","T"],
+    "dna" : ["a","c","g","t"],
+    "RNA" : ["A","C","G","U"],
+    "rna" : ["a","c","g","u"],
+}
+
 def bpHandler(bp2id=None, nucleic_acid="DNA", WatsonCrick=True, Wobble=False):
     """ Make the function which checks 'whether 2 bases form a base pairs' or 'the energy of them'.
-    @params score_dict  : (list) Describes the relationship between base pairs and the index.
+    @params bp2id       : (list) Describes the relationship between base pairs and the index.
     @params nucleic_acid: (str)  DNA: deoxyribonucleic acid, RNA: ribonucleic acid.
     @params WatsonCrick : (bool)
         - In canonical Watson–Crick base pairing in DNA,
@@ -27,10 +34,15 @@ def bpHandler(bp2id=None, nucleic_acid="DNA", WatsonCrick=True, Wobble=False):
         cond_expression = "".join([f'{i} if ("{b1}" in x and "{b2}" in x) else ' for i,(b1,b2) in enumerate(bp2id)]) + f"{len(bp2id)}"
         cond_branch = lambda x: eval(cond_expression)
     else:
-        cond_branch = lambda x: \
-        ("A" in x and "T" in x) if nucleic_acid=="DNA" else ("A" in x and "U" in x) or \
-        ("G" in x and "C" in x) or \
-        ("G" in x and "U" in x) if Wobble else False
+        if nucleic_acid=="DNA":
+            pair = (("A","T"),("G","C"))
+        elif nucleic_acid=="RNA":
+            pair = []
+            if WatsonCrick:
+                pair.extend([("A","U"),("G","C")])
+            if Wobble:
+                pair.append(("G","U"))
+        cond_branch = lambda x: any([b1 in x and b2 in x for (b1,b2) in pair])
     def func(base_i, base_j):
         bases = base_i+base_j
         return cond_branch(bases)
@@ -79,13 +91,7 @@ def printAlignment(sequences, indexes, score, scorename="Alignment score", add_i
     )
     print("=" * (9+2*digit+width))
 
-def readMonoSeq(path, header=True):
-    with open(path, "r") as f:
-        seqfile = f.readlines()
-    sequence = ["".join(seqfile[header:]).replace('\n', '')]
-    return sequence
-
-def readMultiSeq(path, symbol='>'):
+def read_fastseq(path, symbol='>'):
     with open(path, "r") as f:
         sequences=[]
         seq=""
@@ -98,3 +104,7 @@ def readMultiSeq(path, symbol='>'):
                 seq+=line.rstrip('\n')
         sequences.append(seq)
     return sequences
+
+def kmer_create(string,k):
+    """ Disassemble to k-mer. """
+    return [string[i:k+i] for i in range(len(string)-k+1)]

@@ -23,8 +23,8 @@ from . import vis_utils
 from .bio_utils import bpHandler
 from .bio_utils import arangeFor_printAlignment
 from .bio_utils import printAlignment
-from .bio_utils import readMonoSeq
-from .bio_utils import readMultiSeq
+from .bio_utils import read_fastseq
+from .bio_utils import kmer_create
 
 from .deep_utils import get_params_size
 from .deep_utils import print_summary

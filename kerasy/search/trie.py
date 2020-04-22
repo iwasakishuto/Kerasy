@@ -12,11 +12,19 @@ def words2LOUDSbit(words):
     bit_array, labels = trie.to_bit()
     return bit_array, labels
 
+def trie_mining(node, curt=""):
+    for val, child in node.children.items():
+        next = curt + val
+        if child.end:
+            yield next
+        yield from trie_mining(node=child, curt=next)
+
 class Node():
-    """ Node for Tree structure."""
+    """ Node for Tree structure. """
     def __init__(self, value):
         self.value = value
         self.children = {}
+        self.end = False
 
     def __iter__(self):
         return iter(self.children.values())
@@ -45,11 +53,15 @@ class NaiveTrie():
                 return False
         return True
 
+    def __iter__(self):
+        return iter(trie_mining(self.root, curt=""))
+
     def build(self, node, word):
         for w in word:
             child = Node(w)
             node.add(child)
             node = child
+        node.end = True
 
     def add(self, word):
         node = self.root
@@ -59,6 +71,7 @@ class NaiveTrie():
                 self.build(node, word[i:])
                 break
             node = child
+        node.end = True
 
     def to_bit(self):
         bit_array = "10"

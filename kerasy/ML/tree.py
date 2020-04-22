@@ -3,6 +3,7 @@
 import os
 import numpy as np
 from ..utils import DecisionTreeDOTexporter
+from ..utils import DOTexporterHandler
 
 def split_data(data, cond):
     return (data[cond], data[~cond])
@@ -166,10 +167,4 @@ class DecisionTreeClassifier():
             cmap=cmap, feature_names=feature_names, class_names=class_names,
             filled=filled, rounded=rounded, precision=precision
         )
-        if out_file is not None:
-            ext = os.path.splitext(os.path.basename(out_file))[-1]
-            if ext==".png":
-                return exporter.write_png(self.root, path=out_file)
-            elif ext==".dot":
-                return exporter.export(self.root, out_file=out_file)
-        return exporter.export(self.root, out_file=None)
+        return DOTexporterHandler(exporter, root=self.root, out_file=out_file)

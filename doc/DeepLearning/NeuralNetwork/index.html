@@ -189,6 +189,13 @@
 
 
   <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Cluster/">Cluster</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
     <a class="" href="../../MachineLearning/HMM/">HMM</a>
   </li>
         
@@ -623,8 +630,8 @@ $$\frac{\partial E_n}{\partial w_{ji}} = \delta_j z_i$$</li>
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Layers</span><span class="p">():</span>
     <span class="n">NLayers</span><span class="o">=</span><span class="mi">1</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">f</span><span class="s2">"Layer</span><span class="si">{Layers.NLayers}</span><span class="s2">.</span><span class="si">{name}</span><span class="s2">"</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Layer</span><span class="si">{</span><span class="n">Layers</span><span class="o">.</span><span class="n">NLayers</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outdim</span><span class="o">=</span><span class="n">units</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">Layers</span><span class="o">.</span><span class="n">NLayers</span><span class="o">+=</span><span class="mi">1</span>
@@ -637,11 +644,11 @@ $$\frac{\partial E_n}{\partial w_{ji}} = \delta_j z_i$$</li>
         <span class="p">]</span>
 
 <span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">Layers</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputdim</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputdim</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">"inputs"</span><span class="p">,</span> <span class="n">inputdim</span><span class="p">)</span>
 
 <span class="k">class</span> <span class="nc">Dense</span><span class="p">(</span><span class="n">Layers</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'linear'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">'random_normal'</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">'zeros'</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">'linear'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s1">'random_normal'</span><span class="p">,</span> <span class="n">bias_initializer</span><span class="o">=</span><span class="s1">'zeros'</span><span class="p">):</span>
         <span class="sd">"""</span>
 <span class="sd">        @param units             : (tuple) dimensionality of the (input space, output space).</span>
 <span class="sd">        @param activation        : (str) Activation function to use.</span>
@@ -693,7 +700,7 @@ $$\frac{\partial E_n}{\partial w_{ji}} = \delta_j z_i$$</li>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Sequential</span><span class="p">():</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="n">layer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
@@ -722,7 +729,7 @@ $$\frac{\partial E_n}{\partial w_{ji}} = \delta_j z_i$$</li>
             <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">+=</span><span class="mi">1</span>
             <span class="n">y_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>
             <span class="n">mse</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">y_pred</span><span class="o">-</span><span class="n">y_train</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">99</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">'[{self.epochs+1:</span><span class="si">{digit}</span><span class="s1">d}/{goal_epochs:</span><span class="si">{digit}</span><span class="s1">d}] mse={mse:</span><span class="si">{4}</span><span class="s1">f}'</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">99</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="o">+</span><span class="mi">1</span><span class="si">:{</span><span class="n">digit</span><span class="si">}</span><span class="s1">d</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">goal_epochs</span><span class="si">:{</span><span class="n">digit</span><span class="si">}</span><span class="s1">d</span><span class="si">}</span><span class="s1">] mse=</span><span class="si">{</span><span class="n">mse</span><span class="si">:{</span><span class="mi">4</span><span class="si">}</span><span class="s1">f</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
         <span class="n">out</span><span class="o">=</span><span class="nb">input</span>

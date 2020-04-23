@@ -8,13 +8,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Shuto" />
     <meta name="twitter:card" content="summary">
-    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/MachineLearning/EM algorithm/index.html" />
-    <meta property="og:title" content="EM algorithm">
-    <meta property="og:description" content="Brief explanation of EM algorithm and introduction of modules that can be used in Kerasy">
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy/doc/MachineLearning/Cluster/index.html" />
+    <meta property="og:title" content="Cluster">
+    <meta property="og:description" content="Brief explanation of Cluster and introduction of modules that can be used in Kerasy">
     <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png"/>
     <meta property="og:type" content="article" />
 
-    <title>EM algorithm - Kerasy Documentation</title>
+    <title>Cluster - Kerasy Documentation</title>
     <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/doc/theme/css/custom.css">
@@ -24,9 +24,9 @@
 
     <script>
       // Current page data
-      var mkdocs_page_name = "EM algorithm";
-      var mkdocs_page_input_path = "MachineLearning/EM algorithm.md";
-      var mkdocs_page_url = "/Kerasy/MachineLearning/EM algorithm/";
+      var mkdocs_page_name = "Cluster";
+      var mkdocs_page_input_path = "MachineLearning/Cluster.md";
+      var mkdocs_page_url = "/Kerasy/MachineLearning/Cluster/";
     </script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/jquery-2.1.1.min.js" defer></script>
     <script src="https://iwasakishuto.github.io/Kerasy/doc/theme/js/modernizr-2.8.3.min.js" defer></script>
@@ -180,9 +180,17 @@
           
 
 
-  <li class="navtree toctree-l2 inactive">
-    <a class="" href="../Cluster/">Cluster</a>
-  </li>
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Cluster
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+
+  
         
           
 
@@ -194,17 +202,9 @@
           
 
 
-  
-    
-    <li class="navtree toctree-l2 page current">
-      <a class="current" href="./">
-        EM algorithm
-          <span class="toctree-expand"></span>
-      </a>
-    </li>
-    
-
-  
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../EM algorithm/">EM algorithm</a>
+  </li>
         
           
 
@@ -298,7 +298,7 @@
         
       
     
-    <li>EM algorithm</li>
+    <li>Cluster</li>
     <li class="wy-breadcrumbs-aside">
       
         <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
@@ -314,42 +314,37 @@
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>EM algorithm</h3>
+          <h3>Cluster</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-11-28(木)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/ML/EM.py">ML/EM.py</a></span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-12-28(土)</span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/ML/cluster.py">ML/cluster.py</a></span></li>
             <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/machinelearning.html">MachineLearning</a></span></li> -->
         </ul>
     </div>
 </div>
         <section class="article">
-            <div class="admonition tip">
-  <p class="admonition-title">Notebook</p>
-  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/EM.ipynb">Kerasy.examples.EM.ipynb</a></p>
+            <div class="frame">
+  <h4>Purpose</h4>
+  <p>Clustering algorithms are attractive for the task of class identification in spatial databases.</p>
 </div>
 
-<h2>EM algorithm</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">EM</span><span class="o">.</span><span class="n">BaseEMmodel</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</pre></div>
+<div class="admonition tip">
+  <p class="admonition-title">Notebook</p>
+  <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/cluster.ipynb">Kerasy.examples.cluster.ipynb</a></p>
+</div>
 
-
-<h2>KMeans</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">EM</span><span class="o">.</span><span class="n">KMeans</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</pre></div>
-
-
-<h2>Gaussian Mixture model</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">EM</span><span class="o">.</span><span class="n">MixedGaussian</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<h2>DBSCAN</h2>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">cluster</span><span class="o">.</span><span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 
 
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
-    <li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/#!prml-book">Pattern Recognition and Machine Learning by Christopher Bishop</a></li>
+    <li><a href="https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf">A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise</a></li>
   </ul>
 </div>
         </section>
@@ -363,10 +358,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../Tree/" class="btn btn-neutral float-right" title="Tree">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../HMM/" class="btn btn-neutral float-right" title="HMM">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../HMM/" class="btn btn-neutral" title="HMM"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../Linear Regression/" class="btn btn-neutral" title="Linear Regression"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -392,10 +387,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../HMM/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../Linear Regression/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../Tree/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../HMM/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

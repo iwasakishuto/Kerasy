@@ -1,41 +1,34 @@
-"""
-Created on Thu Jan 2 2020
-@author: Shuto Iwasaki
-```
-$ python setup.py build_ext --inplace
-```
-"""
-
 # codin: utf-8
 import os
 from pathlib import Path
+import numpy as np
 
-from distutils.core import setup, Extension
-from Cython.Build import cythonize
-from numpy import get_include
+libraries = []
+if os.name == 'posix':
+    libraries.append('m')
 
-# ext = Extension("c_kmeans", sources=["c_kmeans.pyx"], include_dirs=['.', get_include()])
-# setup(name="c_kmeans", ext_modules=cythonize([ext]))
+CLIB_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+
+def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import Configuration
+    config = Configuration(
+        package_name='clib',
+        parent_name=parent_package,
+        top_path=top_path
+    )
+    p = Path(CLIB_ABS_PATH)
+    for abs_prog_path in p.glob("*.pyx"):
+        fn = str(abs_prog_path).split("/")[-1]
+        name = fn.split(".")[0]
+        config.add_extension(
+            name=name,
+            sources=[fn],
+            include_dirs=[np.get_include()],
+            language="c++",
+        )
+    # config.add_subpackage('tests')
+    return config
 
 if __name__ == "__main__":
-    extentions = []
-
-    libraries = []
-    if os.name == 'posix':
-        libraries.append('m')
-
-    p = Path()
-    for fn in p.glob("*.pyx"):
-        fn = str(fn)
-        print(f"* \033[34m{fn}\033[0m")
-        name = fn.split(".")[0]
-        extentions.append(
-            Extension(
-                name=name,
-                sources=[fn],
-                include_dirs=['.', get_include()],
-                libraries=libraries,
-                language="c++"
-            )
-        )
-    setup(name="Kerasy_clib", ext_modules=cythonize(extentions))
+    from numpy.distutils.core import setup
+    setup(**configuration(top_path='').todict())

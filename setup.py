@@ -1,7 +1,8 @@
 # coding: utf-8
 # ref: https://packaging.python.org/tutorials/packaging-projects/
 import os
-import setuptools
+# from setuptools import setup
+from numpy.distutils.core import setup
 
 import builtins
 builtins.__KERASY_SETUP__ = True
@@ -10,17 +11,20 @@ import kerasy
 from kerasy.clib import _check_cython_version
 from kerasy.clib import CYTHON_MIN_VERSION
 
+DISTNAME = 'kerasy'
 DESCRIPTION = 'A set of python modules for machine learning and data mining \
 especially in the biological field.'
 
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
 def configuration(parent_package='', top_path=None):
+    if os.path.exists('MANIFEST'):
+        os.remove('MANIFEST')
     from numpy.distutils.misc_util import Configuration
     config = Configuration(
-        package_name='Kerasy',
+        package_name=None,
         parent_name=parent_package,
         top_path=top_path
     )
@@ -36,7 +40,7 @@ def configuration(parent_package='', top_path=None):
 
 def setup_package():
     metadata = dict(
-        name='kerasy',
+        name=DISTNAME,
         version=kerasy.__version__,
         author=kerasy.__author__,
         author_email=kerasy.__author_email__,
@@ -44,14 +48,13 @@ def setup_package():
         url=kerasy.__url__,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
-        long_description_content_type='text/markdown',
+        # long_description_content_type='text/markdown',
         project_urls={
             'Bug Reports'  : 'https://github.com/iwasakishuto/Kerasy/issues',
             'Documentation': 'https://iwasakishuto.github.io/Kerasy/doc/index.html',
             'Source Code'  : 'https://github.com/iwasakishuto/Kerasy',
             'Say Thanks!'  : 'https://iwasakishuto.github.io/',
         },
-        packages=setuptools.find_packages(where='.'),
         python_requires=">=3.6",
         install_requires=[
             'numpy>=1.15.1',
@@ -83,9 +86,9 @@ def setup_package():
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.6',
         ],
-        configuration=configuration,
+        configuration = configuration,
     )
-    setuptools.setup(**metadata)
+    setup(**metadata)
 
 if __name__ == "__main__":
     setup_package()

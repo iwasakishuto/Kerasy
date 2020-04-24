@@ -23,8 +23,9 @@ def configuration(parent_package='', top_path=None):
         config.add_extension(
             name=name,
             sources=[fn],
-            include_dirs=[np.get_include()],
             language="c++",
+            include_dirs=[np.get_include()],
+            libraries=libraries,
         )
     # config.add_subpackage('tests')
     return config

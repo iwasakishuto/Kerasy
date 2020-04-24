@@ -1,9 +1,12 @@
 # coding: utf-8
 # ref: https://packaging.python.org/tutorials/packaging-projects/
 import os
-import kerasy
 import setuptools
 
+import builtins
+builtins.__KERASY_SETUP__ = True
+
+import kerasy
 from kerasy.clib import _check_cython_version
 from kerasy.clib import CYTHON_MIN_VERSION
 

@@ -8,10 +8,12 @@ Icon?
 
 pelican
 MkDocs
+README.md
 
 pelican2mkdocs.py
 checkLibs.py
 
 # PyPI
-dist/*
-kerasy.egg-info/*
+dist/
+MANIFEST
+kerasy.egg-info/

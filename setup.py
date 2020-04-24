@@ -35,7 +35,7 @@ def configuration(parent_package='', top_path=None):
         quiet=True
     )
     _check_cython_version()
-    config.add_subpackage('kerasy/clib')
+    config.add_subpackage('kerasy')
     return config
 
 def setup_package():

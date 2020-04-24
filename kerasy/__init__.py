@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+# coding: utf-8
 
 __copyright__    = "Copyright (C) 2020 Shuto Iwasaki"
 __version__      = "0.0.1"

@@ -79,7 +79,6 @@ class LinearRegressionLASSO(LinearRegression):
         if verbose: print()
         self.w = w
 
-
 class BayesianLinearRegression(LinearRegression):
     def __init__(self, alpha=1, beta=25, basis="none", **basisargs):
         self.alpha=alpha

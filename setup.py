@@ -2,6 +2,7 @@
 # ref: https://packaging.python.org/tutorials/packaging-projects/
 import os
 import sys
+import shutil
 import builtins
 builtins.__KERASY_SETUP__ = True
 
@@ -12,8 +13,8 @@ DISTNAME = 'kerasy'
 DESCRIPTION = 'A set of python modules for machine learning and data mining \
 especially in the biological field.'
 
-here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
+cwd = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(cwd, 'README.rst'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
 def configuration(parent_package='', top_path=None):

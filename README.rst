@@ -1,7 +1,7 @@
 
 
 .. image:: https://badge.fury.io/py/kerasy.svg
-   :target: https://pypi.org/project/kerasy/0.0.1/
+   :target: https://pypi.org/project/kerasy/
    :alt: PyPI version
 
 
@@ -69,3 +69,4 @@ Keras
       :alt: license
 
    Keras is a high-level neural networks API, written in Python and capable of running on top of `TensorFlow <https://github.com/tensorflow/tensorflow>`_\ , `CNTK <https://github.com/Microsoft/cntk>`_\ , or `Theano <https://github.com/Theano/Theano>`_. It was developed with a focus on enabling fast experimentation. *Being able to go from idea to result with the least possible delay is key to doing good research.*
+

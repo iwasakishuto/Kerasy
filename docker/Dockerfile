@@ -33,8 +33,8 @@ RUN pip install --upgrade pip && \
       scipy>=1.4.1 \
       seaborn>=0.10.0 \
       cython>=0.28.5 && \
-    git clone git://github.com/iwasakishuto/Kerasy.git /src && pip install -e /src[tests] && \
-    pip install git+git://github.com/iwasakishuto/Kerasy.git
+      git clone git://github.com/iwasakishuto/Kerasy.git /src && pip install -e /src[tests] && \
+      pip install git+git://github.com/iwasakishuto/Kerasy.git
 
 ENV PYTHONPATH='/src/:$PYTHONPATH'
 

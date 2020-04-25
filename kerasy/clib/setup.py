@@ -1,35 +1,55 @@
+"""
+Created on Thu Jan 2 2020
+@author: Shuto Iwasaki
+
+```
+$ python setup.py build_ext --inplace
+```
+
+class distutils.core.Extension
+Ref: https://docs.python.org/3/distutils/apiref.html#distutils.core.Extension
+    * name   : the full name of the extension, including any packages
+               — ie. not a filename or pathname, but Python dotted name.
+    * sources: list of source filenames, relative to the distribution root (where
+               the setup script lives), in Unix form (slash-separated) for portability.
+"""
 # codin: utf-8
 import os
 from pathlib import Path
 import numpy as np
 
-libraries = []
-if os.name == 'posix':
-    libraries.append('m')
+from distutils.core import setup, Extension
+from Cython.Build import cythonize
+from Cython.Distutils import build_ext
 
 CLIB_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
 
-def configuration(parent_package='', top_path=None):
-    from numpy.distutils.misc_util import Configuration
-    config = Configuration(
-        package_name='clib',
-        parent_name=parent_package,
-        top_path=top_path
-    )
+def setup_clib():
+    libraries = []
+    if os.name == 'posix':
+        libraries.append('m')
+
+    extentions = []
     p = Path(CLIB_ABS_PATH)
     for abs_prog_path in p.glob("*.pyx"):
-        fn = str(abs_prog_path).split("/")[-1]
-        name = fn.split(".")[0]
-        config.add_extension(
-            name=name,
-            sources=[fn],
-            language="c++",
-            include_dirs=[np.get_include()],
-            libraries=libraries,
+        fn = abs_prog_path.name
+        extentions.append(
+            Extension(
+                name=fn.split(".")[0],
+                sources=[fn],
+                include_dirs=[np.get_include()],
+                libraries=libraries,
+                language="c++"
+            )
         )
-    # config.add_subpackage('tests')
-    return config
+        print(f"* building \033[34m{fn}\033[0m")
+
+    setup(
+        name="clib",
+        cmdclass = {'build_ext': build_ext},
+        ext_modules=cythonize(extentions)
+    )
+
 
 if __name__ == "__main__":
-    from numpy.distutils.core import setup
-    setup(**configuration(top_path='').todict())
+    setup_clib()

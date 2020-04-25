@@ -32,17 +32,18 @@ def setup_clib():
     extentions = []
     p = Path(CLIB_ABS_PATH)
     for abs_prog_path in p.glob("*.pyx"):
-        fn = abs_prog_path.name
+        fn = abs_prog_path.name # hoge.pyx
+        name = fn.split(".")[0] # hoge
         extentions.append(
             Extension(
-                name=fn.split(".")[0],
+                name=name,
                 sources=[fn],
                 include_dirs=[np.get_include()],
                 libraries=libraries,
                 language="c++"
             )
         )
-        print(f"* building \033[34m{fn}\033[0m")
+        print(f"* \033[34m{fn}\033[0m is compiled by Cython to \033[34m{name}.c\033[0m file.")
 
     setup(
         name="clib",

@@ -1,14 +1,11 @@
 # coding: utf-8
 # ref: https://packaging.python.org/tutorials/packaging-projects/
 import os
-# from setuptools import setup
-from numpy.distutils.core import setup
-
+import sys
 import builtins
 builtins.__KERASY_SETUP__ = True
 
 import kerasy
-from kerasy.clib import _check_cython_version
 from kerasy.clib import CYTHON_MIN_VERSION
 
 DISTNAME = 'kerasy'
@@ -22,7 +19,10 @@ with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
 def configuration(parent_package='', top_path=None):
     if os.path.exists('MANIFEST'):
         os.remove('MANIFEST')
+
     from numpy.distutils.misc_util import Configuration
+    from kerasy.clib import _check_cython_version
+
     config = Configuration(
         package_name=None,
         parent_name=parent_package,
@@ -34,8 +34,12 @@ def configuration(parent_package='', top_path=None):
         delegate_options_to_subpackages=True,
         quiet=True
     )
+
     _check_cython_version()
+
     config.add_subpackage('kerasy')
+    config.add_data_files(('kerasy', 'LICENSE'))
+
     return config
 
 def setup_package():
@@ -86,8 +90,24 @@ def setup_package():
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.6',
         ],
-        configuration = configuration,
     )
+
+    if len(sys.argv) == 1 or (
+            len(sys.argv) >= 2 and ('--help' in sys.argv[1:] or
+                                    sys.argv[1] in ('--help-commands',
+                                                    'egg_info',
+                                                    'dist_info',
+                                                    '--version',
+                                                    'clean'))):
+        try:
+            from setuptools import setup
+        except ImportError:
+            from distutils.core import setup
+    else:
+        from numpy.distutils.core import setup
+
+        metadata['configuration'] = configuration
+
     setup(**metadata)
 
 if __name__ == "__main__":

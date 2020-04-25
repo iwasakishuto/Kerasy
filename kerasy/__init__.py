@@ -2,7 +2,8 @@
 import sys
 
 __copyright__    = "Copyright (C) 2020 Shuto Iwasaki"
-__version__      = "0.0.10"
+__version__      = "0.0.11"
+
 __license__      = "MIT"
 __author__       = "Shuto Iwasaki"
 __author_email__ = "cabernet.rock@gmail.com"

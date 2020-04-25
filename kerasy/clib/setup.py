@@ -2,16 +2,18 @@
 import os
 from pathlib import Path
 import numpy as np
-
 from Cython.Build import cythonize
-
-libraries = []
-if os.name == 'posix':
-    libraries.append('m')
 
 CLIB_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
 
 def configuration(parent_package='', top_path=None):
+    from numpy.distutils.misc_util import get_info
+    npymath_info = get_info('npymath')
+
+    libraries = []
+    if os.name == 'posix':
+        libraries.append('m')
+
     from numpy.distutils.misc_util import Configuration
     config = Configuration(
         package_name='clib',
@@ -26,8 +28,9 @@ def configuration(parent_package='', top_path=None):
             name=name,
             sources=[fn],
             language="c++",
-            include_dirs=[np.get_include()],
-            libraries=libraries,
+            # include_dirs=[np.get_include()],
+            # libraries=libraries,
+            **npymath_info,
         )
         print(f"* \033[34m{fn}\033[0m is compiled by Cython to \033[34m{name}.c\033[0m file.")
 

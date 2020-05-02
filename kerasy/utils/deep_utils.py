@@ -1,5 +1,24 @@
 # coding: utf-8
 import numpy as np
+from .generic_utils import handleKeyError, handleTypeError
+
+def mk_class_get(all_classes, kerasy_abst_class, genre):
+    def get(identifier):
+        f"""
+        Retrieves a Kerasy {genre.capitalize()} instance.
+        @params identifier : {genre.capitalize()} identifier, string name of a {genre}, or
+                             a Kerasy {genre.capitalize()} instance.
+        @return {genre:<11}: A Kerasy {genre.capitalize()} instance.
+        """
+        if isinstance(identifier, str):
+            handleKeyError(lst=list(all_classes.keys()), identifier=identifier)
+            instance = all_classes.get(identifier)()
+        elif isinstance(identifier, kerasy_abst_class):
+            instance = identifier
+        else:
+            handleTypeError(types=[str, kerasy_abst_class], identifier=identifier)
+        return instance
+    return get
 
 def get_params_size(layer):
     trainable_params = np.sum([layer.__dict__.get(key).size for key in layer._trainable_weights]).astype(int)

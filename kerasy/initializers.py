@@ -2,6 +2,8 @@
 import numpy as np
 from scipy import stats
 
+from .utils import handleKeyError
+
 def Zeros(shape, dtype=None):
     return np.zeros(shape=shape, dtype=dtype)
 
@@ -150,8 +152,7 @@ def _compute_fans(shape, data_format='channels_last'):
         fan_out = np.sqrt(np.prod(shape))
     return fan_in, fan_out
 
-
-InitializeHandler = {
+KerasyInitializerFunctions = {
     'zeros': Zeros,
     'ones': Ones,
     'constant': Constant,
@@ -169,7 +170,16 @@ InitializeHandler = {
     'lecun_uniform': LeCunUniform,
 }
 
-def Initializer(initializer_name):
-    if initializer_name not in InitializeHandler:
-        raise KeyError(f"Please select initializer from {list(InitializeHandler.keys())}")
-    return InitializeHandler[initializer_name]
+def get(identifier):
+    """
+    Retrieves a Kerasy Initializer function.
+    @params identifier : Initializer function, string name of a initializer, or
+                         a Kerasy Initializer function.
+    @return initializer: A Kerasy Initializer function.
+    """
+    if isinstance(identifier, str):
+        handleKeyError(lst=list(KerasyInitializerFunctions.keys()), identifier=identifier)
+        func = KerasyInitializerFunctions.get(identifier)
+    else:
+        handleTypeError(types=[str], identifier=identifier)
+    return func

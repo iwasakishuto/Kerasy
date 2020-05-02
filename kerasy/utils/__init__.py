@@ -70,6 +70,7 @@ from .metric_utils import pairwise_euclidean_distances
 from .model_select_utils import cross_validation
 
 from .monitor_utils import ConvergenceMonitor
+from .monitor_utils import ProgressMonitor
 from .monitor_utils import ThresholdMonitor
 
 from .np_utils import CategoricalEncoder

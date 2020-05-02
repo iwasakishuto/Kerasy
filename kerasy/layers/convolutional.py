@@ -3,9 +3,8 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from ..activations import ActivationFunc
-from ..initializers import Initializer
-from ..losses import LossFunc
+from .. import activations
+from .. import initializers
 from ..engine.base_layer import Layer
 
 class Conv2D(Layer):
@@ -25,11 +24,11 @@ class Conv2D(Layer):
         self.sh, self.sw = strides
         if padding not in ["same", "valid"]: raise ValueError("padding must be 'same' or 'valid'. Please chose one of them.")
         self.padding = padding
-        self.h = ActivationFunc(activation)
-        self.kernel_initializer = Initializer(kernel_initializer)
+        self.h = activations.get(activation)
+        self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = None
         self.kernel_constraint  = None
-        self.bias_initializer   = Initializer(bias_initializer)
+        self.bias_initializer   = initializers.get(bias_initializer)
         self.bias_regularizer   = None
         self.bias_constraint    = None
         self.use_bias = True
@@ -54,19 +53,23 @@ class Conv2D(Layer):
     def build(self, input_shape):
         """ @params input_shape: (H,W,F) of input image. """
         output_shape = self.compute_output_shape(input_shape)
-        self.kernel  = self.add_weight(shape=(self.kh, self.kw, self.F, self.OF),
-                                       name="kernel",
-                                       initializer=self.kernel_initializer,
-                                       regularizer=self.kernel_regularizer,
-                                       constraint =self.kernel_constraint,
-                                       trainable  =self.trainable)
+        self.kernel  = self.add_weight(
+            shape=(self.kh, self.kw, self.F, self.OF),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint =self.kernel_constraint,
+            trainable  =self.trainable
+        )
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.OF,),
-                                        name="bias",
-                                        initializer=self.bias_initializer,
-                                        regularizer=self.bias_regularizer,
-                                        constraint =self.bias_constraint,
-                                        trainable  =self.trainable)
+            self.bias = self.add_weight(
+                shape=(self.OF,),
+                name="bias",
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint =self.bias_constraint,
+                trainable  =self.trainable
+            )
         else:
             self.bias = None
         return output_shape
@@ -84,21 +87,14 @@ class Conv2D(Layer):
         self.Xin = Xin # Memorize
         return Xin
 
-    def _generator(self, Xin):
-        #=== generator ===
-        for i in range(self.OH//self.sh):
-            for j in range(self.OW//self.sw):
-                clipedXin = Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]
-                yield clipedXin,i,j
-
     # old version: https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
     def forward(self, input):
         """ @param input: (ndarray) 3-D array. shape=(H,W,F) """
-        Xin  = self._paddInput(input)
-        a    = np.empty(shape=(self.OH, self.OW, self.OF))
-        for clip_image,i,j in self._generator(Xin):
-            """ 'self.kernel' and np.expand_dims('clip_image', axis=-1) shapes equal to ( kh,kw,F,OF(None) ) """
-            a[i,j,:] = np.sum(clip_image*self.kernel, axis=(0,1,2))
+        Xin = self._paddInput(input)
+        a   = np.empty(shape=(self.OH, self.OW, self.OF))
+        for i in range(self.OH//self.sh):
+            for j in range(self.OW//self.sw):
+                a[i,j,:] = np.sum(Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]*self.kernel, axis=(0,1,2))
         a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
         self.a = a     # Memorize. (output layer. shape=(OH,OW,OF))
         Xout = self.h.forward(a)
@@ -114,12 +110,13 @@ class Conv2D(Layer):
         @return delta_times_w: shape=(H,W,F)
         """
         dEda = dEdXout*self.h.diff(self.a) # Xout=h(a) → dE/da = dE/dXout*h'(a)
-        dEdXin = np.zeros_like(self.Xin)   # shape=(H+2ph,W+2pw,F)
+        dEdXin = np.empty_like(self.Xin)   # shape=(H+2ph,W+2pw,F)
         for c in range(self.F):
             for i in range(self.H+2*self.ph):
                 for j in range(self.W+2*self.pw):
-                    dEdXin[i,j,c] = np.sum([ dEda[(i-m)//self.sh,(j-n)//self.sw,:] * self.kernel[i%self.sh+m,j%self.sw+n,c,:] for m in range(0,self.kh,self.sh) for n in range(0,self.kw,self.sw) if self._backprop_mask(i,j,m,n)])
-        if self.trainable: self.memorize_delta(dEda)
+                    dEdXin[i,j,c] = np.mean([ dEda[(i-m)//self.sh,(j-n)//self.sw,:] * self.kernel[i%self.sh+m,j%self.sw+n,c,:] for m in range(0,self.kh,self.sh) for n in range(0,self.kw,self.sw) if self._backprop_mask(i,j,m,n)])
+        if self.trainable:
+            self.memorize_delta(dEda)
         return dEdXin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:]
 
     def memorize_delta(self, dEda):

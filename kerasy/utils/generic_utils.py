@@ -115,12 +115,15 @@ class priColor:
     FLASH     = '\033[05m'    # 点滅
     RED_FLASH = '\033[05;41m' # 赤背景+点滅
     END       = '\033[0m'
-    
+
     @staticmethod
-    def color(value, color="RED"):
-        color = color.upper()
-        handleKeyError(priColor.__dict__.keys(), color=color)
-        return f"{priColor.__dict__[color.upper()]}{value}{priColor.END}"
+    def color(value, color=None):
+        if color is None:
+            return str(value)
+        else:
+            color = color.upper()
+            handleKeyError(priColor.__dict__.keys(), color=color)
+            return f"{priColor.__dict__[color.upper()]}{value}{priColor.END}"
 
 def handleKeyError(lst, msg_="", **kwargs):
     k,v = kwargs.popitem()

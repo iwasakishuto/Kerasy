@@ -4,13 +4,17 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from ..losses import LossFunc
-from ..optimizers import Optimizer
-from ..layers.core import Input
+from ..layers import Input
 from .base_layer import Layer
+from ..layers import Dropout
+
+from .. import optimizers
+from .. import losses
+
 from ..utils import make_batches
 from ..utils import flush_progress_bar
 from ..utils import print_summary
+from ..utils import Table
 
 class Sequential():
     def __init__(self):
@@ -28,8 +32,8 @@ class Sequential():
         @param loss     : (String name of loss function) or (Loss instance).
         @param metrics  : (List) Metrics to be evaluated by the model during training and testing.
         """
-        self.optimizer = Optimizer(optimizer)() if isinstance(optimizer, str) else optimizer
-        self.loss = LossFunc(loss) if isinstance(loss, str) else loss
+        self.optimizer = optimizers.get(optimizer)
+        self.loss = losses.get(loss)
         self.metrics = metrics
         input_layer = self.layers[0]
         if not isinstance(input_layer, Input): raise ValueError(f"The initial layer should be Input instance, but {str(input_layer)}")
@@ -52,7 +56,8 @@ class Sequential():
                 val_sample_weight = None
             elif len(validation_data) == 3:
                 val_x, val_y, val_sample_weight = validation_data
-            else: raise ValueError(f"When passing validation_data, it must contain 2 (x_val, y_val) or 3 (x_val, y_val, val_sample_weights) items. However, it contains {len(validation)} items.")
+            else:
+                raise ValueError(f"When passing validation_data, it must contain 2 (x_val, y_val) or 3 (x_val, y_val, val_sample_weights) items. However, it contains {len(validation)} items.")
 
         # Prepare for the trainig.
         epoch_digit = len(str(epochs))
@@ -67,20 +72,30 @@ class Sequential():
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
                 for bs, (x_train, y_true) in enumerate(zip(x[batch_ids], y[batch_ids])):
-                    y_pred = self.forward(x_train)
+                    y_pred = self.forward_train(x_train)
                     losses += self.loss.loss(y_true=y_true, y_pred=y_pred)
                     self.backprop(y_true=y_true, y_pred=y_pred)
                 self.updates(bs+1)
-                flush_progress_bar(batch_index,
-                                   num_batchs,
-                                   barname=f"Epoch {epoch+1:>0{epoch_digit}}/{epochs} |",
-                                   metrics=f"{self.loss.__name__}: {losses/min((batch_index+1)*batch_size, num_train_samples):.4f}",
-                                   verbose=verbose)
+                flush_progress_bar(
+                    it=batch_index, max_iter=num_batchs, verbose=verbose,
+                    barname=f"Epoch {epoch+1:>0{epoch_digit}}/{epochs} |",
+                    metrics={
+                        self.loss.name : losses/min((batch_index+1)*batch_size, num_train_samples)
+                    }
+                )
             if verbose>=1: print()
 
-    def forward(self, input):
+    def forward_train(self, input):
         out=input
         for layer in self.layers:
+            out = layer.forward(out)
+        return out
+
+    def forward_test(self, input):
+        out=input
+        for layer in self.layers:
+            if isinstance(layer, Dropout):
+                continue
             out = layer.forward(out)
         return out
 
@@ -91,9 +106,9 @@ class Sequential():
 
     def predict(self, x_train):
         if np.ndim(x_train) == 1:
-            return self.forward(x_train)
+            return self.forward_test(x_train)
         else:
-            return np.array([self.forward(x) for x in x_train])
+            return np.array([self.forward_test(x) for x in x_train])
 
     def updates(self, batch_size):
         for layer in reversed(self.layers):
@@ -101,3 +116,18 @@ class Sequential():
 
     def summary(self):
         print_summary(self)
+
+    def trainable(self):
+        layers = self.layers
+        num_layers = len(layers)
+
+        table = Table()
+        table.set_cols(colname="id", values=range(num_layers), zero_padding=True, width=len(str(num_layers)))
+        table.set_cols(colname="name", values=[l.name for l in layers], align=">")
+        table.set_cols(colname="trainable", values=[str(l.trainable) for l in layers], align="^", color="blue")
+        table.show()
+
+    def set_ltrainable(self, Layer, trainable):
+        for layer in self.layers:
+            if isinstance(layer, Layer):
+                layer.trainable = trainable

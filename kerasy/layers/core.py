@@ -3,9 +3,8 @@ from __future__ import absolute_import
 
 import numpy as np
 
-from ..activations import ActivationFunc
-from ..initializers import Initializer
-from ..losses import LossFunc
+from .. import activations
+from .. import initializers
 from ..engine.base_layer import Layer
 from ..utils import flush_progress_bar
 
@@ -13,6 +12,7 @@ class Input(Layer):
     def __init__(self, input_shape, **kwargs):
         self.input_shape=input_shape
         super().__init__(**kwargs)
+        self.trainable = False
 
     def forward(self, input):
         return input
@@ -23,6 +23,7 @@ class Input(Layer):
 class Flatten(Layer):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.trainable = False
 
     def compute_output_shape(self, input_shape):
         self.input_shape = input_shape
@@ -44,13 +45,13 @@ class Dense(Layer):
         @param bias_initializer  : (str) Initializer for the bias vector.
         """
         self.output_shape=(units,)
-        self.kernel_initializer = Initializer(kernel_initializer)
+        self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = None
         self.kernel_constraint  = None
-        self.bias_initializer   = Initializer(bias_initializer)
+        self.bias_initializer   = initializers.get(bias_initializer)
         self.bias_regularizer   = None
         self.bias_constraint    = None
-        self.h = ActivationFunc(activation)
+        self.h = activations.get(activation)
         self.use_bias = True
         super().__init__(**kwargs)
 
@@ -107,6 +108,7 @@ class Dropout(Layer):
     def __init__(self, keep_prob, **kwargs):
         self.keep_prob = min(1., max(0., keep_prob))
         super().__init__(**kwargs)
+        self.trainable = False
 
     def compute_output_shape(self, input_shape):
         self.input_shape = input_shape

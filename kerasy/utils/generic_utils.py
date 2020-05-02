@@ -129,7 +129,7 @@ def handleKeyError(lst, msg_="", **kwargs):
     k,v = kwargs.popitem()
     if v not in lst:
         lst = ', '.join([f"'{e}'" for e in lst])
-        raise KeyError(f"Please chose the argment `{k}` from {lst}.\n{msg_}")
+        raise KeyError(f"Please chose the argment `{k}` from {lst}.\n\033[32m{msg_}\033[0m")
 
 def handleTypeError(types, msg_="", **kwargs):
     type2str = lambda t: re.sub(r"<class '(.*?)'>", r"\033[34m\1\033[0m", str(t))
@@ -141,7 +141,7 @@ def handleTypeError(types, msg_="", **kwargs):
             err_msg = f"must be {str_true_types}"
         else:
             err_msg = f"must be one of {str_true_types}"
-        raise TypeError(f"`{k}` {err_msg}, not {srt_false_type}.\n{msg_}")
+        raise TypeError(f"`{k}` {err_msg}, not {srt_false_type}.\n\033[32m{msg_}\033[0m")
 
 def urlDecorate(url, addDate=True):
     """ Decorate URL like Wget. (Add datetime information and coloring url to blue.) """

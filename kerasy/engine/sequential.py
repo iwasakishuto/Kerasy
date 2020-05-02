@@ -13,6 +13,7 @@ from .. import losses
 
 from ..utils import make_batches
 from ..utils import flush_progress_bar
+from ..utils import handleTypeError
 from ..utils import print_summary
 from ..utils import Table
 
@@ -36,7 +37,10 @@ class Sequential():
         self.loss = losses.get(loss)
         self.metrics = metrics
         input_layer = self.layers[0]
-        if not isinstance(input_layer, Input): raise ValueError(f"The initial layer should be Input instance, but {str(input_layer)}")
+        handleTypeError(
+            types=[Input], input_layer=input_layer,
+            msg_="The initial layer should be Input Layer"
+        )
         output_shape = input_layer.input_shape
         for layer in self.layers:
             output_shape = layer.build(output_shape)

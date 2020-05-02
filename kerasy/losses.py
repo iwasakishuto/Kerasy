@@ -18,13 +18,13 @@ class KerasyAbstLoss(metaclass=ABCMeta):
     def diff(self, y_true, y_pred):
         pass
 
-class mean_squared_error(KerasyAbstLoss):
+class MeanSquaredError(KerasyAbstLoss):
     def loss(self, y_true, y_pred):
         return np.mean(np.square(y_pred - y_true), axis=-1)
     def diff(self, y_true, y_pred):
         return y_pred-y_true
 
-class categorical_crossentropy(KerasyAbstLoss):
+class CategoricalCrossentropy(KerasyAbstLoss):
     def loss(self, y_true, y_pred):
         small_val = 0 #1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
         return -np.sum(y_true * np.log(y_pred+small_val))
@@ -33,12 +33,13 @@ class categorical_crossentropy(KerasyAbstLoss):
         return -y_true/(y_pred+small_val)
 
 KerasyLossClasses = {
-    'mean_squared_error' : mean_squared_error,
-    'categorical_crossentropy' : categorical_crossentropy,
+    'mean_squared_error' : MeanSquaredError,
+    'mse'                : MeanSquaredError,
+    'categorical_crossentropy' : CategoricalCrossentropy,
 }
 
 get = mk_class_get(
     all_classes=KerasyLossClasses,
-    kerasy_abst_class=KerasyAbstLoss,
+    kerasy_abst_class=[KerasyAbstLoss],
     genre="loss"
 )

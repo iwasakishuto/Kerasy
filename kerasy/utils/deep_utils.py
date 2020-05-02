@@ -2,7 +2,7 @@
 import numpy as np
 from .generic_utils import handleKeyError, handleTypeError
 
-def mk_class_get(all_classes, kerasy_abst_class, genre):
+def mk_class_get(all_classes={}, kerasy_abst_class=[], genre=""):
     def get(identifier):
         f"""
         Retrieves a Kerasy {genre.capitalize()} instance.
@@ -13,10 +13,9 @@ def mk_class_get(all_classes, kerasy_abst_class, genre):
         if isinstance(identifier, str):
             handleKeyError(lst=list(all_classes.keys()), identifier=identifier)
             instance = all_classes.get(identifier)()
-        elif isinstance(identifier, kerasy_abst_class):
-            instance = identifier
         else:
-            handleTypeError(types=[str, kerasy_abst_class], identifier=identifier)
+            handleTypeError(types=[str] + kerasy_abst_class, identifier=identifier)
+            instance = identifier
         return instance
     return get
 

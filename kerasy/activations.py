@@ -84,6 +84,6 @@ KerasyActivationClasses = {
 
 get = mk_class_get(
     all_classes=KerasyActivationClasses,
-    kerasy_abst_class=KerasyAbstActivation,
+    kerasy_abst_class=[KerasyAbstActivation],
     genre="activation"
 )

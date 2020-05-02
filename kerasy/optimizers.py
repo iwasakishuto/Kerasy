@@ -112,6 +112,6 @@ KerasyOptimizerClasses = {
 
 get = mk_class_get(
     all_classes=KerasyOptimizerClasses,
-    kerasy_abst_class=KerasyAbstOptimizer,
+    kerasy_abst_class=[KerasyAbstOptimizer],
     genre="optimizer"
 )

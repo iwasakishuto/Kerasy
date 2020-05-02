@@ -56,10 +56,11 @@ class Tanh(KerasyAbstActivation):
 
 class Relu(KerasyAbstActivation):
     def forward(self, input):
-        return np.where(input>0, input, 0)
+        self.mask = input>0
+        return np.where(self.mask, input, 0)
 
     def diff(self, delta):
-        return np.where(delta>0, 1, 0)
+        return np.where(self.mask, 1, 0)
 
 class Sigmoid(KerasyAbstActivation):
     def __init__(self):

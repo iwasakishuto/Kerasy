@@ -26,16 +26,28 @@ class MeanSquaredError(KerasyAbstLoss):
 
 class CategoricalCrossentropy(KerasyAbstLoss):
     def loss(self, y_true, y_pred):
-        small_val = 0 #1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
+        small_val = 1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
         return -np.sum(y_true * np.log(y_pred+small_val))
     def diff(self, y_true, y_pred):
-        small_val = 0 #1e-7
+        small_val = 1e-7
         return -y_true/(y_pred+small_val)
+
+class SoftmaxCategoricalCrossentropy(KerasyAbstLoss):
+    def loss(self, y_true, y_pred):
+        # Softmax Layer
+        exps = np.exp(y_pred - np.max(y_pred))
+        y_pred = exps/np.sum(exps)
+        # Categorical CrossEntropy
+        small_val = 1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
+        return -np.sum(y_true * np.log(y_pred+small_val))
+    def diff(self, y_true, y_pred):
+        return y_pred - y_true
 
 KerasyLossClasses = {
     'mean_squared_error' : MeanSquaredError,
     'mse'                : MeanSquaredError,
     'categorical_crossentropy' : CategoricalCrossentropy,
+    'softmax_categorical_crossentropy' : SoftmaxCategoricalCrossentropy,
 }
 
 get = mk_class_get(

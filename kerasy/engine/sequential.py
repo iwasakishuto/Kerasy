@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 import numpy as np
+import warnings
 
 from ..layers import Input
 from .base_layer import Layer
@@ -11,6 +12,7 @@ from ..layers import Dropout
 from .. import optimizers
 from .. import losses
 from .. import metrics
+from .. import activations
 
 from ..utils import make_batches
 from ..utils import flush_progress_bar
@@ -40,6 +42,8 @@ class Sequential():
         self.optimizer = optimizers.get(optimizer)
         self.loss = losses.get(loss)
         self.metrics = metrics.get(metric)
+        self.activation = activations.get("linear")
+
         input_layer = self.layers[0]
         handleTypeError(
             types=[Input], input_layer=input_layer,
@@ -48,6 +52,17 @@ class Sequential():
         output_shape = input_layer.input_shape
         for layer in self.layers:
             output_shape = layer.build(output_shape)
+
+        # TODO:
+        if (self.loss.name == "categoricalcrossentropy") and \
+            (hasattr(self.layers[-1], "activation") and self.layers[-1].activation.name=="softmax"):
+            self.layers[-1].activation = activations.get("linear")
+            self.loss = losses.get("softmax_categorical_crossentropy")
+            self.activation = activations.get("softmax")
+            warnings.warn("\033[31mKerasy Warnings\033[0m\n" + \
+            "When calculating the \033[34mCategoricalCrossentropy\033[0m loss and the derivative " + \
+            "of the \033[34mSoftmax\033[0m layer, the gradient disappears when backpropagating the actual value, " + \
+            "so the \033[34mSoftmaxCategoricalCrossentropy\033[0m is implemented instead.")
 
     def fit(self,
             x=None, y=None, batch_size=32, epochs=1, verbose=1, shuffle=True,
@@ -109,7 +124,7 @@ class Sequential():
         out=input
         for layer in self.layers:
             out = layer.forward(out)
-        return out
+        return self.activation.forward(out)
 
     def forward_test(self, input):
         out=input
@@ -117,7 +132,7 @@ class Sequential():
             if isinstance(layer, Dropout):
                 continue
             out = layer.forward(out)
-        return out
+        return self.activation.forward(out)
 
     def backprop(self, y_true, y_pred):
         dEdXout = self.loss.diff(y_true, y_pred)
@@ -137,7 +152,7 @@ class Sequential():
     def summary(self):
         print_summary(self)
 
-    def trainable(self):
+    def is_trainable(self):
         layers = self.layers
         num_layers = len(layers)
 
@@ -146,8 +161,3 @@ class Sequential():
         table.set_cols(colname="name", values=[l.name for l in layers], align=">")
         table.set_cols(colname="trainable", values=[str(l.trainable) for l in layers], align="^", color="blue")
         table.show()
-
-    def set_ltrainable(self, Layer, trainable):
-        for layer in self.layers:
-            if isinstance(layer, Layer):
-                layer.trainable = trainable

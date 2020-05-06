@@ -31,6 +31,7 @@ class Softmax(KerasyAbstActivation):
     def __init__(self):
         self.exps = None
         self.S = None
+        super().__init__()
 
     def forward(self, input):
         """ @param input shape=(class,) """
@@ -65,6 +66,7 @@ class Relu(KerasyAbstActivation):
 class Sigmoid(KerasyAbstActivation):
     def __init__(self):
         self.out = None
+        super().__init__()
 
     def forward(self, input):
         out = 1/(1+np.exp(input))

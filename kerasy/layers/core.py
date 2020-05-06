@@ -51,7 +51,7 @@ class Dense(Layer):
         self.bias_initializer   = initializers.get(bias_initializer)
         self.bias_regularizer   = None
         self.bias_constraint    = None
-        self.h = activations.get(activation)
+        self.activation = activations.get(activation)
         self.use_bias = True
         super().__init__(**kwargs)
 
@@ -80,16 +80,16 @@ class Dense(Layer):
         """ @param input: shape=(Din,) """
         Xin  = np.append(input,1) if self.use_bias else input # shape=(Din+1,)
         a    = np.c_[self.kernel, self.bias].dot(Xin) # (Dout,Din+1) @ (Din+1,) = (Dout,)
-        Xout = self.h.forward(input=a) # shape=(Dout,)
+        Xout = self.activation.forward(input=a) # shape=(Dout,)
         self.a = a
         self.Xin = Xin # shape=(Din+1,) or shape=(Din,)
         return Xout
 
     def backprop(self, dEdXout):
         """ @param dEdXout: shape=(Dout,) """
-        # dXoutda = self.h.diff(self.a) # shape=(Dout,)
+        # dXoutda = self.activation.diff(self.a) # shape=(Dout,)
         # dEda = dEdXout.dot(dXoutda) if dXoutda.ndim==2 else dEdXout * dXoutda # shape=(Dout,)
-        dEda = self.h.diff(self.a) * dEdXout
+        dEda = self.activation.diff(self.a) * dEdXout
         dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
         if self.trainable:
             self.memorize_delta(dEda)

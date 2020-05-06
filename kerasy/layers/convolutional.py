@@ -24,7 +24,7 @@ class Conv2D(Layer):
         self.sh, self.sw = strides
         if padding not in ["same", "valid"]: raise ValueError("padding must be 'same' or 'valid'. Please chose one of them.")
         self.padding = padding
-        self.h = activations.get(activation)
+        self.activation = activations.get(activation)
         self.kernel_initializer = initializers.get(kernel_initializer)
         self.kernel_regularizer = None
         self.kernel_constraint  = None
@@ -97,7 +97,7 @@ class Conv2D(Layer):
                 a[i,j,:] = np.sum(Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]*self.kernel, axis=(0,1,2))
         a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
         self.a = a     # Memorize. (output layer. shape=(OH,OW,OF))
-        Xout = self.h.forward(a)
+        Xout = self.activation.forward(a)
         return Xout
 
     def _backprop_mask(self,i,j,m,n):
@@ -109,7 +109,7 @@ class Conv2D(Layer):
         @param  self.kernel  : shape=(self.kh, self.kw, self.F, self.OF)
         @return delta_times_w: shape=(H,W,F)
         """
-        dEda = dEdXout*self.h.diff(self.a) # Xout=h(a) → dE/da = dE/dXout*h'(a)
+        dEda = dEdXout*self.activation.diff(self.a) # Xout=h(a) → dE/da = dE/dXout*h'(a)
         dEdXin = np.empty_like(self.Xin)   # shape=(H+2ph,W+2pw,F)
         for c in range(self.F):
             for i in range(self.H+2*self.ph):

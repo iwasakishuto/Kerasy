@@ -194,7 +194,7 @@ f_signs            = ["+", "-", " ", ""]
 f_grouping_options = ["_", ",", ""]
 f_types            = ["b", "c", "d", "e", "E", "f", "F", "g", "G", "n", "o", "s", "x", "X", "%"]
 
-def format_spec_create(width, align=">", sign="", zero_padding=False,
+def format_spec_create(width=0, align=">", sign="", zero_padding=False,
                        grouping_option="", fmt=""):
     """
     Create a function which returns a formatted text.
@@ -221,7 +221,7 @@ def format_spec_create(width, align=">", sign="", zero_padding=False,
     handleTypeError(types=[int], width=width)
     return lambda fill : f"{fill:{align}{sign}{zero}{width}{grouping_option}{fmt}}"
 
-def print_func_create(width, align=">", sign="", zero_padding=False,
+def print_func_create(width=0, align=">", sign="", zero_padding=False,
                       grouping_option="", fmt="", color="black",
                       left_side_bar="", right_side_bar="",
                       left_margin=0, right_margin=0, end="\n"):

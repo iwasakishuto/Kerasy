@@ -7,10 +7,11 @@ from .. import activations
 from .. import initializers
 from ..engine.base_layer import Layer
 from ..utils import flush_progress_bar
+from ..utils import handle_random_state
 
 class Input(Layer):
     def __init__(self, input_shape, **kwargs):
-        self.input_shape=input_shape
+        self.input_shape=self.output_shape=input_shape
         super().__init__(**kwargs)
         self.trainable = False
 
@@ -27,11 +28,12 @@ class Flatten(Layer):
 
     def compute_output_shape(self, input_shape):
         self.input_shape = input_shape
-        self.output_shape = (np.prod(list(input_shape)),)
+        self.output_shape = (np.prod(input_shape), )
         return self.output_shape
 
     def forward(self, input):
-        return input.flatten()
+        # return input.flatten()
+        return np.ravel(input)
 
     def backprop(self, delta):
         return delta.reshape(self.input_shape)
@@ -61,17 +63,21 @@ class Dense(Layer):
     def build(self, input_shape):
         self.input_shape = input_shape
         output_shape = self.compute_output_shape(input_shape)
-        self.kernel  = self.add_weight(shape=(self.output_shape + input_shape),
-                                       name="kernel",
-                                       initializer=self.kernel_initializer,
-                                       regularizer=self.kernel_regularizer,
-                                       constraint =self.kernel_constraint)
+        self.kernel  = self.add_weight(
+            shape=(self.output_shape + input_shape),
+            name="kernel",
+            initializer=self.kernel_initializer,
+            regularizer=self.kernel_regularizer,
+            constraint =self.kernel_constraint
+        )
         if self.use_bias:
-            self.bias = self.add_weight(shape=(self.output_shape[0],1),
-                                        name="bias",
-                                        initializer=self.bias_initializer,
-                                        regularizer=self.bias_regularizer,
-                                        constraint =self.bias_constraint)
+            self.bias = self.add_weight(
+                shape=(self.output_shape[0],1),
+                name="bias",
+                initializer=self.bias_initializer,
+                regularizer=self.bias_regularizer,
+                constraint =self.bias_constraint
+            )
         else:
             self.bias = np.empty(shape=(self.output_shape[0],1))
         return output_shape
@@ -105,10 +111,11 @@ class Dense(Layer):
             self._losses['kernel'] += dEdw
 
 class Dropout(Layer):
-    def __init__(self, keep_prob, **kwargs):
+    def __init__(self, keep_prob, random_state=None, **kwargs):
         self.keep_prob = min(1., max(0., keep_prob))
         super().__init__(**kwargs)
         self.trainable = False
+        self.rnd = handle_random_state(random_state)
 
     def compute_output_shape(self, input_shape):
         self.input_shape = input_shape
@@ -116,7 +123,7 @@ class Dropout(Layer):
         return input_shape
 
     def forward(self, input):
-        self.mask = np.random.uniform(low=0., high=1., size=input.shape)<=self.keep_prob
+        self.mask = self.rnd.uniform(low=0., high=1., size=input.shape)<=self.keep_prob
         return input * self.mask
 
     def backprop(self, delta):

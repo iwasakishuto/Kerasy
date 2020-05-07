@@ -35,7 +35,9 @@ class Conv2D(Layer):
         super().__init__(**kwargs)
 
     def compute_output_shape(self, input_shape):
-        if len(input_shape) != 3: raise ValueError(f"The input shape of {self.name} must be 3-dimension (height, width, channel). However it is {len(input_shape)}-dimension.")
+        if len(input_shape) != 3:
+            raise ValueError(f"The input shape of {self.name} must be 3-dimension (height, width, channel). However it is {len(input_shape)}-dimension.")
+        self.input_shape = input_shape
         self.H, self.W, self.F = input_shape
         if self.padding=="same":
             self.OH = self.H

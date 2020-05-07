@@ -11,7 +11,7 @@ from ..layers import Dropout
 
 from .. import optimizers
 from .. import losses
-from .. import metrics
+from .. import metrics as _metrics
 from .. import activations
 
 from ..utils import make_batches
@@ -33,7 +33,7 @@ class Sequential():
             raise TypeError(f"The added layer must be an instance of class Layer. Found: {str(layer)}")
         self.layers.append(layer)
 
-    def compile(self, optimizer, loss, metric):
+    def compile(self, optimizer, loss, metrics=[]):
         """ Creates the layer weights.
         @param optimizer: (String name of optimizer) or (Optimizer instance).
         @param loss     : (String name of loss function) or (Loss instance).
@@ -41,7 +41,8 @@ class Sequential():
         """
         self.optimizer = optimizers.get(optimizer)
         self.loss = losses.get(loss)
-        self.metrics = metrics.get(metric)
+        self.metrics = [_metrics.get(metric) for metric in set(metrics+[loss])]
+        self.test_metrics = self.metrics.copy()
         self.activation = activations.get("linear")
 
         input_layer = self.layers[0]
@@ -53,16 +54,21 @@ class Sequential():
         for layer in self.layers:
             output_shape = layer.build(output_shape)
 
-        # TODO:
+        # TODO: Kerasy didn't support the computational graph, so it may occur to
+        #       disappear the gradients in the middle of the backpropagation even though
+        #       computational graph could convey them though to the end.
         if (self.loss.name == "categoricalcrossentropy") and \
             (hasattr(self.layers[-1], "activation") and self.layers[-1].activation.name=="softmax"):
             self.layers[-1].activation = activations.get("linear")
             self.loss = losses.get("softmax_categorical_crossentropy")
             self.activation = activations.get("softmax")
-            warnings.warn("\033[31mKerasy Warnings\033[0m\n" + \
+            self.test_metrics.remove(self.loss)
+            self.test_metrics.append(losses.get("categorical_crossentropy"))
+            # Warnings.
+            warnings.warn("\033[31mKerasy Warnings\033[0m\n" + '-'*60 + '\n'\
             "When calculating the \033[34mCategoricalCrossentropy\033[0m loss and the derivative " + \
             "of the \033[34mSoftmax\033[0m layer, the gradient disappears when backpropagating the actual value, " + \
-            "so the \033[34mSoftmaxCategoricalCrossentropy\033[0m is implemented instead.")
+            "so the \033[34mSoftmaxCategoricalCrossentropy\033[0m is implemented instead.\n" + '-'*60)
 
     def fit(self,
             x=None, y=None, batch_size=32, epochs=1, verbose=1, shuffle=True,
@@ -91,40 +97,53 @@ class Sequential():
         num_batchs = len(batches)
         index_array = np.arange(num_train_samples)
 
+        train_metrics = self.metrics
+        test_metrics = self.test_metrics
+        num_metrics = len(train_metrics)
+
         for epoch in range(epochs):
             if shuffle:
                 self.rnd.shuffle(index_array)
+
             monitor = ProgressMonitor(
                 max_iter=num_batchs, verbose=verbose,
                 barname=f"Epoch {epoch+1:>0{len(str(epochs))}}/{epochs} |"
             )
-            losses = 0
+            train_metrics_vals = [0.]*num_metrics
+
             for batch_index, (batch_start, batch_end) in enumerate(batches):
                 batch_ids = index_array[batch_start:batch_end]
                 for bs, (x_train, y_true) in enumerate(zip(x[batch_ids], y[batch_ids])):
                     y_pred = self.forward_train(x_train)
                     self.backprop(y_true=y_true, y_pred=y_pred)
-                    losses += self.metrics.loss(y_true=y_true, y_pred=np.argmax(y_pred))
+                    for i,metric in enumerate(train_metrics):
+                        train_metrics_vals[i]+=metric.loss(y_true=y_true, y_pred=y_pred)
+
                 self.updates(bs+1)
-                # NOTE: This metrics is specialized for MNIST sample.
-                metrics = {
-                    self.metrics.name: f"{losses/min((batch_index+1)*batch_size, num_train_samples):.1%}",
+
+                metric_contents = {
+                    metric.name : metric.format_spec(
+                        metric.aggr_method(metric_val, min((batch_index+1)*batch_size, num_train_samples))
+                    ) for metric, metric_val in zip(train_metrics, train_metrics_vals)
                 }
-                monitor.report(it=batch_index, **metrics)
+                monitor.report(it=batch_index, **metric_contents)
+
             if do_validation:
-                # NOTE: This metrics is specialized for MNIST sample.
                 y_val_pred = self.predict(x_val)
-                metrics.update({
-                    "val_" + self.metrics.name: f"{self.metrics.loss(y_true=y_val, y_pred=np.argmax(y_val_pred, axis=1)):.1%}",
+                metric_contents.update({
+                    "val_" + metric.name : metric.format_spec(
+                        metric.loss(y_true=y_val, y_pred=y_val_pred)
+                    ) for metric in test_metrics
                 })
-                monitor.report(it=batch_index, **metrics)
+                monitor.report(it=batch_index, **metric_contents)
+
             monitor.remove()
 
     def forward_train(self, input):
         out=input
         for layer in self.layers:
             out = layer.forward(out)
-        return self.activation.forward(out)
+        return out
 
     def forward_test(self, input):
         out=input

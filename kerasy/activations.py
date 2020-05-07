@@ -1,11 +1,12 @@
 # coding: utf-8
+import re
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from .utils import mk_class_get
 
 class KerasyAbstActivation(metaclass=ABCMeta):
     def __init__(self):
-        self.name = self.__class__.__name__.lower()
+        self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
 
     def __repr__(self):
         return f"{super().__repr__()}\n{self.__doc__}"
@@ -58,10 +59,10 @@ class Tanh(KerasyAbstActivation):
 class Relu(KerasyAbstActivation):
     def forward(self, input):
         self.mask = input>0
-        return np.where(self.mask, input, 0)
+        return np.where(self.mask, input, 0.)
 
     def diff(self, delta):
-        return np.where(self.mask, 1, 0)
+        return np.where(self.mask, 1., 0.)
 
 class Sigmoid(KerasyAbstActivation):
     def __init__(self):

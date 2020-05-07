@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+import re
 import numpy as np
 from collections import deque, defaultdict
 from abc import ABCMeta, abstractmethod
@@ -27,7 +28,7 @@ class KerasyAbstOptimizer(metaclass=ABCMeta):
     @param clipvalue: (float >= 0) Gradients will be clipped when their absolute value exceeds this value.
     """
     def __init__(self, **kwargs):
-        self.name = self.__class__.__name__.lower()
+        self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
         allowed_kwargs = {"clipnorm", "clipvalue"}
         for k in kwargs:
             if k not in allowed_kwargs:

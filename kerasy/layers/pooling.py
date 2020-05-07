@@ -22,13 +22,14 @@ class MaxPooling2D(Layer):
     c 0 0 0   \
     """
     def __init__(self, pool_size=(2, 2), **kwargs):
-        self.input = None
+        self.mask = None
         self.pool_size = pool_size
         super().__init__(**kwargs)
         self.trainable = False
 
     def compute_output_shape(self, input_shape):
         self.H, self.W, self.F = input_shape
+        self.input_shape = input_shape
         ph,pw = self.pool_size
         self.OH = self.H//ph
         self.OW = self.W//pw
@@ -36,27 +37,29 @@ class MaxPooling2D(Layer):
         self.output_shape = (self.OH, self.OW, self.OF)
         return self.output_shape
 
-    def _generator(self, Xin):
+    def _generator(self, image):
         """ Generator for training. """
         ph,pw = self.pool_size
         for i in range(self.H//ph):
             for j in range(self.W//pw):
-                clipedXin = Xin[i*ph:(i+1)*ph,j*pw:(j+1)*pw]
-                yield clipedXin,i,j
+                clipped_img = image[i*ph:(i+1)*ph, j*pw:(j+1)*pw]
+                yield clipped_img, i, j
 
     def forward(self, input):
-        self.input = input # Memorize the input array. (not shape)
         ph,pw = self.pool_size
-        out = np.zeros((self.H//ph, self.W//pw, self.F)) # output image shape.
-        for crip_image, i, j in self._generator(input):
-            out[i][j] = np.amax(crip_image, axis=(0, 1))
+        out = np.zeros(self.output_shape) # output image shape.
+        mask = np.zeros(self.input_shape)
+        for clipped_input, i, j in self._generator(input):
+            max_vals = np.amax(clipped_input, axis=(0, 1)) # shape=(F,)
+            out[i,j,:] = max_vals
+            mask[i*ph:(i+1)*ph, j*pw:(j+1)*pw, :] = clipped_input==max_vals
+        self.mask = mask
         return out
 
-    def backprop(self, Pre_delta, lr=1e-3):
+    def backprop(self, pooled_delta, lr=1e-3):
         """ Loss only flows to the pixel that takes the maximum value in pooling block. """
-        Next_delta = np.zeros(self.input.shape)
+        delta = np.zeros(self.input_shape)
         ph,pw = self.pool_size
-        for crip_image, i, j in self._generator(self.input):
-            Next_delta[i*ph:(i+1)*ph,j*pw:(j+1)*pw] = np.where(crip_image==np.max(crip_image), np.max(crip_image), 0)
-
-        return Next_delta
+        for mask, i, j in self._generator(self.mask):
+            delta[i*ph:(i+1)*ph, j*pw:(j+1)*pw, :] = np.where(mask, pooled_delta[i,j,:], 0.)
+        return delta

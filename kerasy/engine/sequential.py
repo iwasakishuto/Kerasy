@@ -5,8 +5,8 @@ from __future__ import absolute_import
 import numpy as np
 import warnings
 
-from ..layers import Input
 from .base_layer import Layer
+from ..layers import Input
 from ..layers import Dropout
 
 from .. import optimizers
@@ -42,7 +42,6 @@ class Sequential():
         self.optimizer = optimizers.get(optimizer)
         self.loss = losses.get(loss)
         self.metrics = [_metrics.get(metric) for metric in set(metrics+[loss])]
-        self.test_metrics = self.metrics.copy()
         self.activation = activations.get("linear")
 
         input_layer = self.layers[0]
@@ -57,13 +56,12 @@ class Sequential():
         # TODO: Kerasy didn't support the computational graph, so it may occur to
         #       disappear the gradients in the middle of the backpropagation even though
         #       computational graph could convey them though to the end.
-        if (self.loss.name == "categoricalcrossentropy") and \
-            (hasattr(self.layers[-1], "activation") and self.layers[-1].activation.name=="softmax"):
-            self.layers[-1].activation = activations.get("linear")
-            self.loss = losses.get("softmax_categorical_crossentropy")
-            self.activation = activations.get("softmax")
-            self.test_metrics.remove(self.loss)
-            self.test_metrics.append(losses.get("categorical_crossentropy"))
+        if (self.loss.name == "categorical_crossentropy") and (
+                hasattr(self.layers[-1], "activation") and \
+                self.layers[-1].activation.name=="softmax"):
+            self.layers[-1].activation = activations.get("linear")     # softmax -> linear
+            self.loss = losses.get("softmax_categorical_crossentropy") # categorical crossentropy -> softmax categorical crossentropy
+            self.activation = activations.get("softmax")               # linear -> softmax
             # Warnings.
             warnings.warn("\033[31mKerasy Warnings\033[0m\n" + '-'*60 + '\n'\
             "When calculating the \033[34mCategoricalCrossentropy\033[0m loss and the derivative " + \
@@ -97,9 +95,8 @@ class Sequential():
         num_batchs = len(batches)
         index_array = np.arange(num_train_samples)
 
-        train_metrics = self.metrics
-        test_metrics = self.test_metrics
-        num_metrics = len(train_metrics)
+        metrics = self.metrics
+        num_metrics = len(metrics)
 
         for epoch in range(epochs):
             if shuffle:
@@ -109,22 +106,22 @@ class Sequential():
                 max_iter=num_batchs, verbose=verbose,
                 barname=f"Epoch {epoch+1:>0{len(str(epochs))}}/{epochs} |"
             )
-            train_metrics_vals = [0.]*num_metrics
+            metrics_vals = [0.]*num_metrics
 
             for batch_index, (batch_start, batch_end) in enumerate(batches):
+                num_curl_samples = min((batch_index+1)*batch_size, num_train_samples)
                 batch_ids = index_array[batch_start:batch_end]
                 for bs, (x_train, y_true) in enumerate(zip(x[batch_ids], y[batch_ids])):
                     y_pred = self.forward_train(x_train)
                     self.backprop(y_true=y_true, y_pred=y_pred)
-                    for i,metric in enumerate(train_metrics):
-                        train_metrics_vals[i]+=metric.loss(y_true=y_true, y_pred=y_pred)
+                    for i,metric in enumerate(metrics):
+                        metrics_vals[i]+=metric.loss(y_true=y_true, y_pred=y_pred)
 
                 self.updates(bs+1)
-
                 metric_contents = {
                     metric.name : metric.format_spec(
-                        metric.aggr_method(metric_val, min((batch_index+1)*batch_size, num_train_samples))
-                    ) for metric, metric_val in zip(train_metrics, train_metrics_vals)
+                        metric.aggr_method(metric_val, num_curl_samples)
+                    ) for metric, metric_val in zip(metrics, metrics_vals)
                 }
                 monitor.report(it=batch_index, **metric_contents)
 
@@ -133,7 +130,7 @@ class Sequential():
                 metric_contents.update({
                     "val_" + metric.name : metric.format_spec(
                         metric.loss(y_true=y_val, y_pred=y_val_pred)
-                    ) for metric in test_metrics
+                    ) for metric in metrics
                 })
                 monitor.report(it=batch_index, **metric_contents)
 
@@ -143,7 +140,7 @@ class Sequential():
         out=input
         for layer in self.layers:
             out = layer.forward(out)
-        return out
+        return self.activation.forward(out)
 
     def forward_test(self, input):
         out=input

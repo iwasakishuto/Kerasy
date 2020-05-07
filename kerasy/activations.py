@@ -8,9 +8,6 @@ class KerasyAbstActivation(metaclass=ABCMeta):
     def __init__(self):
         self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
 
-    def __repr__(self):
-        return f"{super().__repr__()}\n{self.__doc__}"
-
     @abstractmethod
     def forward(self, input):
         pass

@@ -8,7 +8,7 @@ from .utils import format_spec_create
 from .losses import KerasyAbstLoss, KerasyLossClasses
 
 class KerasyAbstMetrics(metaclass=ABCMeta):
-    def __init__(self, aggr_type="sum", fmt="3f", **format_codes):
+    def __init__(self, aggr_type="sum", fmt=".3f", **format_codes):
         self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
         # Aggregation method for training.
         self.aggr_method = {
@@ -16,9 +16,6 @@ class KerasyAbstMetrics(metaclass=ABCMeta):
             "ave" : lambda sum,n : sum/n
         }.get(aggr_type, lambda sum,n : sum)
         self.format_spec = format_spec_create(fmt=fmt, **format_codes)
-
-    def __repr__(self):
-        return f"{super().__repr__()}\n{self.__doc__}"
 
     @abstractmethod
     def loss(self, y_true, y_pred):

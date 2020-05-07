@@ -7,6 +7,8 @@ from .. import activations
 from .. import initializers
 from ..engine.base_layer import Layer
 
+from ..utils import handleKeyError
+
 class Conv2D(Layer):
     def __init__(self, filters, kernel_size=(3,3), strides=(1,1), padding='valid', activation='relu',
                  kernel_initializer='random_normal', bias_initializer='zeros', data_format='channels_last', **kwargs):
@@ -85,15 +87,19 @@ class Conv2D(Layer):
         elif self.padding == "valid":
             Xin = input[:self.sh*self.OH+self.kh-1, :self.sw*self.OW+self.kw-1, :]
         else:
-            TypeError(f"Can't understand 'padding=f{self.padding}'")
+            handleKeyError(lst=["same", "valid"], **{"self.padding": self.padding})
         self.Xin = Xin # Memorize
         return Xin
+
+    def _pad_same(self, input):
+        Xin = np.zeros(shape=(self.H+2*self.ph,self.W+2*self.pw,self.F))
+        Xin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
 
     # old version: https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
     def forward(self, input):
         """ @param input: (ndarray) 3-D array. shape=(H,W,F) """
         Xin = self._paddInput(input)
-        a   = np.empty(shape=(self.OH, self.OW, self.OF))
+        a   = np.empty(shape=self.output_shape)
         for i in range(self.OH//self.sh):
             for j in range(self.OW//self.sw):
                 a[i,j,:] = np.sum(Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]*self.kernel, axis=(0,1,2))
@@ -122,12 +128,13 @@ class Conv2D(Layer):
         return dEdXin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:]
 
     def memorize_delta(self, dEda):
+        Xin = self.Xin
         dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)
         for m in range(self.kh):
             for n in range(self.kw):
                 for c in range(self.F):
                     for c_ in range(self.OF):
                         # dEdw_{m,n,c,c'} = ΣiΣj(dEda * dadw) = ΣiΣj(dEda_{i,j,c'}*Xin_{i+m,j+n,c})
-                        dEdw[m,n,c,c_] = np.sum(dEda[:,:,c_] * self.Xin[m:m+self.OH:self.sh, n:n+self.OW:self.sw, c])
+                        dEdw[m,n,c,c_] = np.sum(dEda[:,:,c_] * Xin[m:m+self.OH:self.sh, n:n+self.OW:self.sw, c])
         self._losses['kernel'] += dEdw
         self._losses['bias'] += np.sum(dEda, axis=(0,1))

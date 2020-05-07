@@ -39,9 +39,6 @@ class KerasyAbstOptimizer(metaclass=ABCMeta):
         self.weights = []
         self.optparams = defaultdict(lambda: defaultdict(list))
 
-    def __repr__(self):
-        return f"{super().__repr__()}\n{self.__doc__}"
-
     @abstractmethod
     def get_updates(self, grad, curt_param, name):
         """ This is the parent class of all optimizer, not an actual optimizer. """

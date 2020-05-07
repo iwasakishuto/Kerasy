@@ -87,7 +87,7 @@ class ProgressMonitor():
     def _report_progress_bar_and_metrics(self, it, **metrics):
         it += 1
         metric = ", ".join([
-            f"{priColor.color(k, color='GREEN')}: {priColor.color(v, color='BLUE')}" \
+            f"{priColor.color(k, color='ACCENT')}: {priColor.color(v, color='BLUE')}" \
             for  k,v in metrics.items()
         ])
         sys.stdout.write(

@@ -6,7 +6,7 @@ from .utils import mk_class_get
 from .utils import format_spec_create
 
 class KerasyAbstLoss(metaclass=ABCMeta):
-    def __init__(self, aggr_type="sum", fmt="3f", **format_codes):
+    def __init__(self, aggr_type="sum", fmt=".3f", **format_codes):
         self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
         # Aggregation method for training.
         self.aggr_method = {
@@ -14,9 +14,6 @@ class KerasyAbstLoss(metaclass=ABCMeta):
             "ave" : lambda sum,n : sum/n
         }.get(aggr_type, lambda sum,n : sum)
         self.format_spec = format_spec_create(fmt=fmt, **format_codes)
-
-    def __repr__(self):
-        return f"{super().__repr__()}\n{self.__doc__}"
 
     @abstractmethod
     def loss(self, y_true, y_pred):
@@ -49,13 +46,22 @@ class CategoricalCrossentropy(KerasyAbstLoss):
 
 class SoftmaxCategoricalCrossentropy(KerasyAbstLoss):
     def loss(self, y_true, y_pred):
-        # Softmax Layer
-        exps = np.exp(y_pred - np.max(y_pred))
-        y_pred = exps/np.sum(exps)
+        # # Softmax Layer (model.activation)
+        # exps = np.exp(y_pred - np.max(y_pred))
+        # y_pred = exps/np.sum(exps)
+
         # Categorical CrossEntropy
         small_val = 1e-7 # Avoiding np.log(y_pred)=inf if y_pred==0
         return -np.sum(y_true * np.log(y_pred+small_val))
     def diff(self, y_true, y_pred):
+        """
+        Ref: https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/Softmax-with-Loss.png
+               a -> Softmax -> y_pred \
+        y_pred - y_true                | CrossEntropy -> loss
+               ^               y_true /                    |
+               |                                           |
+               \-------------------------------------------/
+        """
         return y_pred - y_true
 
 KerasyLossClasses = {

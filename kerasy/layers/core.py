@@ -6,8 +6,10 @@ import numpy as np
 from .. import activations
 from .. import initializers
 from ..engine.base_layer import Layer
+
 from ..utils import flush_progress_bar
 from ..utils import handle_random_state
+from ..utils import set_weight
 
 class Input(Layer):
     def __init__(self, input_shape, **kwargs):
@@ -70,22 +72,23 @@ class Dense(Layer):
             regularizer=self.kernel_regularizer,
             constraint =self.kernel_constraint
         )
-        if self.use_bias:
-            self.bias = self.add_weight(
-                shape=(self.output_shape[0],1),
-                name="bias",
-                initializer=self.bias_initializer,
-                regularizer=self.bias_regularizer,
-                constraint =self.bias_constraint
-            )
-        else:
-            self.bias = np.empty(shape=(self.output_shape[0],1))
+        self.bias = self.add_weight(
+            shape=(self.output_shape[0],1),
+            name="bias",
+            initializer=self.bias_initializer,
+            regularizer=self.bias_regularizer,
+            constraint =self.bias_constraint
+        )
         return output_shape
 
     def forward(self, input):
         """ @param input: shape=(Din,) """
-        Xin  = np.append(input,1) if self.use_bias else input # shape=(Din+1,)
-        a    = np.c_[self.kernel, self.bias].dot(Xin) # (Dout,Din+1) @ (Din+1,) = (Dout,)
+        if self.use_bias:
+            Xin = np.append(input,1) # shape=(Din+1,)
+            a = np.c_[self.kernel, self.bias].dot(Xin) # (Dout,Din+1) @ (Din+1,) = (Dout,)
+        else:
+            Xin = input # shape=(Din,)
+            a = self.kernel.dot(Xin) # (Dout,Din) @ (Din,) = (Dout,)
         Xout = self.activation.forward(input=a) # shape=(Dout,)
         self.a = a
         self.Xin = Xin # shape=(Din+1,) or shape=(Din,)
@@ -96,11 +99,15 @@ class Dense(Layer):
         # dXoutda = self.activation.diff(self.a) # shape=(Dout,)
         # dEda = dEdXout.dot(dXoutda) if dXoutda.ndim==2 else dEdXout * dXoutda # shape=(Dout,)
         dEda = self.activation.diff(self.a) * dEdXout
-        dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
         if self.trainable:
             self.memorize_delta(dEda)
-        dEdXin = dEdXin[:-1] if self.use_bias else dEdXin
-        return dEdXin # shape=(Din,) delta of bias is not propagated.
+
+        if self.use_bias:
+            dEdXin = np.c_[self.kernel, self.bias].T.dot(dEda) # (Din+1,Dout) @ (Dout,) = (Din+1,)
+            dEdXin = dEdXin[:-1] # delta of bias is not propagated.
+        else:
+            dEdXin = self.kernel.T.dot(dEda)
+        return dEdXin # shape=(Din,)
 
     def memorize_delta(self, dEda):
         dEdw = np.outer(dEda, self.Xin)
@@ -109,6 +116,19 @@ class Dense(Layer):
             self._losses['bias'] += dEdw[:,-1:] # shape=(Dout, 1)
         else:
             self._losses['kernel'] += dEdw
+
+    def get_weights(self):
+        return [self.kernel, self.bias]
+
+    def set_weights(self, weights):
+        if len(weights)==1:
+            kernel = weights[0]
+        elif len(weights)==2:
+            kernel, bias = weights
+            set_weight(self.bias, bias)
+        else:
+            raise ValueError(f"Dense has 2 weights, but len(weights)={len(weights)}")
+        set_weight(self.kernel, kernel)
 
 class Dropout(Layer):
     def __init__(self, keep_prob, random_state=None, **kwargs):

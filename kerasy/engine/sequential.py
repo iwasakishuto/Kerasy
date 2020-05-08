@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
+# coding: utf-8
+import pickle
 import numpy as np
 import warnings
 
@@ -167,6 +165,26 @@ class Sequential():
 
     def summary(self):
         print_summary(self)
+
+    @property
+    def weights(self):
+        return self.get_weights()
+
+    def get_weights(self):
+        return [layer.get_weights() for layer in self.layers]
+
+    def set_weights(self, weights):
+        for layer,weight in zip(self.layers, weights):
+            layer.set_weights(weight)
+
+    def save_weights(self, path):
+        with open(path, 'wb') as f:
+            pickle.dump(self.weights, f)
+
+    def load_weights(self, path):
+        with open(path, 'rb') as f:
+            weights = pickle.load(f)
+        self.set_weights(weights)
 
     def is_trainable(self):
         layers = self.layers

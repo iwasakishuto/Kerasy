@@ -62,3 +62,13 @@ class Layer():
 
             # self._updates[name] = np.r_[self._updates[name], np.expand_dims(new_weight, axis=0)]
             self._losses[name]  = np.zeros_like(new_weight)
+
+    def get_weights(self):
+        return []
+
+    def set_weights(self, weights):
+        pass
+
+    @property
+    def weights(self):
+        return self.get_weights()

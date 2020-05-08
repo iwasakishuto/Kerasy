@@ -2,6 +2,11 @@
 import numpy as np
 from .generic_utils import handleKeyError, handleTypeError
 
+def set_weight(ver, val):
+    if ver.shape != val.shape:
+        raise TyoeError(f"weight shape must be the same. ({ver.shape} != {val.shape})")
+    ver = val
+
 def mk_class_get(all_classes={}, kerasy_abst_class=[], genre=""):
     def get(identifier):
         f"""

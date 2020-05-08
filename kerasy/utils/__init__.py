@@ -26,6 +26,7 @@ from .bio_utils import printAlignment
 from .bio_utils import read_fastseq
 from .bio_utils import kmer_create
 
+from .deep_utils import set_weight
 from .deep_utils import mk_class_get
 from .deep_utils import get_params_size
 from .deep_utils import print_summary

@@ -8,6 +8,8 @@ from .. import initializers
 from ..engine.base_layer import Layer
 
 from ..utils import handleKeyError
+from ..utils import set_weight
+from ..clib import c_deep
 
 class Conv2D(Layer):
     def __init__(self, filters, kernel_size=(3,3), strides=(1,1), padding='valid', activation='relu',
@@ -21,10 +23,10 @@ class Conv2D(Layer):
         @param kernel_initializer: (str) Initializer for the `kernel` weights matrix.
         @param bias_initializer  : (str) Initializer for the bias vector.
         """
+        handleKeyError(lst=["same", "valid"], padding=padding)
         self.OF = filters # Output filters.
         self.kh, self.kw = kernel_size # kernel size.
         self.sh, self.sw = strides
-        if padding not in ["same", "valid"]: raise ValueError("padding must be 'same' or 'valid'. Please chose one of them.")
         self.padding = padding
         self.activation = activations.get(activation)
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -36,22 +38,43 @@ class Conv2D(Layer):
         self.use_bias = True
         super().__init__(**kwargs)
 
+    @property
+    def input_shape(self):
+        return (self.H, self.W, self.F)
+    @property
+    def output_shape(self):
+        return (self.OH, self.OW, self.OF)
+
+    @property
+    def kernel_size(self):
+        return (self.kh, self.kw)
+
+    @property
+    def strides(self):
+        return (self.sh, self.sw)
+
+    @property
+    def padding_size(self):
+        return (self.ph, self.pw)
+
     def compute_output_shape(self, input_shape):
         if len(input_shape) != 3:
             raise ValueError(f"The input shape of {self.name} must be 3-dimension (height, width, channel). However it is {len(input_shape)}-dimension.")
-        self.input_shape = input_shape
         self.H, self.W, self.F = input_shape
         if self.padding=="same":
             self.OH = self.H
             self.OW = self.W
             self.ph = ((self.sh-1)*self.H+self.kh-self.sh)//2
             self.pw = ((self.sw-1)*self.W+self.kw-self.sw)//2
+            self.padded_input_shape = (self.H+2*self.ph, self.W+2*self.pw, self.F)
+            self.padding_input = self._padding_input_same_with_zero
         elif self.padding=="valid":
             self.OH = (self.H-self.kh)//self.sh+1
             self.OW = (self.W-self.kw)//self.sw+1
             self.ph = 0
             self.pw = 0
-        self.output_shape = (self.OH, self.OW, self.OF)
+            self.padded_input_shape = (self.sh*self.OH+self.kh-1, self.sw*self.OW+self.kw-1, self.F)
+            self.padding_input = self._padding_input_valid
         return self.output_shape
 
     def build(self, input_shape):
@@ -65,76 +88,66 @@ class Conv2D(Layer):
             constraint =self.kernel_constraint,
             trainable  =self.trainable
         )
-        if self.use_bias:
-            self.bias = self.add_weight(
-                shape=(self.OF,),
-                name="bias",
-                initializer=self.bias_initializer,
-                regularizer=self.bias_regularizer,
-                constraint =self.bias_constraint,
-                trainable  =self.trainable
-            )
-        else:
-            self.bias = None
+        self.bias = self.add_weight(
+            shape=(self.OF,),
+            name="bias",
+            initializer=self.bias_initializer,
+            regularizer=self.bias_regularizer,
+            constraint =self.bias_constraint,
+            trainable  =self.trainable
+        )
         return output_shape
 
-    def _paddInput(self, input):
-        """ @param input: (ndarray) must be a 3-D array. shape=(H,W,F) """
-        #=== padding ===
-        if self.padding =="same":
-            Xin = np.zeros(shape=(self.H+2*self.ph,self.W+2*self.pw,self.F))
-            Xin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
-        elif self.padding == "valid":
-            Xin = input[:self.sh*self.OH+self.kh-1, :self.sw*self.OW+self.kw-1, :]
-        else:
-            handleKeyError(lst=["same", "valid"], **{"self.padding": self.padding})
-        self.Xin = Xin # Memorize
+    def _padding_input_same_with_zero(self, input):
+        Xin = np.zeros(shape=self.padded_input_shape)
+        Xin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
         return Xin
 
-    def _pad_same(self, input):
-        Xin = np.zeros(shape=(self.H+2*self.ph,self.W+2*self.pw,self.F))
-        Xin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:] = input
+    def _padding_input_valid(self, input):
+        Xin = input[:self.sh*self.OH+self.kh-1, :self.sw*self.OW+self.kw-1, :]
+        return Xin
 
-    # old version: https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
     def forward(self, input):
         """ @param input: (ndarray) 3-D array. shape=(H,W,F) """
-        Xin = self._paddInput(input)
+        self.Xin = self.padding_input(input)
         a   = np.empty(shape=self.output_shape)
-        for i in range(self.OH//self.sh):
-            for j in range(self.OW//self.sw):
-                a[i,j,:] = np.sum(Xin[self.sh*i:(self.sh*i+self.kh), self.sw*j:(self.sw*j+self.kw), :, None]*self.kernel, axis=(0,1,2))
-        a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
-        self.a = a     # Memorize. (output layer. shape=(OH,OW,OF))
+        c_deep.Conv2D_forward(
+            a, self.Xin, self.kernel,
+            self.OH, self.OW,
+            *self.strides, *self.kernel_size,
+        )
+        if self.use_bias:
+            a += self.bias # (OH,OW,OF) + (OF,) = (OH,OW,OF)
+        self.a = a
         Xout = self.activation.forward(a)
         return Xout
 
-    def _backprop_mask(self,i,j,m,n):
-        return ((i%self.sh+m < self.kh) and (j%self.sw+n < self.kw)) and ((self.OH > (i-m)//self.sh >= 0) and (self.OW > (j-n)//self.sw >= 0))
-
-    def backprop(self, dEdXout, lr=1e-3):
-        """
-        @param  delta_times_w: shape=(OH,OW,OF)
-        @param  self.kernel  : shape=(self.kh, self.kw, self.F, self.OF)
-        @return delta_times_w: shape=(H,W,F)
-        """
+    def backprop(self, dEdXout):
         dEda = dEdXout*self.activation.diff(self.a) # Xout=h(a) → dE/da = dE/dXout*h'(a)
-        dEdXin = np.empty_like(self.Xin)   # shape=(H+2ph,W+2pw,F)
-        for c in range(self.F):
-            for i in range(self.H+2*self.ph):
-                for j in range(self.W+2*self.pw):
-                    dEdXin[i,j,c] = np.mean([ dEda[(i-m)//self.sh,(j-n)//self.sw,:] * self.kernel[i%self.sh+m,j%self.sw+n,c,:] for m in range(0,self.kh,self.sh) for n in range(0,self.kw,self.sw) if self._backprop_mask(i,j,m,n)])
+        dEdXin = np.empty(shape=self.padded_input_shape)   # shape=(H+2ph,W+2pw,F)
+        dEdw = np.empty_like(self.kernel) # shape=(kh, kw, F, OF)
+        c_deep.Conv2D_backprop(
+            dEda, dEdXin, dEdw, self.Xin, self.kernel,
+            *self.padded_input_shape, *self.output_shape, *self.strides, *self.kernel_size,
+            trainable=self.trainable
+        )
         if self.trainable:
-            self.memorize_delta(dEda)
+            self._losses['kernel'] += dEdw
+            self._losses['bias'] += np.sum(dEda, axis=(0,1))
         return dEdXin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:]
 
-    def memorize_delta(self, dEda):
-        Xin = self.Xin
-        dEdw = np.zeros(shape=self.kernel.shape) # shape=(kh, kw, F, OF)
-        for m in range(self.kh):
-            for n in range(self.kw):
-                for c in range(self.F):
-                    for c_ in range(self.OF):
-                        # dEdw_{m,n,c,c'} = ΣiΣj(dEda * dadw) = ΣiΣj(dEda_{i,j,c'}*Xin_{i+m,j+n,c})
-                        dEdw[m,n,c,c_] = np.sum(dEda[:,:,c_] * Xin[m:m+self.OH:self.sh, n:n+self.OW:self.sw, c])
-        self._losses['kernel'] += dEdw
-        self._losses['bias'] += np.sum(dEda, axis=(0,1))
+    def get_weights(self):
+        return [self.kernel, self.bias]
+
+    def set_weights(self, weights):
+        if len(weights)==1:
+            kernel = weights[0]
+        elif len(weights)==2:
+            kernel, bias = weights
+            set_weight(self.bias, bias)
+        else:
+            raise ValueError(f"Conv2D has 2 weights, but len(weights)={len(weights)}")
+        set_weight(self.kernel, kernel)
+
+    # old version 1 : https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
+    # old version 2 : https://github.com/iwasakishuto/Kerasy/blob/ff8aab0d3f32a5d5cfb28f38deecfc8c561184b3/kerasy/layers/convolutional.py#L99 

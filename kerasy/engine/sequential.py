@@ -162,6 +162,7 @@ class Sequential():
     def updates(self, batch_size):
         for layer in reversed(self.layers):
             layer.update(self.optimizer, batch_size)
+        self.optimizer.iterations += 1
 
     def summary(self):
         print_summary(self)

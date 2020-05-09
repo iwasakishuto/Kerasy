@@ -33,12 +33,13 @@ h3:before{
 .topRibbon h3:before {
     content: "";
 }
-h4.pro_args:before {
+h4.pro_args:after {
     color: #800000;
     content: "\f103";
     font-family: FontAwesome;
+    padding-left: 1px;
 }
-h4:not(.pro_args) {
+h4 {
     padding: 0.25em 0.5em;
     border-left: solid 4px #800000;
 }

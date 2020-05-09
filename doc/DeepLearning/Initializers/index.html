@@ -313,7 +313,7 @@
     <div class="small-12 columns">
         <ul class="inline-list">
             <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-28(水)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href=""></a></span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/initializers.py">initializers.py</a></span></li>
             <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/deeplearning.html">DeepLearning</a></span></li> -->
         </ul>
     </div>
@@ -322,91 +322,26 @@
             <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<table>
-<thead><tr>
-<th style="text-align:center">#</th>
-<th style="text-align:left">手法</th>
-<th style="text-align:left">Kerasy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">1</td>
-<td style="text-align:left"><a href="#Zeros">Zeros</a></td>
-<td style="text-align:left"><code>kerasy.initializers.Zeros()</code></td>
-</tr>
-<tr>
-<td style="text-align:center">2</td>
-<td style="text-align:left"><a href="#Ones">Ones</a></td>
-<td style="text-align:left"><code>kerasy.initializers.Ones()</code></td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td style="text-align:left"><a href="#Constant">Constant</a></td>
-<td style="text-align:left"><code>kerasy.initializers.Constant(value=0)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">4</td>
-<td style="text-align:left"><a href="#Random-Normal">RandomNormal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td style="text-align:left"><a href="#Random-Uniform">RandomUniform</a></td>
-<td style="text-align:left"><code>kerasy.initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td style="text-align:left"><a href="#Truncated-Normal">TruncatedNormal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.TruncatedNormal(mean=0.0, stddev=0.05, seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">7</td>
-<td style="text-align:left"><a href="#Variance-Scaling">VarianceScaling</a></td>
-<td style="text-align:left"><code>kerasy.initializers.VarianceScaling(scale=1.0, mode='fan_in', distribution='normal', seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">8</td>
-<td style="text-align:left"><a href="#Orthogonal">Orthogonal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.Orthogonal(gain=1.0, seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">9</td>
-<td style="text-align:left"><a href="#Identity">Identity</a></td>
-<td style="text-align:left"><code>kerasy.initializers.Identity(gain=1.0)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">10</td>
-<td style="text-align:left"><a href="#Glorot-Normal">GlorotNormal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.glorot_normal(seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">11</td>
-<td style="text-align:left"><a href="#Glorot-Uniform">GlorotUniform</a></td>
-<td style="text-align:left"><code>kerasy.initializers.glorot_uniform(seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">12</td>
-<td style="text-align:left"><a href="#He-Normal">HeNormal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.he_normal(seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">13</td>
-<td style="text-align:left"><a href="#LeCun-Normal">LeCunNormal</a></td>
-<td style="text-align:left"><code>kerasy.initializers.lecun_normal(seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">14</td>
-<td style="text-align:left"><a href="#He-Uniform">HeUniform</a></td>
-<td style="text-align:left"><code>kerasy.initializers.he_uniform(seed=None)</code></td>
-</tr>
-<tr>
-<td style="text-align:center">15</td>
-<td style="text-align:left"><a href="#LeCun-Uniform">LeCunUniform</a></td>
-<td style="text-align:left"><code>kerasy.initializers.lecun_uniform(seed=None)</code></td>
-</tr>
-</tbody>
-</table>
+<div class="admonition summary">
+<p class="admonition-title" style="font-size: 125%;">Available initializers</p>
+<ul>
+<li><a href="#Zeros">Zeros</a></li>
+<li><a href="#Ones">Ones</a></li>
+<li><a href="#Constant">Constant</a></li>
+<li><a href="#Random-Normal">RandomNormal</a></li>
+<li><a href="#Random-Uniform">RandomUniform</a></li>
+<li><a href="#Truncated-Normal">TruncatedNormal</a></li>
+<li><a href="#Variance-Scaling">VarianceScaling</a></li>
+<li><a href="#Orthogonal">Orthogonal</a></li>
+<li><a href="#Identity">Identity</a></li>
+<li><a href="#Glorot-Normal">GlorotNormal</a></li>
+<li><a href="#Glorot-Uniform">GlorotUniform</a></li>
+<li><a href="#He-Normal">HeNormal</a></li>
+<li><a href="#LeCun-Normal">LeCunNormal</a></li>
+<li><a href="#He-Uniform">HeUniform</a></li>
+<li><a href="#LeCunUniform">LeCunUniform</a></li>
+</ul>
+</div>
 </div>
 </div>
 </div>
@@ -422,10 +357,11 @@
 <div class="prompt input_prompt">In [18]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">galleryplot</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">visualizeInitialKernel</span><span class="p">,</span>
-                        <span class="n">argnames</span><span class="o">=</span><span class="s2">"kernel_name"</span><span class="p">,</span>
-                        <span class="n">iterator</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">InitializeHandler</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-                        <span class="n">sharex</span><span class="o">=</span><span class="s2">"all"</span><span class="p">,</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">galleryplot</span><span class="p">(</span>
+    <span class="n">func</span><span class="o">=</span><span class="n">visualizeInitialKernel</span><span class="p">,</span>
+    <span class="n">argnames</span><span class="o">=</span><span class="s2">"kernel_name"</span><span class="p">,</span>
+    <span class="n">iterator</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">KerasyInitializerFunctions</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+    <span class="n">sharex</span><span class="o">=</span><span class="s2">"all"</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1287,23 +1223,16 @@ $$\mathrm{Uni}\left[-\frac{\sqrt{6}}{\sqrt{n_{\text{in}}}}, \frac{\sqrt{6}}{\sqr
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [5]:</div>
+<div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [6]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">kerasy.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+
+<span class="kn">from</span> <span class="nn">kerasy.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
 <span class="kn">from</span> <span class="nn">kerasy.layers</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">kerasy.utils</span> <span class="kn">import</span> <span class="n">galleryplot</span>
+<span class="kn">from</span> <span class="nn">kerasy.initializers</span> <span class="kn">import</span> <span class="n">KerasyInitializerFunctions</span>
 </pre></div>
 </div>
 </div>
@@ -1311,33 +1240,25 @@ $$\mathrm{Uni}\left[-\frac{\sqrt{6}}{\sqrt{n_{\text{in}}}}, \frac{\sqrt{6}}{\sqr
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [7]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">kerasy.utils</span> <span class="kn">import</span> <span class="n">galleryplot</span>
-<span class="kn">from</span> <span class="nn">kerasy.initializers</span> <span class="kn">import</span> <span class="n">InitializeHandler</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [22]:</div>
+<div class="prompt input_prompt">In [2]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">visualizeInitialKernel</span><span class="p">(</span><span class="n">kernel_name</span><span class="p">,</span> <span class="n">input_units</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
     <span class="c1"># Create the model.</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
     <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">input_units</span><span class="p">,)))</span>
     <span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">input_units</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="n">kernel_name</span><span class="p">))</span>
     <span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">'sgd'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s2">"mean_squared_error"</span><span class="p">)</span>
+
     <span class="c1"># Get the layer's kernel(weights).</span>
     <span class="n">freq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">kernel</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">"#722f37"</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">kernel_name</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">ax</span>
 </pre></div>
 </div>
@@ -1346,7 +1267,7 @@ $$\mathrm{Uni}\left[-\frac{\sqrt{6}}{\sqrt{n_{\text{in}}}}, \frac{\sqrt{6}}{\sqr
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [25]:</div>
+<div class="prompt input_prompt">In [3]:</div>
 <div class="inner_cell">
 <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">plotMonoInitializer</span><span class="p">(</span><span class="n">kernel_name</span><span class="p">,</span> <span class="n">input_units</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=-</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
@@ -1356,13 +1277,6 @@ $$\mathrm{Uni}\left[-\frac{\sqrt{6}}{\sqrt{n_{\text{in}}}}, \frac{\sqrt{6}}{\sqr
     <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<hr />
 </div>
 </div>
 </div>

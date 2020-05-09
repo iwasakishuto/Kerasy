@@ -13,6 +13,8 @@ from ..utils import set_weight
 
 class Input(Layer):
     def __init__(self, input_shape, **kwargs):
+        if isinstance(input_shape, int):
+            input_shape = (input_shape,)
         self.input_shape=self.output_shape=input_shape
         super().__init__(**kwargs)
         self.trainable = False

@@ -96,11 +96,15 @@ pre, code, .rst-content tt, kbd, samp {
   color: #333333
 }
 
+/* Added by Shuto Iwasaki. */
+/* Github Style. */
 pre {
+    padding: 16px;
     overflow: auto;
-    white-space: pre;
-    word-break: normal;
-    word-wrap: normal;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 3px;
 }
 
 q {

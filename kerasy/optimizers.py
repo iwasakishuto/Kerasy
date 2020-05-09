@@ -78,7 +78,7 @@ class SGD(KerasyAbstOptimizer):
     """ (Momentum SGD) Stochastic gradient descent optimizer.
     ~~~
     @param learning_rate: (float) Learning rate.
-    @param momentum     : (float) Parameter that accelerates SGD in the relevant direction and dampens oscillations.
+    @param momentum     : (float) Accelerates SGD in the relevant direction and dampens oscillations.
     @param nesterov     : (bool)  Whether to apply Nesterov momentum.
     """
     def __init__(self, learning_rate=0.01, momentum=0., nesterov=False, **kwargs):
@@ -87,7 +87,7 @@ class SGD(KerasyAbstOptimizer):
         self.learning_rate = learning_rate
         self.momentum = momentum
         self.nesterov = nesterov
-        self.moments = defaultdict()
+        self.velocities = defaultdict()
 
     def get_updates(self, grad, curt_param, name):
         grad = self.get_gradient(grad) # Cliped.
@@ -97,9 +97,9 @@ class SGD(KerasyAbstOptimizer):
         if self.initial_decay > 0:
             lr = lr * (1. / (1. + self.decay*self.iterations))
 
-        m = self.moments.get(name, np.zeros_like(curt_param))
-        v = self.momentum*m - lr*grad
-        self.moments[name] = v
+        v = self.velocities.get(name, np.zeros_like(curt_param))
+        v = self.momentum*v - lr*grad
+        self.velocities[name] = v
 
         if self.nesterov:
             new_param = curt_param + self.momentum*v - lr*grad

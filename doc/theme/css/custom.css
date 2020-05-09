@@ -17,7 +17,28 @@
 .md-typeset h2 {
   border-bottom: 1px dotted #888;
 }
-h1, h2, h3, h4 {
+
+h2:before{
+    color: #800000;
+    content: "\f02e";
+    font-family: FontAwesome;
+    padding-right: 10px;
+}
+h3:before{
+    color: #800000;
+    content: "\f111";
+    font-family: FontAwesome;
+    padding-right: 10px;
+}
+.topRibbon h3:before {
+    content: "";
+}
+h4.pro_args:before {
+    color: #800000;
+    content: "\f103";
+    font-family: FontAwesome;
+}
+h4:not(.pro_args) {
     padding: 0.25em 0.5em;
     border-left: solid 4px #800000;
 }

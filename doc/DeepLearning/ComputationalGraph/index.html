@@ -124,13 +124,6 @@
           
 
 
-  <li class="navtree toctree-l2 inactive">
-    <a class="" href="../TrainOnlyDense/">TrainOnlyDense</a>
-  </li>
-        
-          
-
-
   
     
     <li class="navtree toctree-l2 page current">
@@ -473,6 +466,21 @@ $$<p>したがって、expノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="補足">補足<a class="anchor-link" href="#補足">¶</a></h4><p>上記の Softmax レイヤの誤差伝播は、以下のように表せる。</p>
+$$
+\begin{cases}
+    \begin{aligned}
+        &\sum_i\left(\underbrace{\underbrace{-\frac{t_i}{y_i}\times\exp(a_i)}_{-t_iS}\times\left(-\frac{1}{S^2}\right)}_{\frac{t_i}{S}}\right) \times \exp(a_i) = y_i\left(\because\sum_it_i=1\right)\\
+        &\underbrace{-\frac{t_i}{y_i}\times\frac{1}{S}}_{-\frac{t_i}{\exp(a_i)}}\times \exp(a_i) = -t_i
+    \end{aligned}
+\end{cases}
+$$
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="dot">dotノード</h3><p>$\mathbf{Y} = \mathbf{X}\cdot\mathbf{W} + \mathbf{B}$ という数式を考えると、この式の微分は以下のようになる。</p>
 $$
 \begin{cases}
@@ -727,7 +735,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
         <a href="../Initializers/" class="btn btn-neutral float-right" title="Initializers">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../TrainOnlyDense/" class="btn btn-neutral" title="TrainOnlyDense"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../NeuralNetwork/" class="btn btn-neutral" title="Neural Network"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -753,7 +761,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../TrainOnlyDense/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href="../NeuralNetwork/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
         <span style="margin-left: 15px"><a href="../Initializers/" style="color: #fcfcfc">Next &raquo;</a></span>

@@ -313,7 +313,7 @@
     <div class="small-12 columns">
         <ul class="inline-list">
             <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-23(金)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href=""></a></span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/activations.py">activations.py</a></span></li>
             <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/deeplearning.html">DeepLearning</a></span></li> -->
         </ul>
     </div>
@@ -322,23 +322,13 @@
             <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="計算グラフ(Computational-Graph)">計算グラフ(Computational Graph)<a class="anchor-link" href="#計算グラフ(Computational-Graph)">¶</a></h1>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
+<p>A <strong>computational graph</strong> is a directed graph where</p>
 <ul>
-<li>計算の過程をグラフによって表現したもの。<ul>
-<li>ノード：<span aria-label="機械語の1個の命令の部分で、実行する操作(operation)の種類を指定する部分のこと、およびそのコード（符号）のこと。数式における演算子に相当する。" class="marker-info">オペコード</span></li>
-<li>エッジ：<span aria-label="コンピュータの演算における値や変数のこと。オぺランドは演算の種類や内容を表す演算子（オペレータ）によって演算対象となるもので、例えば「7×3」という計算式があれば、「7」と「3」がオペランドとなる。" class="marker-info">オペランド</span></li>
+<li>the nodes correspond to opecodes (operations).</li>
+<li>the edges correspond to operands (variables).</li>
 </ul>
-</li>
-<li>途中の計算結果を全て保持できる。</li>
-<li>局所的な計算を伝播することによって最終的な計算結果を得ることが可能であり、それによって<span class="marker-pink">問題を単純化して理解できる。</span></li>
-<li>特に微分の計算は「計算の局所化」＝<span aria-label="ある関数が合成関数で表される場合、その合成関数の微分は合成関数を構成するそれぞれの関数の微分の積によって表すことができる。" class="marker-info">「連鎖律(chain rule)」</span>であり、相性が良い。</li>
-</ul>
+<p>By using computational graph, it is possible to obtain the final calculation result by <strong>propagating the local calculation</strong>, which <strong>simplifies</strong> the problem.</p>
+<p>Especially in the backpropagation method, the <strong>"chain rule"</strong> is exactly the localization of the calculation, so it has good compatibility.</p>
 </div>
 </div>
 </div>
@@ -352,45 +342,35 @@
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="連鎖律と計算グラフ">連鎖律と計算グラフ<a class="anchor-link" href="#連鎖律と計算グラフ">¶</a></h2>
+<h3 id="Chain-rule-vs.-Computational-graph">Chain rule vs. Computational graph<a class="anchor-link" href="#Chain-rule-vs.-Computational-graph">¶</a></h3>$$\text{ex.)}\quad z=(x+y)^2$$<table>
+<thead><tr>
+<th style="text-align:center">Chain rule</th>
+<th style="text-align:center">Computational graph</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">$$\begin{cases}z = t^2\\t = x+y\end{cases}\\ \Longrightarrow\frac{\partial z}{\partial x} = \frac{\partial z}{\partial t} \times \frac{\partial t}{\partial x}$$</td>
+<td style="text-align:center"><img alt="computational graph" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/ChainRule.png" /></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="連鎖律(chain-rule)">連鎖律(chain rule)<a class="anchor-link" href="#連鎖律(chain-rule)">¶</a></h3><p>ここでは例として $z=(x+y)^2$ という式を扱う。この式は、次の $2$ 式から構成されていると考えることができる。</p>
-$$
-\begin{cases}
-  z = t^2\\
-  t = x+y
-\end{cases}
-$$<p>この時、連鎖律から<b>「$x$ に関する $z$ の微分 $\frac{\partial z}{\partial x}$」</b>は<b>「$t$ に関する $z$ の微分 $\frac{\partial z}{\partial t}$」</b>と<b>「$x$ に関する $t$ の微分 $\frac{\partial t}{\partial x}$」</b>の積によって表すことができるので、以下のように書くことができる。</p>
-$$
-\frac{\partial z}{\partial x} = \frac{\partial z}{\partial t} \times \frac{\partial t}{\partial x}
-$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="計算グラフ">計算グラフ<a class="anchor-link" href="#計算グラフ">¶</a></h3><p>上で数式的に考えた連鎖律の計算を計算グラフで表すと、以下のようになる。</p>
-<p><img alt="連鎖律" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/ChainRule.png" /></p>
-<p>これによって、局所的な微分計算の積によって合成関数の微分が行われていることが視覚的に理解できる。</p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="色々なノードにおける逆伝播">色々なノードにおける逆伝播<a class="anchor-link" href="#色々なノードにおける逆伝播">¶</a></h2><p>ここから、様々なオペコードにおける逆伝播を考える。</p>
-<div class="frame">
-<li><a href="#add">加算ノード</a></li>
-<li><a href="#multiple">乗算ノード</a></li>
-<li><a href="#inverse">逆数ノード</a></li>
-<li><a href="#exp">expノード</a></li>
-<li><a href="#dot">dotノード</a></li>
+<div class="admonition summary">
+<p class="admonition-title" style="font-size: 125%;">Various operation nodes</p>
+<p>Let's look at backpropagation in various nodes.</p>
+<ul>
+<li><a href="#add">Add</a></li>
+<li><a href="#multiple">Multiple</a></li>
+<li><a href="#inverse">Inverse</a></li>
+<li><a href="#exp">exp</a></li>
+<li><a href="#dot">dot</a></li>
+</ul>
 </div>
 </div>
 </div>
@@ -398,7 +378,7 @@ $$
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="add">加算ノード</h3><p>$z=x+y$ という数式を考えと、この式の微分は次のように計算できる。</p>
+<h2 id="add">Add</h2>$$\text{ex.)}\quad z=x+y$$<p>The derivative can be calculated as</p>
 $$
 \begin{cases}
   \begin{aligned}
@@ -406,16 +386,16 @@ $$
     \frac{\partial z}{\partial y} = 1\\
   \end{aligned}
 \end{cases}
-$$<p>したがって、加算ノードの逆伝播は以下のように表される。</p>
-<p><img alt="加算ノード" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/add.png" /></p>
-<p>つまり、加算ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値をそのまま次のノードへと流すだけ」</span>になる。</p>
+$$<p>Therefore, the backpropagation of the <code>Add</code> node is expressed as follows:</p>
+<p><img alt="Add node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/add.png" /></p>
+<p>※ <strong>Just pass</strong> the differential value transmitted from the upstream to the downstream.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="multiple">乗算ノード</h3><p>$z=xy$ という数式を考えと、この式の微分は次のように計算できる。</p>
+<h2 id="multiple">Mul</h2>$$\text{ex.)}\quad z=xy$$<p>The derivative can be calculated as</p>
 $$
 \begin{cases}
   \begin{aligned}
@@ -423,42 +403,55 @@ $$
     \frac{\partial z}{\partial y} = x\\
   \end{aligned}
 \end{cases}
-$$<p>したがって、乗算ノードの逆伝播は以下のように表される。</p>
-<p><img alt="乗算ノード" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/multiple.png" /></p>
-<p>つまり、乗算ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に、順伝播の際の入力信号を『ひっくり返した値』を乗算して下流のノードへと流す」</span>ことになる。</p>
+$$<p>Therefore, the backpropagation of the <code>Mul</code> node is expressed as follows:</p>
+<p><img alt="Mul node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/multiple.png" /></p>
+<p>※ Multiply the "turned over value" of the input signal.</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="inverse">逆数ノード</h3><p>$y=\frac{1}{x}$ という数式を考えと、この式の微分は次のように計算できる。</p>
+<h2 id="inverse">Inverse</h2>$$\text{ex.)}\quad y=\frac{1}{x}$$<p>The derivative can be calculated as</p>
 $$
 \frac{\partial y}{\partial x} = -\frac{1}{x^2} = -y^2
-$$<p>したがって、逆数ノードの逆伝播は以下のように表される。</p>
-<p><img alt="逆数ノード" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/inverse.png" /></p>
-<p>つまり、逆数ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に『順伝播の出力の二乗にマイナスを付けた値』を乗算して下流のノードへと流す」</span>ことになる。</p>
+$$<p>Therefore, the backpropagation of the <code>Inverse</code> node is expressed as follows:</p>
+<p><img alt="Inverse node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/inverse.png" /></p>
+<p>※ Multiply the minus square of "the output of forward propagation".</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="exp">expノード</h3><p>$y=\exp(x)$ という数式を考えと、この式の微分は次のように計算できる。</p>
+<h2 id="exp">exp</h2>$$\text{ex.)}\quad y=\exp(x)$$<p>The derivative can be calculated as</p>
 $$
 \frac{\partial y}{\partial x} = \exp\left(x\right) = y
-$$<p>したがって、expノードの逆伝播は以下のように表される。</p>
-<p><img alt="expノード" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/exp.png" /></p>
-<p>つまり、逆数ノードの逆伝播は<span class="marker-pink">「上流から伝わった微分の値に『順伝播の出力』を乗算して下流のノードへと流す」</span>ことになる。</p>
+$$<p>Therefore, the backpropagation of the <code>exp</code> node is expressed as follows:</p>
+<p><img alt="exp node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/exp.png" /></p>
+<p>※ Multiply the minus square of "the output of forward propagation".</p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<div class="frame">
-　ここまでのノードを用いることで、<span class="marker-pink">Softmax</span>や<span class="marker-pink">Cross Entropy Error</span>の逆伝播も計算することができる。
-    <img alt="Softmax-with-Loss" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/Softmax-with-Loss.png" />
+<div class="admonition summary">
+<p class="admonition-title" style="font-size: 125%;">Connecting nodes</p>
+<p>By connecting the above four nodes, we can easily calculate the backpropagation of <b>Softmax</b> and <b>Cross Entropy Error</b></p>
+<img alt="Softmax-with-Loss" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/Softmax-with-Loss.png" />
+<details>
+<summary>Supplementary explanation</summary>
+<p>The backpropagation of the <b>Softmax</b> can be expressed as follows.</p>
+    $$
+    \begin{cases}
+        \begin{aligned}
+            &\sum_i\left(\underbrace{\underbrace{-\frac{t_i}{y_i}\times\exp(a_i)}_{-t_iS}\times\left(-\frac{1}{S^2}\right)}_{\frac{t_i}{S}}\right) \times \exp(a_i) = y_i\left(\because\sum_it_i=1\right)\\
+            &\underbrace{-\frac{t_i}{y_i}\times\frac{1}{S}}_{-\frac{t_i}{\exp(a_i)}}\times \exp(a_i) = -t_i
+        \end{aligned}
+    \end{cases}
+    $$
+  </details>
 </div>
 </div>
 </div>
@@ -466,22 +459,7 @@ $$<p>したがって、expノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="補足">補足<a class="anchor-link" href="#補足">¶</a></h4><p>上記の Softmax レイヤの誤差伝播は、以下のように表せる。</p>
-$$
-\begin{cases}
-    \begin{aligned}
-        &\sum_i\left(\underbrace{\underbrace{-\frac{t_i}{y_i}\times\exp(a_i)}_{-t_iS}\times\left(-\frac{1}{S^2}\right)}_{\frac{t_i}{S}}\right) \times \exp(a_i) = y_i\left(\because\sum_it_i=1\right)\\
-        &\underbrace{-\frac{t_i}{y_i}\times\frac{1}{S}}_{-\frac{t_i}{\exp(a_i)}}\times \exp(a_i) = -t_i
-    \end{aligned}
-\end{cases}
-$$
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="dot">dotノード</h3><p>$\mathbf{Y} = \mathbf{X}\cdot\mathbf{W} + \mathbf{B}$ という数式を考えると、この式の微分は以下のようになる。</p>
+<h2 id="dot">dot</h2>$$\text{ex.)}\quad \mathbf{Y} = \mathbf{X}\cdot\mathbf{W} + \mathbf{B}$$<p>The derivative can be calculated as</p>
 $$
 \begin{cases}
   \begin{aligned}
@@ -489,25 +467,24 @@ $$
     \frac{\partial L}{\partial \mathbf{W}} = \mathbf{X}^T\cdot\frac{\partial L}{\partial \mathbf{Y}}\\
   \end{aligned}
 \end{cases}
-$$<p>したがって、dotノードの逆伝播は以下のように表される。</p>
-<p><img alt="dotノード" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine.png" /></p>
-<p>天下り式にこの逆伝播を理解しても良いが、行列を対象とした逆伝播を求める場合は、行列の要素ごとに書き下すことで、これまでのスカラ値を対象とした計算グラフと同様に考えることができる。</p>
-<p>実際に書き下すと、以下の計算グラフに分解できる。</p>
-<p><img alt="dotノード（要素ごとに分解）" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine_element.png" /></p>
+$$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as follows:</p>
+<p><img alt="dot node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine.png" /></p>
+<p>※ You can easily understand the content of the figure above by decomposing a matrix calculation into its elements and using a computational graphs in smaller units.</p>
+<p><img alt="dot node (decomposed)" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine_element.png" /></p>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Pythonによる実装">Pythonによる実装<a class="anchor-link" href="#Pythonによる実装">¶</a></h2>
+<h3 id="Implementation">Implementation<a class="anchor-link" href="#Implementation">¶</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="加算ノード">加算ノード<a class="anchor-link" href="#加算ノード">¶</a></h3>
+<h4 id="Add">Add<a class="anchor-link" href="#Add">¶</a></h4>
 </div>
 </div>
 </div>
@@ -516,7 +493,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">AddLayer</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Add</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
@@ -537,7 +514,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="乗算ノード">乗算ノード<a class="anchor-link" href="#乗算ノード">¶</a></h3>
+<h4 id="Mul">Mul<a class="anchor-link" href="#Mul">¶</a></h4>
 </div>
 </div>
 </div>
@@ -546,7 +523,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="prompt input_prompt">In [2]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">MulLayer</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Mul</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
@@ -571,16 +548,16 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="逆数ノード">逆数ノード<a class="anchor-link" href="#逆数ノード">¶</a></h3>
+<h4 id="Inverse">Inverse<a class="anchor-link" href="#Inverse">¶</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [3]:</div>
+<div class="prompt input_prompt">In [1]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">InverseLayer</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Inverse</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -602,7 +579,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="expノード">expノード<a class="anchor-link" href="#expノード">¶</a></h3>
+<h4 id="exp">exp<a class="anchor-link" href="#exp">¶</a></h4>
 </div>
 </div>
 </div>
@@ -611,7 +588,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="prompt input_prompt">In [4]:</div>
 <div class="inner_cell">
 <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">ExpLayer</span><span class="p">:</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Exp</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -633,7 +610,7 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="dotノード">dotノード<a class="anchor-link" href="#dotノード">¶</a></h3>
+<h4 id="dot">dot<a class="anchor-link" href="#dot">¶</a></h4>
 </div>
 </div>
 </div>
@@ -677,17 +654,11 @@ $$<p>したがって、dotノードの逆伝播は以下のように表される
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="参考">参考<a class="anchor-link" href="#参考">¶</a></h2><p><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585"><img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/Deep_Learning_from_Scratch.png" /></a></p>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In [ ]:</div>
-<div class="inner_cell">
-<div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class="admonition reference">
+<p class="admonition-title">Reference</p>
+<ul>
+<li><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585">ゼロから作る Deep Learning</a> (<a href="https://github.com/oreilly-japan/deep-learning-from-scratch">Github</a>)</li>
+</ul>
 </div>
 </div>
 </div>

@@ -733,7 +733,7 @@ div.output_area .mglyph > img {
    as that of bootstrap */
 .output {
   /* Old browsers */
-  padding-left: 50px;
+  /* padding-left: 50px; */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-box-align: stretch;
@@ -786,7 +786,8 @@ div.output_subarea {
   box-flex: 1;
   /* Modern browsers */
   flex: 1;
-  max-width: calc(100% - 14ex);
+  /* max-width: calc(100% - 14ex); */
+  max-width: 100% !important;
 }
 div.output_scroll div.output_subarea {
   overflow-x: visible;

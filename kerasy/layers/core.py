@@ -8,7 +8,7 @@ from .. import initializers
 from ..engine.base_layer import Layer
 
 from ..utils import flush_progress_bar
-from ..utils import handle_random_state
+from ..utils import handleRandomState
 from ..utils import set_weight
 
 class Input(Layer):
@@ -137,7 +137,7 @@ class Dropout(Layer):
         self.keep_prob = min(1., max(0., keep_prob))
         super().__init__(**kwargs)
         self.trainable = False
-        self.rnd = handle_random_state(random_state)
+        self.rnd = handleRandomState(random_state)
 
     def compute_output_shape(self, input_shape):
         self.input_shape = input_shape

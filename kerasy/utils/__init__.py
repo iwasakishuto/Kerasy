@@ -47,7 +47,7 @@ from .generic_utils import urlDecorate
 from .generic_utils import measure_complexity
 from .generic_utils import has_all_attrs
 from .generic_utils import has_not_attrs
-from .generic_utils import handle_random_state
+from .generic_utils import handleRandomState
 from .generic_utils import fout_args
 from .generic_utils import format_spec_create
 from .generic_utils import print_func_create

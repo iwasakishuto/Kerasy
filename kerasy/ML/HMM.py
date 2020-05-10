@@ -9,7 +9,7 @@ from ..utils import Params
 from ..utils import ConvergenceMonitor
 from ..utils import flush_progress_bar
 from ..utils import handleKeyError
-from ..utils import handle_random_state
+from ..utils import handleRandomState
 from ..utils import has_not_attrs
 from ..utils import normalize, log_normalize, log_mask_zero
 from ..utils import log_multivariate_normal_density
@@ -110,7 +110,7 @@ class BaseHMM(Params):
         self.init = init
         self.algorithm = algorithm
         self.up_params = up_params
-        self.rnd = handle_random_state(random_state)
+        self.rnd = handleRandomState(random_state)
         self.disp_params = ["n_hstates", "init", "algorithm", "up_params"]
         self.model_params = ["initial", "transit"]
 
@@ -398,7 +398,7 @@ class BaseHMM(Params):
         @params random_state : (int) seed.
         """
         self._check_params_validity()
-        rnd = handle_random_state(random_state) if random_state is not None else self.rnd
+        rnd = handleRandomState(random_state) if random_state is not None else self.rnd
 
         transit = self.transit
         hidden_states = np.arange(self.n_hstates)
@@ -538,7 +538,7 @@ class MultinomialHMM(BaseHMM):
         }
 
     def _generate_sample(self, hstate, random_state=None):
-        rnd = handle_random_state(random_state)
+        rnd = handleRandomState(random_state)
         return rnd.choice(a=np.arange(self.n_states), p=self.emission[hstate, :])
 
     def _compute_log_likelihood(self, X):
@@ -733,7 +733,7 @@ class GaussianHMM(BaseHMM):
         }
 
     def _generate_sample(self, hstate, random_state=None):
-        rnd = handle_random_state(random_state)
+        rnd = handleRandomState(random_state)
         return rnd.multivariate_normal(
             self.means[hstate], self._covariances[hstate]
         )

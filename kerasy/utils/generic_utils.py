@@ -176,7 +176,7 @@ def has_not_attrs(obj, *names):
 def has_all_attrs(obj, *names):
     return sum([1 for name in names if not hasattr(obj, name)])==0
 
-def handle_random_state(seed):
+def handleRandomState(seed):
     """ Turn `np.random.RandomState` """
     if seed is None:
         return np.random.mtrand._rand

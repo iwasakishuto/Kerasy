@@ -4,32 +4,32 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from .generic_utils import handleKeyError
-from .generic_utils import handle_random_state
+from .generic_utils import handleRandomState
 
 DNA_BASE_TYPES=["A","T","G","C"]
 RNA_BASE_TYPES=["A","U","G","C"]
 
 def generateX(size, xmin=-1, xmax=1, seed=None):
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     x = np.linspace(xmin, xmax, size+2)[1:-1]
     x += rnd.normal(0, scale=(xmax-xmin)/(4*size), size=size)
     return np.clip(a=x, a_min=xmin, a_max=xmax)
 
 def generateSin(size, xmin=-1, xmax=1, noise_scale=0.1, seed=None):
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     x     = generateX(size=size, xmin=xmin, xmax=xmax, seed=rnd)
     noise = rnd.normal(loc=0,scale=noise_scale,size=size)
     y     = np.sin(2*np.pi*x) + noise
     return (x,y)
 
 def generateGausian(size, x=None, loc=0, scale=0.1, seed=None):
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     x = x if x is not None else np.linspace(-1,1,size)
     y = rnd.normal(loc=loc,scale=scale,size=size)
     return (x,y)
 
 def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=None, same=True):
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     means = rnd.uniform(low,high,(cls,dim))
     covs = np.eye(dim)*scale
     if same:
@@ -43,7 +43,7 @@ def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=No
 
 def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=False, add_noise=True, noise_scale=5, figsize=(6,6), return_ax=False):
     """ Generate cls-class, 2-dimensional data. """
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     if same:
         Ns = [N//cls for i in range(cls)]
     else:
@@ -70,7 +70,7 @@ def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=Fal
 
 def generateWhirlpool(N, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
     """ Generate 2-class 2-dimensional data. """
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     a = np.linspace(xmin, xmax*np.pi, num=N//2)
     x = np.concatenate([
         np.stack([        a*np.cos(a),         a*np.sin(a)], axis=1),
@@ -91,7 +91,7 @@ def generateSeq(size, nucleic_acid="DNA", weights=None, seed=None):
     @params weights     : weights for each base. it must sum to 1.
     @params seed        : for the porpose of Reproducibility.
     """
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     if nucleic_acid == "DNA":
         bases = DNA_BASE_TYPES
     elif nucleic_acid == "RNA":
@@ -110,7 +110,7 @@ def generateSeq_embedded_Motif(Np, Nn, length, motif, nuc=DNA_BASE_TYPES, seed=N
     @params motif  : shape=(len_motif, num_base_types)
     @params nuc    : Types of Base.
     """
-    rnd = handle_random_state(seed)
+    rnd = handleRandomState(seed)
     num_total = Np+Nn
 
     if isinstance(length, int):
@@ -151,7 +151,7 @@ def generate_test_data(num_train=1000, num_test=500,
                        input_shape=(10,), output_shape=(2,),
                        classification=True, num_classes=2,
                        random_state=None):
-    rnd = handle_random_state(random_state)
+    rnd = handleRandomState(random_state)
     samples = num_train + num_test
 
     if classification:

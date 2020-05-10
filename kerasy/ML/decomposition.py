@@ -5,7 +5,7 @@ import scipy as sp
 from ..utils import flush_progress_bar
 from ..utils import pairwise_euclidean_distances
 from ..utils import standardize
-from ..utils import handle_random_state
+from ..utils import handleRandomState
 
 from ._kernel import kernel_handler
 from ..clib import c_decomposition
@@ -270,10 +270,10 @@ class UMAP():
         self.a=a
         self.b=b
         self.random_state=random_state
-        self.rnd = handle_random_state(random_state)
+        self.rnd = handleRandomState(random_state)
 
     def fit_transform(self, X, n_components=2, n_neighbors=15, init="random", epochs=200, init_lr=1.0, verbose=1):
-        self.rnd = handle_random_state(self.random_state)
+        self.rnd = handleRandomState(self.random_state)
         self.n_neighbors=n_neighbors
         self.n_components=n_components
         n_samples, n_features = X.shape

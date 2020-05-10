@@ -18,13 +18,13 @@ from ..utils import handleTypeError
 from ..utils import print_summary
 from ..utils import Table
 from ..utils import ProgressMonitor
-from ..utils import handle_random_state
+from ..utils import handleRandomState
 from ..utils import KerasyImprementationWarning
 
 class Sequential():
     def __init__(self, random_state=None):
         self.layers = []
-        self.rnd = handle_random_state(random_state)
+        self.rnd = handleRandomState(random_state)
 
     def add(self, layer):
         """Adds a layer instance."""

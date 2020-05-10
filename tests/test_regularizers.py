@@ -21,7 +21,6 @@ def get_test_data():
     y_train = encoder.to_onehot(y_train, num_classes)
     return x_train, y_train
 
-
 def _test_regularizer(regularizer, target=0.75):
     regularizer = regularizers.get(regularizer)
     x_train, y_train = get_test_data()

@@ -21,3 +21,4 @@ kerasy.egg-info/
 
 #pytest
 .pytest_cache
+!tests/README.md

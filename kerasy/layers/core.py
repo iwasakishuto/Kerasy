@@ -5,6 +5,7 @@ import numpy as np
 
 from .. import activations
 from .. import initializers
+from .. import regularizers
 from ..engine.base_layer import Layer
 
 from ..utils import flush_progress_bar
@@ -43,7 +44,9 @@ class Flatten(Layer):
         return delta.reshape(self.input_shape)
 
 class Dense(Layer):
-    def __init__(self, units, activation='linear', kernel_initializer='random_normal', bias_initializer='zeros', **kwargs):
+    def __init__(self, units, activation='linear',
+                 kernel_initializer='random_normal', kernel_regularizer='none',
+                 bias_initializer='zeros', bias_regularizer='none', **kwargs):
         """
         @param units             : (tuple) dimensionality of the (input space, output space).
         @param activation        : (str) Activation function to use.
@@ -52,10 +55,10 @@ class Dense(Layer):
         """
         self.output_shape=(units,)
         self.kernel_initializer = initializers.get(kernel_initializer)
-        self.kernel_regularizer = None
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.kernel_constraint  = None
         self.bias_initializer   = initializers.get(bias_initializer)
-        self.bias_regularizer   = None
+        self.bias_regularizer   = regularizers.get(bias_regularizer)
         self.bias_constraint    = None
         self.activation = activations.get(activation)
         self.use_bias = True
@@ -114,10 +117,10 @@ class Dense(Layer):
     def memorize_delta(self, dEda):
         dEdw = np.outer(dEda, self.Xin)
         if self.use_bias:
-            self._losses['kernel'] += dEdw[:,:-1] # shape=(Dout, Din)
-            self._losses['bias'] += dEdw[:,-1:] # shape=(Dout, 1)
+            self._grads['kernel'] += dEdw[:,:-1] # shape=(Dout, Din)
+            self._grads['bias'] += dEdw[:,-1:] # shape=(Dout, 1)
         else:
-            self._losses['kernel'] += dEdw
+            self._grads['kernel'] += dEdw
 
     def get_weights(self):
         return [self.kernel, self.bias]

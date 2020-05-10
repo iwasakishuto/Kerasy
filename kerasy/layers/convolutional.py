@@ -5,6 +5,7 @@ import numpy as np
 
 from .. import activations
 from .. import initializers
+from .. import regularizers
 from ..engine.base_layer import Layer
 
 from ..utils import handleKeyError
@@ -13,7 +14,9 @@ from ..clib import c_deep
 
 class Conv2D(Layer):
     def __init__(self, filters, kernel_size=(3,3), strides=(1,1), padding='valid', activation='relu',
-                 kernel_initializer='random_normal', bias_initializer='zeros', data_format='channels_last', **kwargs):
+                 kernel_initializer='random_normal', kernel_regularizer='none',
+                 bias_initializer='zeros', bias_regularizer='none',
+                 data_format='channels_last', **kwargs):
         """
         @param filters           : (int) the dimensionality of the output space.
         @param kernel_size       : (int,int) height and width of each kernel. kernel-shape=(*kernel_size, F, OF)
@@ -30,10 +33,10 @@ class Conv2D(Layer):
         self.padding = padding
         self.activation = activations.get(activation)
         self.kernel_initializer = initializers.get(kernel_initializer)
-        self.kernel_regularizer = None
+        self.kernel_regularizer = regularizers.get(kernel_regularizer)
         self.kernel_constraint  = None
         self.bias_initializer   = initializers.get(bias_initializer)
-        self.bias_regularizer   = None
+        self.bias_regularizer   = regularizers.get(bias_regularizer)
         self.bias_constraint    = None
         self.use_bias = True
         super().__init__(**kwargs)
@@ -132,8 +135,8 @@ class Conv2D(Layer):
             trainable=self.trainable
         )
         if self.trainable:
-            self._losses['kernel'] += dEdw
-            self._losses['bias'] += np.sum(dEda, axis=(0,1))
+            self._grads['kernel'] += dEdw
+            self._grads['bias'] += np.sum(dEda, axis=(0,1))
         return dEdXin[self.ph:self.H+self.ph,self.pw:self.W+self.pw,:]
 
     def get_weights(self):
@@ -150,4 +153,4 @@ class Conv2D(Layer):
         set_weight(self.kernel, kernel)
 
     # old version 1 : https://github.com/iwasakishuto/Kerasy/blob/c6a896834be7703e0454ba44ffcd8a66e5de197c/kerasy/layers/convolutional.py#L94
-    # old version 2 : https://github.com/iwasakishuto/Kerasy/blob/ff8aab0d3f32a5d5cfb28f38deecfc8c561184b3/kerasy/layers/convolutional.py#L99 
+    # old version 2 : https://github.com/iwasakishuto/Kerasy/blob/ff8aab0d3f32a5d5cfb28f38deecfc8c561184b3/kerasy/layers/convolutional.py#L99

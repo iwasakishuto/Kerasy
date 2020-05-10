@@ -10,7 +10,7 @@ class Layer():
     def __init__(self, **kwargs):
         self._trainable_weights = []
         self._non_trainable_weights = []
-        self._losses = {}  # (name, delta)
+        self._grads = {}  # (name, delta)
         self._updates = {}
         prefix = self.__class__.__name__.lower()
         self.name = prefix + '_' + str(get_uid(prefix))
@@ -41,7 +41,7 @@ class Layer():
         else:
             self._non_trainable_weights.append(name)
         self._updates[name] = np.expand_dims(weight, axis=0) # shape=(z,x,y)
-        self._losses[name] = np.zeros_like(weight) # shape=(x,y)
+        self._grads[name] = np.zeros_like(weight) # shape=(x,y)
         return weight
 
     def update(self, optimizer, batch_size):
@@ -53,15 +53,17 @@ class Layer():
             self._trainable_weights = []
 
         for name in self._trainable_weights:
+            weight = self.__dict__.get(name)
+            regularizer = self.__dict__.get(f"{name}_regularizer")
+            grad = self._grads[name]/batch_size + regularizer.diff(weight)
             new_weight = optimizer.get_updates(
-                grad=self._losses[name]/batch_size,
-                curt_param=self.__dict__[name],
+                grad=grad,
+                curt_param=weight,
                 name=f"{self.name}_{name}"
             )
-            self.__dict__[name] = new_weight
-
+            self.__dict__[name] = new_weight # Update.
             # self._updates[name] = np.r_[self._updates[name], np.expand_dims(new_weight, axis=0)]
-            self._losses[name]  = np.zeros_like(new_weight)
+            self._grads[name]  = np.zeros_like(new_weight)
 
     def get_weights(self):
         return []

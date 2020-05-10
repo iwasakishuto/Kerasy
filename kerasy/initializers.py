@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 import numpy as np
 from scipy import stats
 from abc import ABCMeta, abstractmethod
@@ -8,7 +9,7 @@ from .utils import handleKeyError
 from .utils import handleRandomState
 
 class KerasyAbstInitializer(metaclass=ABCMeta):
-    def __init__(self, aggr_type="sum", fmt=".3f", **format_codes):
+    def __init__(self):
         self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
 
     @abstractmethod

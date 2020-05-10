@@ -19,6 +19,7 @@ from ..utils import print_summary
 from ..utils import Table
 from ..utils import ProgressMonitor
 from ..utils import handle_random_state
+from ..utils import KerasyImprementationWarning
 
 class Sequential():
     def __init__(self, random_state=None):
@@ -61,10 +62,9 @@ class Sequential():
             self.loss = losses.get("softmax_categorical_crossentropy") # categorical crossentropy -> softmax categorical crossentropy
             self.activation = activations.get("softmax")               # linear -> softmax
             # Warnings.
-            warnings.warn("\033[31mKerasy Warnings\033[0m\n" + '-'*60 + '\n'\
-            "When calculating the \033[34mCategoricalCrossentropy\033[0m loss and the derivative " + \
+            warnings.warn("When calculating the \033[34mCategoricalCrossentropy\033[0m loss and the derivative " + \
             "of the \033[34mSoftmax\033[0m layer, the gradient disappears when backpropagating the actual value, " + \
-            "so the \033[34mSoftmaxCategoricalCrossentropy\033[0m is implemented instead.\n" + '-'*60)
+            "so the \033[34mSoftmaxCategoricalCrossentropy\033[0m is implemented instead.", category=KerasyImprementationWarning)
 
     def fit(self,
             x=None, y=None, batch_size=32, epochs=1, verbose=1, shuffle=True,

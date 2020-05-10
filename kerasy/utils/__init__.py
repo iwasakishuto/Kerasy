@@ -4,6 +4,10 @@ import os
 
 UTILS_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
+class KerasyImprementationWarning(Warning):
+    """Implementation problem. Developer will resolve it."""
+    pass
+
 from . import bio_utils
 from . import deep_utils
 from . import generic_utils
@@ -101,6 +105,7 @@ from .toydata_utils import generateWholeCakes
 from .toydata_utils import generateWhirlpool
 from .toydata_utils import generateSeq
 from .toydata_utils import generateSeq_embedded_Motif
+from .toydata_utils import generate_test_data
 
 from .training_utils import make_batches
 from .training_utils import train_test_split

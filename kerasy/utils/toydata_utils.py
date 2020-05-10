@@ -145,4 +145,27 @@ def generateSeq_embedded_Motif(Np, Nn, length, motif, nuc=DNA_BASE_TYPES, seed=N
                 # embed motif based on respective probabilities.
                 seq[j + k] = rnd.choice(nuc, p=motif[k])
         x[i] = "".join(seq)
+
+# Reference: https://github.com/keras-team/keras/blob/7a39b6c62d43c25472b2c2476bd2a8983ae4f682/keras/utils/test_utils.py#L27
+def generate_test_data(num_train=1000, num_test=500,
+                       input_shape=(10,), output_shape=(2,),
+                       classification=True, num_classes=2,
+                       random_state=None):
+    rnd = handle_random_state(random_state)
+    samples = num_train + num_test
+
+    if classification:
+        y = rnd.randint(0, num_classes, size=(samples,))
+        X = np.zeros((samples,) + input_shape, dtype=np.float64)
+        for i in range(samples):
+            X[i] = rnd.normal(loc=y[i], scale=0.7, size=input_shape)
+    else:
+        y_loc = rnd.random((samples,))
+        X = np.zeros((samples,) + input_shape, dtype=np.float64)
+        y = np.zeros((samples,) + output_shape, dtype=np.float64)
+        for i in range(samples):
+            X[i] = rnd.normal(loc=y_loc[i], scale=0.7, size=input_shape)
+            y[i] = rnd.normal(loc=y_loc[i], scale=0.7, size=output_shape)
+
+    return (X[:num_train], y[:num_train]), (X[num_train:], y[num_train:])
     return (x, y)

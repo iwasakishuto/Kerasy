@@ -82,22 +82,26 @@ def LZfactorization(LPF, string):
 
 def simple_compression(string):
     """ Simple way to compress string. """
-    symbol = ""; compressed_string = ""; n=1
+    compressed_string = "";
+    last, n = ("", 1)
     for cha in string:
-        if cha==symbol: n+=1
+        if cha==last:
+            n+=1
         else:
-            if n>1: compressed_string+=str(n)
-            compressed_string+=cha
-            symbol=cha
-            n=1
+            if n>1:
+                compressed_string += str(n)
+            compressed_string += cha
+            last, n = (cha, 1)
+    if n>1:
+        compressed_string+=str(n)
     return compressed_string
 
 def simple_decompression(compressed_string):
     """Decompression for `simple_compression(string)`"""
-    string=""; i=0; len_string = len(compressed_string)
+    string=""; i=0; 
+    len_string = len(compressed_string)
     while True:
         if compressed_string[i].isdigit():
-            print(compressed_string[i])
             s = i
             while i<len_string and compressed_string[i].isdigit():
                 i+=1

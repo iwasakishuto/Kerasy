@@ -15,7 +15,8 @@ def get_test_data():
                                                num_test=200,
                                                input_shape=(10,),
                                                classification=True,
-                                               num_classes=num_classes)
+                                               num_classes=num_classes,
+                                               random_state=123)
     encoder = CategoricalEncoder()
     y_train = encoder.to_onehot(y_train, num_classes)
     return x_train, y_train

@@ -54,10 +54,10 @@ class L1L2(KerasyAbstRegularizer):
         super().__init__()
 
     def loss(self, weight):
-        return self.L1.loss(weight) * self.L2.loss(weight)
+        return self.L1.loss(weight) + self.L2.loss(weight)
 
     def diff(self, weight):
-        return self.L1.diff(weight) * self.L2.diff(weight)
+        return self.L1.diff(weight) + self.L2.diff(weight)
 
 KerasyRegularizerClasses = {
     'none'     : none,

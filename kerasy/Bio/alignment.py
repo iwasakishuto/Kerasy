@@ -55,9 +55,9 @@ class BaseAlignmentModel(Params):
         else:
             return (score,Xidxes,Yidxes)
 
-    def align_score(self,X,Y):
+    def align_score(self,X,Y,verbose=1):
         """ Calcurate only score. """
-        score = self.align(X,Y,only_score=True)
+        score = self.align(X,Y,only_score=True,verbose=verbose)
         return score
 
     def InitializeDPmatrix(self):

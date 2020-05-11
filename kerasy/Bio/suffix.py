@@ -211,6 +211,8 @@ def reverseBWT(bwt):
     @params bwt    : (str, arr, list) Burrows-Wheeler-Transform.
     @return string : Original String
     """
+    if not isinstance(bwt, str):
+        bwt = "".join(bwt)
     encoder = CategoricalEncoder()
     encoder.to_categorical(bwt.replace("$", ""), origin=1)
     bwt = np.asarray(list(bwt))

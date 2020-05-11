@@ -20,7 +20,7 @@ def _find_tandem_SAIS(sequence):
     tandem_lists = c_tandem._SAIS_Tandem(db.LZ_factorization + ["$"])
     scores = [db.calc_tandem_score(tandem) for tandem in tandem_lists]
     max_val = max(scores)
-    tandem_lists = [tandem for tandem,score in zip(tandem_lists,scores) if score==max_val]
+    tandem_lists = list(set([tandem for tandem,score in zip(tandem_lists,scores) if score==max_val]))
     return max_val, tandem_lists
 
 def find_tandem(sequence, method="SAIS"):

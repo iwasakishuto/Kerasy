@@ -12,7 +12,7 @@ class BaseStructureModel(Params):
     def __init__(self, **kwargs):
         self.disp_params = ["inf", "nucleic_acid", "WatsonCrick", "Wobble"]
 
-    def predict(self, sequence, width=60, only_score=False, display=True, verbose=1):
+    def predict(self, sequence, width=60, only_score=False, ret_val=False, verbose=1):
         N = len(sequence)
         self.Initialization()
         # Recursion
@@ -22,7 +22,9 @@ class BaseStructureModel(Params):
 
         # TraceBack
         structure_info = self.TraceBack(sequence)
-        if display:
+        if ret_val:
+            return (score,structure_info)
+        else:
             printAlignment(
                 sequences=[sequence, structure_info],
                 indexes=[np.arange(len(sequence)), np.arange(len(sequence))],
@@ -31,8 +33,6 @@ class BaseStructureModel(Params):
                 width=width,
                 model=self.__class__.__name__
             )
-        else:
-            return (score,structure_info)
 
     def Initialization(self):
         """ Initialize function like `is_bp`, `bp_ps`. """

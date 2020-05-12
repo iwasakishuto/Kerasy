@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 from kerasy.Bio.second_structure import Nussinov, Zuker
+from kerasy.utils import generateSeq
 
 len_sequences = 100
 
@@ -12,24 +13,22 @@ def get_test_data():
     sequence = "".join(sequence)
     return sequence
 
-def _test_secondary_structure(Model, path="secondary_structure.json", **kwargs):
-    sequences = get_test_data()
-    model = Model(**kwargs)
+def test_nussinov():
+    sequence = get_test_data()
+    model = Nussinov()
     model.load_params()
 
-    score = model.predict(sequence, only_score=True, verbose=-1)
-    model.save_params(path)
-
-    model_ = Model(**kwargs)
-    model_.load_params(path)
-    score_ = model_.predict(sequence, only_score=True, verbose=-1)
-
-    os.remove(path)
-
-    assert score == score_
-
-def test_nussinov():
-    _test_secondary_structure(Nussinov)
+    score, structure_info = model.predict(sequence, verbose=-1, ret_val=True)
+    stack = []
+    for i,symbol in enumerate(structure_info):
+        if symbol == "(":
+            stack.append(i)
+        elif symbol == ")":
+            assert model.is_bp(sequence[stack.pop(-1)], sequence[i])
 
 def test_zuker():
-    _test_secondary_structure(Zuker)
+    sequence = get_test_data()
+    model = Zuker()
+    model.load_params()
+
+    score, structure_info = model.predict(sequence, verbose=-1, ret_val=True)

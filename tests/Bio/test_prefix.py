@@ -1,5 +1,6 @@
 # coding: utf-8
 import numpy as np
+from kerasy.utils import generateSeq
 from kerasy.Bio.prefix import LCP_create, LP_create, LP_with_pattern_create
 
 len_text = 100

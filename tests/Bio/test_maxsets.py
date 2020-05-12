@@ -1,7 +1,7 @@
 # coding: utf-8
 import numpy as np
 from kerasy.utils import generateSeq
-from kerasy.Bio.factorization import simple_compression, simple_decompression
+from kerasy.Bio.maxsets import MSS
 
 len_array = 1000
 
@@ -16,7 +16,7 @@ def _test_maxsets(R, limits=(5,10)):
     for i,limit in enumerate(sorted(limits)):
         model.run(R, limit=limit, verbose=-1)
         score = model.score
-        assert i==0 or score >= prev_score
+        assert i==0 or prev_score >= score
         prev_score = score
 
 def test_maxsets_int():

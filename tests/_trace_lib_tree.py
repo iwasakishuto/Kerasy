@@ -5,7 +5,7 @@ from pathlib import Path
 TESTS_DIR_PATH = os.path.dirname(os.path.abspath(__file__)) # path/to/tests
 KERASY_LIB_PATH = os.path.join(os.path.dirname(TESTS_DIR_PATH), "kerasy") # path/to/kerasy
 STOP_FILE = ["__init__.py", "setup.py"]
-STOP_DIR = ["clib", "utils"]
+STOP_DIR = ["clib", "engine", "layers", "utils"]
 
 p = Path(KERASY_LIB_PATH)
 for abs_path in p.glob("**/*.py"):

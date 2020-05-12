@@ -36,7 +36,7 @@ class CategoricalAccuracy(KerasyAbstMetrics):
         ))
 
 
-KerasyMetricsClasses = {
+all = KerasyMetricsClasses = {
     'categorical_accuracy': CategoricalAccuracy
 }
 KerasyMetricsClasses.update(KerasyLossClasses)

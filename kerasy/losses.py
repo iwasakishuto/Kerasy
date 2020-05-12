@@ -28,7 +28,7 @@ class MeanSquaredError(KerasyAbstLoss):
         super().__init__(aggr_type="ave")
 
     def loss(self, y_true, y_pred):
-        return np.mean(np.square(y_pred - y_true), axis=-1)
+        return np.mean(np.sum(np.square(y_pred - y_true), axis=-1))
     def diff(self, y_true, y_pred):
         return y_pred-y_true
 
@@ -64,7 +64,7 @@ class SoftmaxCategoricalCrossentropy(KerasyAbstLoss):
         """
         return y_pred - y_true
 
-KerasyLossClasses = {
+all = KerasyLossClasses = {
     'mean_squared_error' : MeanSquaredError,
     'mse'                : MeanSquaredError,
     'categorical_crossentropy' : CategoricalCrossentropy,

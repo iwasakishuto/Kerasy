@@ -74,7 +74,7 @@ class Sigmoid(KerasyAbstActivation):
     def diff(self, delta):
         return delta * (1-self.out) * self.out
 
-KerasyActivationClasses = {
+all = KerasyActivationClasses = {
     'linear' : Linear,
     'softmax': Softmax,
     'tanh'   : Tanh,

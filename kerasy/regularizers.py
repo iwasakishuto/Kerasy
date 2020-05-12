@@ -59,7 +59,7 @@ class L1L2(KerasyAbstRegularizer):
     def diff(self, weight):
         return self.L1.diff(weight) + self.L2.diff(weight)
 
-KerasyRegularizerClasses = {
+all = KerasyRegularizerClasses = {
     'none'     : none,
     'l1'       : L1,
     'l2'       : L2,

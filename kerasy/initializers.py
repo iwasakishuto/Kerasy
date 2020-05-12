@@ -63,15 +63,13 @@ class VarianceScaling(KerasyAbstInitializer):
 
 class Orthogonal(KerasyAbstInitializer):
     def __call__(self, shape, gain=1.0, dtype=None, seed=None):
+        rnd = handleRandomState(seed)
         num_rows = 1
         for dim in shape[:-1]:
             num_rows *= dim
         num_cols = shape[-1]
         flat_shape = (num_rows, num_cols)
-        rng = np.random
-        if seed is not None:
-            rng = np.random.RandomState(seed)
-        a = rng.normal(loc=0.0, scale=1.0, size=flat_shape).astype(dtype)
+        a = rnd.normal(loc=0.0, scale=1.0, size=flat_shape).astype(dtype)
         u, _, v = np.linalg.svd(a, full_matrices=False)
         # Pick the one with the correct shape.
         q = u if u.shape == flat_shape else v

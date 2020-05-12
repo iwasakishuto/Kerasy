@@ -350,7 +350,7 @@ class Nadam(KerasyAbstOptimizer):
 
         return new_param
 
-KerasyOptimizerClasses = {
+all = KerasyOptimizerClasses = {
     'gra'      : GradientDescent,
     'sgd'      : SGD,
     'rmsprop'  : RMSprop,

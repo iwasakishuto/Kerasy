@@ -188,3 +188,31 @@ PAIRWISE_DISTANCES = {
     'euclidean': paired_euclidean_distances,
     'l2': paired_euclidean_distances,
 }
+
+def cluster_accuracy(y_true, y_pred, algorithm="rough"):
+    """
+    Calculate how well the clusters match, even if the clusters were assigned
+    different numbers.
+    ex.)                              [Pairs]
+    y_true   = [0,0,1,1,2,2,1,1,2,0]   0 1 2
+    y_pred   = [1,1,1,0,2,2,0,1,2,1]   1 0 2
+    accuracy = [*,*,-,*,*,*,*,*,*,*] --------> 90%
+    """
+    num_samples = y_true.shape[0]
+    if y_pred.shape[0] != num_samples:
+        raise ValueError(f"y_true and y_pred must be the same size ({y_pred.shape[0]} != {num_samples})")
+    score = 0
+    score_matrix = np.asarray([
+        [
+            np.sum([
+                e in np.where(y_pred==i)[0] for e in np.where(y_true==j)[0]
+            ]) for j in np.unique(y_true)
+        ] for i in np.unique(y_pred)
+    ])
+
+    while score_matrix.size > 0:
+        i,j = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
+        score += score_matrix[i,j]
+        score_matrix = np.delete(np.delete(score_matrix, i, axis=0), j, axis=1)
+
+    return score/num_samples

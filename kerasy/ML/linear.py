@@ -1,6 +1,6 @@
 # coding: utf-8
 import numpy as np
-from ._kernel import kernel_handler
+from . import _kernel
 from ..utils import basis_transformer
 from ..utils import flush_progress_bar
 
@@ -33,8 +33,8 @@ class LinearRegression():
         return X.dot(self.w) # shape=(N',M)
 
 class LinearRegressionRidge(LinearRegression):
-    def __init__(self, lambda_, basis="none", **basisargs):
-        self.lambda_ = lambda_
+    def __init__(self, lamda=1e-3, basis="none", **basisargs):
+        self.lamda = lamda
         super().__init__(basis=basis, **basisargs)
 
     def fit(self, train_x, train_y):
@@ -45,17 +45,17 @@ class LinearRegressionRidge(LinearRegression):
         """
         train_x = self.basis_transform(train_x)
         N, M = train_x.shape
-        self.w = np.linalg.solve(self.lambda_*np.identity(M) + train_x.T.dot(train_x), train_x.T.dot(train_y))
+        self.w = np.linalg.solve(self.lamda*np.identity(M) + train_x.T.dot(train_x), train_x.T.dot(train_y))
 
 class LinearRegressionLASSO(LinearRegression):
-    def __init__(self, lambda_, basis="none", **basisargs):
-        self.lambda_ = lambda_
+    def __init__(self, lamda=1e-3, basis="none", **basisargs):
+        self.lamda = lamda
         super().__init__(basis=basis, **basisargs)
 
     @staticmethod
-    def prox(w,alpha,rho,lambda_):
+    def prox(w,alpha,rho,lamda):
         z0 = w + alpha/rho
-        c = lambda_/rho
+        c = lamda/rho
         return z0-c if c<z0 else z0+c if z0<-c else 0
 
     def fit(self, train_x, train_y, rho=1e-3, tol=1e-7, max_iter=100, verbose=1):
@@ -71,7 +71,7 @@ class LinearRegressionLASSO(LinearRegression):
         z = np.ones(shape=(M))
         for it in range(max_iter):
             w = np.linalg.solve(train_x.T.dot(train_x)+rho*np.identity(M), train_x.T.dot(train_y)-alpha+rho*z)
-            z = np.asarray([self.prox(w_,alpha_,rho,self.lambda_) for w_,alpha_ in zip(w,alpha)])
+            z = np.asarray([self.prox(w_,alpha_,rho,self.lamda) for w_,alpha_ in zip(w,alpha)])
             alpha += rho*(w-z)
             diff = np.sqrt(np.sum(np.square(w-z)))
             if diff < tol: break
@@ -112,8 +112,8 @@ class EvidenceApproxBayesianRegression(BayesianLinearRegression):
         for it in range(max_iter):
             params = [self.alpha, self.beta]
             super().fit(train_x, train_y)
-            lambda_ = self.beta * eigvals
-            self.gamma = np.sum(lambda_ / (self.alpha + lambda_))
+            lamda = self.beta * eigvals
+            self.gamma = np.sum(lamda / (self.alpha + lamda))
             self.alpha = self.gamma / self.mN.dot(self.mN)
             self.beta  = (N-self.gamma) / np.sum( (train_y-train_x_.dot(self.mN))**2 )
             if np.allclose(params, [self.alpha, self.beta]): break
@@ -132,7 +132,7 @@ class EvidenceApproxBayesianRegression(BayesianLinearRegression):
 class KernelRegression():
     def __init__(self, lamda, kernel="gaussian", **kernelargs):
         self.lamda = lamda
-        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.kernel = _kernel.get(kernel, **kernelargs)
         self.x_train = None # shape=(N,D)
 
     def fit(self, x_train, y_train):

@@ -1,11 +1,11 @@
 #coding: utf-8
 import numpy as np
-from ._kernel import kernel_handler
+from . import _kernel
 from ..utils import flush_progress_bar
 
 class BaseSVM():
     def __init__(self, kernel="gaussian", **kernelargs):
-        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.kernel = _kernel.get(kernel, **kernelargs)
         self.isZero = None
         self.N = None; self.M = None;
         self.K = None # gram matrix: shape=(N,N)

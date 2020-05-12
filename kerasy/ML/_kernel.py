@@ -1,60 +1,114 @@
-""" Ref: http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/ """
-#coding: utf-8
+# coding: utf-8
+import re
 import numpy as np
+from scipy import stats
+from abc import ABCMeta, abstractmethod
 
-def kernel_handler(inputs, **params):
-    if type(inputs) == str:
-        try:
-            # Overwrite default kwargs.
-            func = kernel_dict[inputs]
-            for k,v in params.items():
-                func.__kwdefaults__[k] = v
-            return func
-        except KeyError:
-            print("Please specify from followings:\n")
-            print("\n".join(kernel_dict.keys()))
-    else:
-        return inputs
+from ..utils import mk_class_get
 
-def linear_kernel(x, x_prime,*,c=0):
-    return x.T.dot(x_prime) + c
+class KerasyAbstKernel(metaclass=ABCMeta):
+    def __init__(self):
+        self.name = re.sub(r"([a-z])([A-Z])", r"\1_\2", self.__class__.__name__).lower()
 
-def polynomial_kernle(x, x_prime,*,alpha=1, c=0, d=3):
-    return (alpha*x.T.dot(x_prime) + c)**d
+    @abstractmethod
+    def __call__(self, x, x_prime):
+        raise NotImplementedError
 
-def gaussian_kernel(x, x_prime,*,sigma=1):
-    return np.exp(-sum((x-x_prime)**2)/(2*sigma**2))
+class Linear(KerasyAbstKernel):
+    def __init__(self, c=0):
+        self.c = c
+        super().__init__()
 
-def exponential_kernel(x, x_prime,*,sigma=0.1):
-    return np.exp(-sum(abs(x-x_prime))/(2*sigma**2))
+    def __call__(self, x, x_prime):
+        return x.T.dot(x_prime) + self.c
 
-def laplacian_kernel(x, x_prime,*,sigma=0.1):
-    return np.exp(-sum(abs(x-x_prime))/sigma)
+class Polynomial(KerasyAbstKernel):
+    def __init__(self, alpha=1, c=0, d=3):
+        self.alpha = alpha
+        self.c = c
+        self.d = d
+        super().__init__()
 
-def hyperbolic_tangent_kernel(x, x_prime,*,alpha=1,c=0):
-    return np.tanh(alpha*x.T.dot(x_prime) + c)
+    def __call__(self, x, x_prime):
+        return (self.alpha*x.T.dot(x_prime) + self.c)**self.d
 
-def rational_quadratic_kernel(x, x_prime,*,c=1):
-    return 1 - sum((x-x_prime)**2)/(sum((x-x_prime)**2)+c)
+class Gaussian(KerasyAbstKernel):
+    def __init__(self, sigma=1):
+        self.sigma = sigma
+        super().__init__()
 
-def multiquadric_kernel(x, x_prime,*,c=1):
-    return np.sqrt(sum((x-x_prime)**2) + c)
+    def __call__(self, x, x_prime):
+        return np.exp(-sum((x-x_prime)**2)/(2*self.sigma**2))
 
-def inverse_multiquadric_kernel(x, x_prime,*,c=1):
-    return 1/multiquadric_kernel(x,x_prime,c=c)
+class Exponential(KerasyAbstKernel):
+    def __init__(self, sigma=0.1):
+        self.sigma = sigma
+        super().__init__()
 
-def log_kernel(x, x_prime,*,d=3):
-    return -np.log(sum(abs(x-x_prime)**d) + 1)
+    def __call__(self, x, x_prime):
+        return np.exp(-sum(abs(x-x_prime))/(2*self.sigma**2))
 
-kernel_dict = {
-    "linear": linear_kernel,
-    "polynomial": polynomial_kernle,
-    "gaussian": gaussian_kernel,
-    "exponential": exponential_kernel,
-    "laplacian": laplacian_kernel,
-    "sigmoid": hyperbolic_tangent_kernel,
-    "rational_quadratic": rational_quadratic_kernel,
-    "multiquadric": multiquadric_kernel,
-    "inverse_multiquadric": inverse_multiquadric_kernel,
-    "log": log_kernel,
+class Laplacian(KerasyAbstKernel):
+    def __init__(self, sigma=0.1):
+        self.sigma = sigma
+        super().__init__()
+
+    def __call__(self, x, x_prime):
+        return np.exp(-sum(abs(x-x_prime))/self.sigma)
+
+class HyperbolicTangent(KerasyAbstKernel):
+    def __init__(self, alpha=1, c=0):
+        self.alpha = alpha
+        self.c = c
+        super().__init__()
+
+    def __call__(self, x, x_prime):
+        return np.tanh(self.alpha*x.T.dot(x_prime) + self.c)
+
+class RationalQuadratic(KerasyAbstKernel):
+    def __init__(self, c=1):
+        self.c = c
+        super().__init__()
+
+    def __call__(self, x, x_prime):
+        return 1 - sum((x-x_prime)**2)/(sum((x-x_prime)**2)+self.c)
+
+class Multiquadric(KerasyAbstKernel):
+    def __init__(self, c=1):
+        self.c = c
+
+    def __call__(self, x, x_prime):
+        return np.sqrt(sum((x-x_prime)**2) + self.c)
+
+class InverseMultiquadric(KerasyAbstKernel):
+    def __init__(self, c=1):
+        self.multiquadric = Multiquadric(c=c)
+
+    def __call__(self, x, x_prime):
+        return 1/self.multiquadric(x,x_prime)
+
+class Log(KerasyAbstKernel):
+    def __init__(self, d=3):
+        self.d = d
+
+    def __call__(self, x, x_prime):
+        return -np.log(sum(abs(x-x_prime)**self.d) + 1)
+
+all = KerasyKernelFunctions = {
+    "linear"               : Linear,
+    "polynomial"           : Polynomial,
+    "gaussian"             : Gaussian,
+    "exponential"          : Exponential,
+    "laplacian"            : Laplacian,
+    "sigmoid"              : HyperbolicTangent,
+    "rational_quadratic"   : RationalQuadratic,
+    "multiquadric"         : Multiquadric,
+    "inverse_multiquadric" : InverseMultiquadric,
+    "log"                  : Log,
 }
+
+get = mk_class_get(
+    all_classes=KerasyKernelFunctions,
+    kerasy_abst_class=[KerasyAbstKernel],
+    genre="kernel"
+)

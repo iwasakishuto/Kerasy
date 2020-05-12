@@ -7,7 +7,7 @@ from ..utils import pairwise_euclidean_distances
 from ..utils import standardize
 from ..utils import handleRandomState
 
-from ._kernel import kernel_handler
+from . import _kernel
 from ..clib import c_decomposition
 
 class PCA():
@@ -75,7 +75,7 @@ class LDA():
 
 class KernelPCA():
     def __init__(self, n_components=None, kernel="gaussian", **kernelargs):
-        self.kernel = kernel_handler(kernel, **kernelargs)
+        self.kernel = _kernel.get(kernel, **kernelargs)
         self.n_components = n_components
 
     def fit_transform(self, X):

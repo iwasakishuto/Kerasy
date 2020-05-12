@@ -28,47 +28,47 @@ def generateGausian(size, x=None, loc=0, scale=0.1, seed=None):
     y = rnd.normal(loc=loc,scale=scale,size=size)
     return (x,y)
 
-def generateMultivariateNormal(cls, N, dim=2, low=0, high=1, scale=3e-2, seed=None, same=True):
+def generateMultivariateNormal(num_classes, num_samples, dim=2, low=0, high=1, scale=3e-2, seed=None, same=True):
     rnd = handleRandomState(seed)
-    means = rnd.uniform(low,high,(cls,dim))
+    means = rnd.uniform(low,high,(num_classes,dim))
     covs = np.eye(dim)*scale
     if same:
-        Ns = [N//cls for i in range(cls)]
+        Ns = [num_samples//num_classes for i in range(num_classes)]
     else:
-        idx = rnd.randint(low=0, high=cls, size=N)
-        Ns = [np.count_nonzero(idx==k) for k in range(cls)]
-    data = np.concatenate([rnd.multivariate_normal(mean=means[k], cov=covs, size=Ns[k]) for k in range(cls)])
-    clsses = np.concatenate([[k for _ in range(n)] for k,n in enumerate(Ns)])
-    return (data, clsses)
+        idx = rnd.randint(low=0, high=num_classes, size=num_samples)
+        Ns = [np.count_nonzero(idx==k) for k in range(num_classes)]
+    data = np.concatenate([rnd.multivariate_normal(mean=means[k], cov=covs, size=Ns[k]) for k in range(num_classes)])
+    classes = np.concatenate([[k for _ in range(n)] for k,n in enumerate(Ns)])
+    return (data, classes)
 
-def generateWholeCakes(cls, N, r_low=0, r_high=5, seed=None, same=True, plot=False, add_noise=True, noise_scale=5, figsize=(6,6), return_ax=False):
-    """ Generate cls-class, 2-dimensional data. """
+def generateWholeCakes(num_classes, num_samples, r_low=0, r_high=5, seed=None, same=True, plot=False, add_noise=True, noise_scale=5, figsize=(6,6), return_ax=False):
+    """ Generate num_classes-class, 2-dimensional data. """
     rnd = handleRandomState(seed)
     if same:
-        Ns = [N//cls for i in range(cls)]
+        Ns = [num_samples//num_classes for i in range(num_classes)]
     else:
-        idx = rnd.randint(low=0, high=cls, size=N)
-        Ns = [np.count_nonzero(idx==k) for k in range(cls)]
-    Xs = []; clsses = []
+        idx = rnd.randint(low=0, high=num_classes, size=num_samples)
+        Ns = [np.count_nonzero(idx==k) for k in range(num_classes)]
+    Xs = []; classes = []
     if plot: fig, ax = plt.subplots(figsize=figsize)
     for k,n in enumerate(Ns):
-        theta = rnd.uniform(k*2/cls, (k+1)*2/cls, size=n)*np.pi
+        theta = rnd.uniform(k*2/num_classes, (k+1)*2/num_classes, size=n)*np.pi
         if add_noise:
-            theta_noise = rnd.uniform(-2/(cls*noise_scale), 2/(cls*noise_scale), size=n)*np.pi
+            theta_noise = rnd.uniform(-2/(num_classes*noise_scale), 2/(num_classes*noise_scale), size=n)*np.pi
             theta += theta_noise
         r = rnd.uniform(r_low,r_high, size=n)
         Xs.append(np.c_[
             r*np.cos(theta), # x-axis.
             r*np.sin(theta)  # y-axis
         ])
-        clsses.append([k for _ in range(n)])
-        if plot: ax.scatter(r*np.cos(theta), r*np.sin(theta), color=cm.jet(k/cls), label=f"class {k}: n={n}")
+        classes.append([k for _ in range(n)])
+        if plot: ax.scatter(r*np.cos(theta), r*np.sin(theta), color=cm.jet(k/num_classes), label=f"class {k}: n={n}")
     if plot: ax.set_xlabel("$x$", fontsize=14), ax.set_ylabel("$y$", fontsize=14), ax.set_title("Generated data", fontsize=14)
     if return_ax:
-        return ax, np.concatenate(Xs), np.concatenate(clsses)
-    return np.concatenate(Xs), np.concatenate(clsses)
+        return ax, np.concatenate(Xs), np.concatenate(classes)
+    return np.concatenate(Xs), np.concatenate(classes)
 
-def generateWhirlpool(N, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
+def generateWhirlpool(num_samples, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
     """ Generate 2-class 2-dimensional data. """
     rnd = handleRandomState(seed)
     a = np.linspace(xmin, xmax*np.pi, num=N//2)
@@ -145,6 +145,7 @@ def generateSeq_embedded_Motif(Np, Nn, length, motif, nuc=DNA_BASE_TYPES, seed=N
                 # embed motif based on respective probabilities.
                 seq[j + k] = rnd.choice(nuc, p=motif[k])
         x[i] = "".join(seq)
+    return (x, y)
 
 # Reference: https://github.com/keras-team/keras/blob/7a39b6c62d43c25472b2c2476bd2a8983ae4f682/keras/utils/test_utils.py#L27
 def generate_test_data(num_train=1000, num_test=500,
@@ -160,7 +161,7 @@ def generate_test_data(num_train=1000, num_test=500,
         for i in range(samples):
             X[i] = rnd.normal(loc=y[i], scale=0.7, size=input_shape)
     else:
-        y_loc = rnd.random((samples,))
+        y_loc = rnd.rand(samples,)
         X = np.zeros((samples,) + input_shape, dtype=np.float64)
         y = np.zeros((samples,) + output_shape, dtype=np.float64)
         for i in range(samples):
@@ -168,4 +169,3 @@ def generate_test_data(num_train=1000, num_test=500,
             y[i] = rnd.normal(loc=y_loc[i], scale=0.7, size=output_shape)
 
     return (X[:num_train], y[:num_train]), (X[num_train:], y[num_train:])
-    return (x, y)

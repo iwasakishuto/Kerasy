@@ -71,6 +71,7 @@ from .metric_utils import paired_cosine_distances
 from .metric_utils import check_pairwise_array
 from .metric_utils import pairwise_distances
 from .metric_utils import pairwise_euclidean_distances
+from .metric_utils import cluster_accuracy
 
 from .model_select_utils import cross_validation
 

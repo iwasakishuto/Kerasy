@@ -52,7 +52,7 @@ class Sequential():
         for layer in self.layers:
             output_shape = layer.build(output_shape)
 
-        # TODO: Kerasy didn't support the computational graph, so it may occur to
+        # TODO: Kerasy don't support the computational graph, so it may occur to
         #       disappear the gradients in the middle of the backpropagation even though
         #       computational graph could convey them though to the end.
         if (self.loss.name == "categorical_crossentropy") and (

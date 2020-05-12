@@ -16,7 +16,7 @@ def dbscan_inner(is_core, neighborhoods, labels, verbose=1):
     stack = []
     num_data = labels.shape[0]
     for i in range(num_data):
-        flush_progress_bar(i, num_data, metrics={"num cluster": label+2}, verbose=verbose)
+        flush_progress_bar(i, num_data, metrics={"num cluster": label}, verbose=verbose)
         if labels[i] != -1 or not is_core[i]:
             continue
         # Depth-first search starting from i,
@@ -53,7 +53,7 @@ class DBSCAN():
         # Distance Matrix of All-to-All.
         distances = pairwise_euclidean_distances(X, squared=False)
         neighborhoods = np.asarray([np.where(neighbors)[0] for neighbors in distances<=self.eps])
-        n_neighbors = np.asarray([np.count_nonzero(dist<self.eps) for dist in distances], dtype=np.int)
+        n_neighbors = np.asarray([len(neighbors) for neighbors in neighborhoods], dtype=np.int)
         # A list of all core samples found.
         core_samples = np.asarray(n_neighbors >= self.min_samples, dtype=np.uint8)
         labels = dbscan_inner(core_samples, neighborhoods, labels, verbose=verbose)
@@ -68,6 +68,6 @@ class DBSCAN():
             # no core samples
             self.components_ = np.empty((0, X.shape[1]))
 
-    def fit_predict(self, X):
-        self.fit(X)
+    def fit_predict(self, X, verbose=1):
+        self.fit(X, verbose=verbose)
         return self.labels_

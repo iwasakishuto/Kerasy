@@ -23,3 +23,6 @@ notebook: build
 
 examples: build
 	$(DOCKER) run -it -p $(HOST_PORT):8888 -v $(SRC):/src/workspace -v $(EXAMPLES_PATH):/data/kerasy_examples kerasy
+
+rebuild:
+	docker build -t kerasy --no-cache -f $(DOCKER_FILE) . 

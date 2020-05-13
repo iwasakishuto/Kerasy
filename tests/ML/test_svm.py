@@ -12,15 +12,15 @@ def get_test_data():
                                          seed=0)
     return x_train, y_train
 
-def test_svm(model, target=0.75):
+def _test_svm(model, target=0.75):
     x_train, y_train = get_test_data()
     model.fit(x_train, y_train, max_iter=max_iter, sparse_memorize=False, verbose=-1)
     assert model.accuracy(x_train, y_train) >= target
 
 def test_hard_svc():
     model = hardSVC(kernel="gaussian", sigma=1.0)
-    test_svm(model, target=0.75)
+    _test_svm(model, target=0.75)
 
 def test_soft_svc():
     model = SVC(kernel="gaussian", sigma=1.0, C=10)
-    test_svm(model, target=0.75)
+    _test_svm(model, target=0.75)

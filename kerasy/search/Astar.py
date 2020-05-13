@@ -93,7 +93,9 @@ class Pannel():
         ax.set_xticks([]), ax.set_yticks([])
         return ax
 
-def OptimalTransit(n_rows,n_cols,initial_str,last_str,heuristic_method="Manhattan_distance",max_iter=100, verbose=1, n_fig_cols=5):
+def OptimalTransit(n_rows, n_cols, initial_str, last_str,
+                   heuristic_method="Manhattan_distance", max_iter=100,
+                   verbose=1, n_fig_cols=5, retval=False):
     initial_state = Pannel(
         string=initial_str,
         par_string=None,
@@ -118,26 +120,28 @@ def OptimalTransit(n_rows,n_cols,initial_str,last_str,heuristic_method="Manhatta
         print("Can't reach to the last state.")
     else:
         n_transition = closed_list[last_str].h
-        print(f"n_transition = {n_transition}")
-
-        # Trace Back.
         pannel_str = last_str
         pannel_lst = []
+        # Trace Back.
         while pannel_str:
             state = closed_list[pannel_str]
             pannel_str = state.par
             pannel_lst.append(state)
 
-        def plot_state_transition(ax, i, state):
-            state.plot(ax=ax)
-            ax.set_title(f"No.{i:<0{len(str(n_transition))}}", fontsize=14)
-            return ax
+        if retval:
+            return pannel_lst
 
-        fig, axes = galleryplot(
-            func=plot_state_transition,
-            argnames=["i", "state"],
-            iterator=enumerate(pannel_lst),
-            ncols=n_fig_cols,
-        )
-        plt.tight_layout()
-        plt.show()
+        else:
+            def plot_state_transition(ax, i, state):
+                state.plot(ax=ax)
+                ax.set_title(f"No.{i:<0{len(str(n_transition))}}", fontsize=14)
+                return ax
+
+            fig, axes = galleryplot(
+                func=plot_state_transition,
+                argnames=["i", "state"],
+                iterator=enumerate(pannel_lst),
+                ncols=n_fig_cols,
+            )
+            plt.tight_layout()
+            plt.show()

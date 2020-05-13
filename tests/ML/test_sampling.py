@@ -2,7 +2,7 @@
 import numpy as np
 from kerasy.ML.sampling import GibbsMsphereSampler
 
-def test_gibbs_msphere_sampling(target=0.05):
+def test_gibbs_msphere_sampling(target=0.15):
     radius = 10
     num_samples = 10000
     dimension = 6

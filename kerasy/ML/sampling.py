@@ -203,8 +203,8 @@ class GibbsMsphereSampler():
         return buff
 
     @classmethod
-    def plot2D(cls, n, r=1, initial_x=None, burnin=0, random_state=None, verbose=-1, ax=None):
-        model = cls(M=2, r=r)
+    def plot2D(cls, n, radius=1, initial_x=None, burnin=0, random_state=None, verbose=-1, ax=None):
+        model = cls(dimension=2, radius=radius)
         if ax is None:
             fig, ax = plt.subplots(figsize=(6,6))
         s = time.time()
@@ -212,17 +212,17 @@ class GibbsMsphereSampler():
         p_time = time.time()-s
         ax.scatter(X,Y,s=1000//n+1)
 
-        x = np.linspace(-r, r, int(r*100))
+        x = np.linspace(-radius,radius, int(radius*100))
         ax.scatter(X,Y,s=1000//n+1, color="blue", alpha=0.5)
-        ax.plot(x,  np.sqrt(np.square(r)-np.square(x)), color="red")
-        ax.plot(x, -np.sqrt(np.square(r)-np.square(x)), color="red")
+        ax.plot(x,  np.sqrt(np.square(radius)-np.square(x)), color="red")
+        ax.plot(x, -np.sqrt(np.square(radius)-np.square(x)), color="red")
         ax.set_title(f"Processing time: {p_time:.3f}[s]"); ax.grid()
-        ax.set_xlim(-r, r); ax.set_ylim(-r,r)
+        ax.set_xlim(-radius,radius); ax.set_ylim(-radius,radius)
         return ax
 
     @classmethod
-    def plot3D(cls, n, r=1, initial_x=None, burnin=0, random_state=None, verbose=-1, ax=None):
-        model = cls(M=3, r=r)
+    def plot3D(cls, n, radius=1, initial_x=None, burnin=0, random_state=None, verbose=-1, ax=None):
+        model = cls(dimension=3, radius=radius)
         if ax is None:
             fig = plt.figure(figsize=(6,6))
             ax = fig.add_subplot(111, projection='3d')
@@ -231,11 +231,11 @@ class GibbsMsphereSampler():
         p_time = time.time()-s
         ax.scatter(X,Y,Z,s=1000//n+1, color="blue", alpha=0.5)
         ax.set_title(f"Processing time: {p_time:.3f}[s]"); ax.grid()
-        ax.set_xlim(-r, r); ax.set_ylim(-r,r); ax.set_zlim(-r,r)
+        ax.set_xlim(-radius,radius); ax.set_ylim(-radius,radius); ax.set_zlim(-radius,radius)
         return ax
 
     @classmethod
     def plot_p_times(cls, n, D, r=1, repetitions=5):
         for d in range(D):
-            model = cls(d+1)
-            flush_progress_bar(d, D, metrics={"processing_time": measure_complexity(model.sample, n, verbose=-1, repetitions_=repetitions)}, verbose=2)
+            model = cls(dimension=d+1)
+            flush_progress_bar(d, D, metrics={"processing_time": measure_complexity(model.sample, n, verbose=-1, repetitions_=repetitions)[0]}, verbose=2)

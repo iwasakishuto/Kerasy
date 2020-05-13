@@ -104,7 +104,7 @@ class EvidenceApproxBayesianRegression(BayesianLinearRegression):
         super().__init__(alpha=alpha, beta=beta, basis=basis, **basisargs)
         self.gamma = None
 
-    def fit(self, train_x, train_y, max_iter=100):
+    def fit(self, train_x, train_y, max_iter=100, verbose=1):
         train_x_ = self.basis_transform(train_x)
         N,M = train_x_.shape
         Phi = train_x_.T.dot(train_x_)

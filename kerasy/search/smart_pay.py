@@ -19,7 +19,7 @@ def breakdown(combs):
     print("-"*width_line)
     print_func('total',sum(num_coins),sum(total_pay))
 
-def smart_pay(coins, total, limit=None, verbose=1):
+def smart_pay(coins, total, limit=None, verbose=1, retval=False):
     """
     Find the minimum number of coin combinations by using Dynamic Programming.
     @params coins: (int list) Coins.
@@ -57,4 +57,7 @@ def smart_pay(coins, total, limit=None, verbose=1):
         last = B[idx]
         combs.append(idx-last)
         idx = last
-    if verbose: breakdown(combs)
+    if retval:
+        return combs
+    else:
+        breakdown(combs)

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from ..utils import flush_progress_bar
 from ..utils import measure_complexity
+from ..utils import handleRandomState
 
 class BaseSampler():
     def __init__(self, p, q=None, domain=None, qargs={}):
@@ -174,26 +175,26 @@ class MHSampler(BaseSampler):
         return ax
 
 class GibbsMsphereSampler():
-    def __init__(self, M, r=1):
-        self.M = M
-        self.r = r
+    def __init__(self, dimension, radius=1.):
+        self.dimension = dimension
+        self.radius = radius
 
     def sampler(self, initial_x=None, random_state=None):
-        r2_lim = np.square(self.r)
-        x = np.zeros(shape=self.M) if initial_x is None else initial_x
-        np.random.seed(random_state)
+        r2_lim = np.square(self.radius)
+        x = np.zeros(shape=self.dimension) if initial_x is None else initial_x
+        rnd = handleRandomState(random_state)
         while True:
             r2 = np.dot(x,x)
-            for m in range(self.M):
-                r2-=np.square(x[m])
-                x[m]=np.random.uniform(-np.sqrt(r2_lim-r2),np.sqrt(r2_lim-r2))
-                r2+=np.square(x[m])
+            for m in range(self.dimension):
+                r2  -= np.square(x[m])
+                x[m] = rnd.uniform(-np.sqrt(r2_lim-r2),np.sqrt(r2_lim-r2))
+                r2  += np.square(x[m])
             yield x
 
-    def sample(self, n, initial_x=None, burnin=0, random_state=None, verbose=1):
-        n = int(n)
-        buff = np.empty(shape=(n,self.M))
-        max_iter=n+burnin
+    def sample(self, num_samples, initial_x=None, burnin=0, random_state=None, verbose=1):
+        num_samples = int(num_samples)
+        buff = np.empty(shape=(num_samples, self.dimension))
+        max_iter = num_samples + burnin
         for i,x in enumerate(self.sampler(initial_x=initial_x, random_state=random_state)):
             if i==max_iter: break
             flush_progress_bar(i, max_iter, barname=self.__class__.__name__, verbose=verbose)

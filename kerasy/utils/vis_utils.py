@@ -141,6 +141,9 @@ def galleryplot(func, argnames, iterator, ncols=5, figsize=(4,4), sharex="none",
     for i,vals in enumerate(iterator):
         kwargs = {argnames:vals} if isinstance(argnames, str) else dict(zip(argnames,vals))
         ax = func(ax=axes[i//ncols, i%ncols], **kwargs)
+        
+    for j in range(i+1, ncols*nrows):
+        axes[j//ncols, j%ncols].remove()
 
     return fig, axes
 

@@ -71,13 +71,13 @@ def generateWholeCakes(num_classes, num_samples, r_low=0, r_high=5, seed=None, s
 def generateWhirlpool(num_samples, xmin=0, xmax=5, seed=None, plot=False, figsize=(6,6)):
     """ Generate 2-class 2-dimensional data. """
     rnd = handleRandomState(seed)
-    a = np.linspace(xmin, xmax*np.pi, num=N//2)
+    a = np.linspace(xmin, xmax*np.pi, num=num_samples//2)
     x = np.concatenate([
         np.stack([        a*np.cos(a),         a*np.sin(a)], axis=1),
         np.stack([(a+np.pi)*np.cos(a), (a+np.pi)*np.sin(a)], axis=1)
     ])
     x += rnd.uniform(size=x.shape)
-    y  = np.repeat(np.arange(2), N//2)
+    y  = np.repeat(np.arange(2), num_samples//2)
     if plot:
         plt.figure(figsize=figsize)
         plt.scatter(x[:,0], x[:,1], c=y, cmap="jet")

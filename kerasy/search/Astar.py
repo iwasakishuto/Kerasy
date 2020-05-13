@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from ..utils import flush_progress_bar
+from ..utils import galleryplot
 
 class Pannel():
     n=None;m=None;digit=None
@@ -32,8 +33,11 @@ class Pannel():
         """ this enables us to compare the pannel directoly. """
         return (self.h+self.g)<(other.h+other.g)
 
-    def arr2str(self, array):  return ",".join(array.flatten().astype(str))
-    def str2arr(self, string): return np.asarray([int(e) for e in string.split(",")]).reshape(Pannel.n,Pannel.m)
+    @staticmethod
+    def arr2str(array):  return ",".join(array.flatten().astype(str))
+
+    @staticmethod
+    def str2arr(string): return np.asarray([int(e) for e in string.split(",")]).reshape(Pannel.n,Pannel.m)
 
     def swap(self,array,xi,yi,xj,yj):
         """ array[xi,yi] ↔︎ array[xj,yj] """
@@ -89,29 +93,27 @@ class Pannel():
         ax.set_xticks([]), ax.set_yticks([])
         return ax
 
-def OptimalTransit(n,m,initial_str,last_str,heuristic_method="Manhattan_distance",n_row=5):
+def OptimalTransit(n_rows,n_cols,initial_str,last_str,heuristic_method="Manhattan_distance",max_iter=100, verbose=1, n_fig_cols=5):
     initial_state = Pannel(
         string=initial_str,
         par_string=None,
         h=0,
         heuristic_method=heuristic_method,
-        n=n,
-        m=m,
+        n=n_rows,
+        m=n_cols,
         goal_str=last_str,
     )
 
     open_list = [initial_state]
     closed_list = {}
-    it = 0; max_it = 100
-    while(open_list):
+    for it in range(max_iter):
+        if len(open_list) == 0: break
         state = open_list.pop(np.argmin(open_list))
         closed_list[state.str] = state
         if state.str==last_str: break
         open_list += [s for s in state.transibles() if s.str not in closed_list]
-        it+=1
-        flush_progress_bar(it, max_it, metrics=f"{state.h} transition from initial states.", barname="")
-        if it==max_it: it=0
-        
+        flush_progress_bar(it, max_iter, metrics={"transition" : state.h}, verbose=verbose)
+
     if last_str not in closed_list:
         print("Can't reach to the last state.")
     else:
@@ -126,11 +128,16 @@ def OptimalTransit(n,m,initial_str,last_str,heuristic_method="Manhattan_distance
             pannel_str = state.par
             pannel_lst.append(state)
 
-        n_fig = n_transition+1
-        n_col = n_fig//n_row if n_fig%n_row==0 else n_fig//n_row+1
-
-        fig = plt.figure(figsize=(4*n_row,4*n_col))
-        for i, state in enumerate(pannel_lst):
-            ax = fig.add_subplot(n_col,n_row, i+1)
+        def plot_state_transition(ax, i, state):
             state.plot(ax=ax)
-            ax.set_title(f"No.{i:<0{len(str(n_transition))}}")
+            ax.set_title(f"No.{i:<0{len(str(n_transition))}}", fontsize=14)
+            return ax
+
+        fig, axes = galleryplot(
+            func=plot_state_transition,
+            argnames=["i", "state"],
+            iterator=enumerate(pannel_lst),
+            ncols=n_fig_cols,
+        )
+        plt.tight_layout()
+        plt.show()

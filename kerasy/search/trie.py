@@ -110,6 +110,9 @@ class LOUDSTrieOffline():
     def __init__(self, words):
         self.bit_array, self.labels = words2LOUDSbit(words)
 
+    def __contains__(self, word):
+        return not self.search(word) == -1
+
     def get_nth_target_bit_idx(self, n, target_bit="0"):
         """Returns the location of the nth target bit.
         @params n         : (int) one-based indexing.
@@ -159,7 +162,7 @@ class LOUDSTrieOffline():
         for w in query:
             node_id = self.traverse_children(node_id, w)
             if node_id is None:
-                return None
+                return -1
         return self.get_nth_target_bit_idx(n=node_id, target_bit="1")
 
 class LOUDSTrieOnline():

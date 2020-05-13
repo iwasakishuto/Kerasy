@@ -56,10 +56,10 @@ class VarianceScaling(KerasyAbstInitializer):
         if distribution=='normal':
             # 0.879... = scipy.stats.truncnorm.std(a=-2, b=2, loc=0., scale=1.)
             stddev = np.sqrt(scale) / .87962566103423978
-            return TruncatedNormal(shape=shape, mean=0.0, stddev=stddev, dtype=dtype, seed=seed)
+            return TruncatedNormal()(shape=shape, mean=0.0, stddev=stddev, dtype=dtype, seed=seed)
         else:
             limit = np.sqrt(3 * scale)
-            return RandomUniform(shape=shape, minval=-limit, maxval=limit, dtype=dtype, seed=seed)
+            return RandomUniform()(shape=shape, minval=-limit, maxval=limit, dtype=dtype, seed=seed)
 
 class Orthogonal(KerasyAbstInitializer):
     def __call__(self, shape, gain=1.0, dtype=None, seed=None):
@@ -84,7 +84,7 @@ class Identity(KerasyAbstInitializer):
 
 class GlorotNormal(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=1.,
             mode='fan_avg',
@@ -95,7 +95,7 @@ class GlorotNormal(KerasyAbstInitializer):
 
 class GlorotUniform(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=1.,
             mode='fan_avg',
@@ -106,7 +106,7 @@ class GlorotUniform(KerasyAbstInitializer):
 
 class HeNormal(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=2.,
             mode='fan_in',
@@ -117,7 +117,7 @@ class HeNormal(KerasyAbstInitializer):
 
 class LeCunNormal(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=1.,
             mode='fan_in',
@@ -128,7 +128,7 @@ class LeCunNormal(KerasyAbstInitializer):
 
 class HeUniform(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=2.,
             mode='fan_in',
@@ -139,7 +139,7 @@ class HeUniform(KerasyAbstInitializer):
 
 class LeCunUniform(KerasyAbstInitializer):
     def __call__(self, shape, dtype=None, seed=None):
-        return VarianceScaling(
+        return VarianceScaling()(
             shape=shape,
             scale=1.,
             mode='fan_in',
@@ -177,7 +177,7 @@ def _compute_fans(shape, data_format='channels_last'):
         fan_out = np.sqrt(np.prod(shape))
     return fan_in, fan_out
 
-KerasyInitializerFunctions = {
+all = KerasyInitializerFunctions = {
     'zeros'            : Zeros,
     'ones'             : Ones,
     'constant'         : Constant,

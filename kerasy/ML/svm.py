@@ -97,7 +97,7 @@ class BaseSVM():
 
 class SVC(BaseSVM):
     def __init__(self, kernel="gaussian", C=10, **kernelargs):
-        super().__init__(kernel=kernel, kernelargs=kernelargs)
+        super().__init__(kernel=kernel, **kernelargs)
         self.C = C
 
     def isSV(self):
@@ -151,7 +151,7 @@ class SVC(BaseSVM):
 
 class hardSVC(BaseSVM):
     def __init__(self, kernel="gaussian", **kernelargs):
-        super().__init__(kernel=kernel, kernelargs=kernelargs)
+        super().__init__(kernel=kernel, **kernelargs)
 
     def isSV(self):
         """whether x_train[i] is a support vector or not."""

@@ -100,10 +100,11 @@ class kmer_deBruijnGraph():
         ext = os.path.splitext(os.path.basename(out_path))[-1]
         if ext==".png":
             graph = pydotplus.graph_from_dot_data(self.dot_data)
-            graph.write_png(out_path, f='png', prog='dot')
+            return graph.write_png(out_path, f='png', prog='dot')
         elif ext==".dot":
             with open(out_path, mode="w") as f:
                 f.write(self.dot_data)
+            return True
         else:
             handleKeyError(
                 lst=[".png", ".dot"], out_path=ext,

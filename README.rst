@@ -23,7 +23,7 @@ I want to **deepen my understanding of deep learning** by imitating the sophisti
 Installation
 ^^^^^^^^^^^^
 
-There are two ways to install Keras:
+There are two ways to install Kerasy:
 
 
 * **Install Kerasy from PyPI (recommended):**

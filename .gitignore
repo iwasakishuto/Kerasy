@@ -19,6 +19,9 @@ dist/
 MANIFEST
 kerasy.egg-info/
 
+# wheel
+wheels/
+
 #pytest
 .pytest_cache
 !tests/README.md

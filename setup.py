@@ -69,6 +69,9 @@ def setup_package():
             'pydotplus>=2.0.2',
             'bitarray>=0.8.1',
         ],
+        extras_require={
+          'tests': ['pytest'],
+        },
         package_data={'': ['*.pxd']},
         classifiers=[
             # How mature is this project? Common values are

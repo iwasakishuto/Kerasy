@@ -2,7 +2,7 @@
 """
 from __future__ import absolute_import
 
-from ..utils import get_file
+from . import get_file
 import numpy as np
 
 def load_data(path='mnist.npz'):

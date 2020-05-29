@@ -18,8 +18,6 @@ class CategoricalEncoder():
             self.obj2cls = dict(zip(unique, range(origin, origin+len(unique))))
             self.cls2obj = dict(zip(range(origin, origin+len(unique)), unique))
             self.dtype = arr.dtype
-        else:
-            print("Dictionaly for Encoder is already made.")
 
     def to_categorical(self, obj, origin=0):
         self._mk_obj2cls_dict(obj, origin=origin)

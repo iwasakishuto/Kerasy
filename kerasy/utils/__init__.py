@@ -9,6 +9,7 @@ class KerasyImprementationWarning(Warning):
     pass
 
 from . import bio_utils
+from . import coloring_utils
 from . import deep_utils
 from . import generic_utils
 from . import hash_utils
@@ -29,6 +30,9 @@ from .bio_utils import arangeFor_printAlignment
 from .bio_utils import printAlignment
 from .bio_utils import read_fastseq
 from .bio_utils import kmer_create
+
+from .coloring_utils import (toRED, toGREEN, toYELLOW, toBLUE, toPURPLE, toCYAN,
+                            toWHITE, toRETURN, toACCENT, toFLASH, toRED_FLASH)
 
 from .deep_utils import set_weight
 from .deep_utils import mk_class_get

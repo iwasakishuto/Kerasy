@@ -5,7 +5,7 @@ DATA?="${HOME}/Data"
 DOCKER_FILE=Dockerfile
 DOCKER=docker
 TEST=tests/
-HOST_PORT=8888
+HOST_PORT=8008
 SRC?=$(shell dirname `pwd`)
 EXAMPLES_PATH=$(SRC)/examples
 

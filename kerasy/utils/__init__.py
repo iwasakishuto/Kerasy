@@ -43,6 +43,7 @@ from .generic_utils import flatten_dual
 from .generic_utils import get_varname
 from .generic_utils import disp_var_globals
 from .generic_utils import disp_val_globals
+from .generic_utils import disp_val_shapes
 from .generic_utils import priColor
 from .generic_utils import handleKeyError
 from .generic_utils import handleTypeError

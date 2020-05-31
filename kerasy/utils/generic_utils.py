@@ -52,6 +52,13 @@ def disp_val_globals(*values, head_=True, align_=True, scope_=globals()):
     for name,val in zip(names, values):
         print(f"{name:<{digit}}: {val}")
 
+def disp_val_shapes(*values, head_=True, align_=True, scope_=globals()):
+    if head_: print(f"#=== ARRAY SHAPES ===")
+    names = [get_varname(val, scope_=scope_) for val in values]
+    digit = max([len(e) for e in names]) + 6 if align_ else 1
+    for name,val in zip(names, values):
+        print(f"{name+'.shape':<{digit}}: {val.shape}")
+
 _UID_PREFIXES = defaultdict(int)
 def get_uid(prefix=""):
     _UID_PREFIXES[prefix] += 1

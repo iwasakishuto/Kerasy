@@ -27,12 +27,12 @@ There are two ways to install Kerasy:
 
 
 * **Install Kerasy from PyPI (recommended):**
-  .. code-block::
+   ::
 
        $ sudo pip install kerasy
 
 * **Alternatively: install Kerasy from the GitHub source:**
-  .. code-block::
+   ::
 
        $ git clone https://github.com/keras-team/keras.git
        $ cd keras

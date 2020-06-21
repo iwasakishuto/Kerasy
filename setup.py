@@ -3,6 +3,7 @@
 import os
 import sys
 import shutil
+from distutils.command.clean import clean as Clean
 import builtins
 builtins.__KERASY_SETUP__ = True
 
@@ -16,6 +17,35 @@ especially in the biological field.'
 cwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(cwd, 'README.rst'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
+
+class CleanCommand(Clean):
+    """ Custom clean command to remove build artifacts. """
+    description = "Remove build artifacts from the source tree"
+
+    def run(self):
+        Clean.run(self)
+        # Remove c files if we are not within a sdist package
+        remove_c_files = not os.path.exists(os.path.join(cwd, 'PKG-INFO'))
+        if remove_c_files:
+            print('Will remove generated .c files')
+        if os.path.exists('build'):
+            shutil.rmtree('build')
+        for dirpath, dirnames, filenames in os.walk(DISTNAME):
+            for filename in filenames:
+                if any(filename.endswith(suffix) for suffix in
+                       (".so", ".pyd", ".dll", ".pyc")):
+                    os.unlink(os.path.join(dirpath, filename))
+                    continue
+                extension = os.path.splitext(filename)[1]
+                if remove_c_files and extension in ['.c', '.cpp']:
+                    pyx_file = str.replace(filename, extension, '.pyx')
+                    if os.path.exists(os.path.join(dirpath, pyx_file)):
+                        os.unlink(os.path.join(dirpath, filename))
+            for dirname in dirnames:
+                if dirname == '__pycache__':
+                    shutil.rmtree(os.path.join(dirpath, dirname))
+
+cmdclass = {'clean': CleanCommand}
 
 def configuration(parent_package='', top_path=None):
     if os.path.exists('MANIFEST'):
@@ -60,6 +90,7 @@ def setup_package():
             'Source Code'  : 'https://github.com/iwasakishuto/Kerasy',
             'Say Thanks!'  : 'https://iwasakishuto.github.io/',
         },
+        cmdclass=cmdclass,
         python_requires=">=3.6",
         install_requires=[
             'numpy>=1.15.1',

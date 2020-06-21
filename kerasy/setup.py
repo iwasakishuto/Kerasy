@@ -26,7 +26,13 @@ def configuration(parent_package='', top_path=None):
     config.add_subpackage('ML')
     config.add_subpackage('search')
     config.add_subpackage('utils')
-    
+
+    # Skip cythonization as we do not want to include the generated
+    # C/C++ files in the release tarballs as they are not necessarily
+    # forward compatible with future versions of Python for instance.
+    if "sdist" not in sys.argv:
+        config.ext_modules = cythonize(config.ext_modules)
+
     return config
 
 if __name__ == "__main__":

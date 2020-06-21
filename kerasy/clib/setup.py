@@ -1,18 +1,23 @@
+""" It is necessary to include numpy's C head files. """
 # codin: utf-8
 import os
 from pathlib import Path
 import numpy as np
-from Cython.Build import cythonize
 
 CLIB_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
 
 def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import get_info
     npymath_info = get_info('npymath')
+    # {
+    #     'include_dirs': ['/usr/local/lib/python3.7/site-packages/numpy/core/include'],
+    #     'library_dirs': ['/usr/local/lib/python3.7/site-packages/numpy/core/lib'],
+    #     'libraries': ['npymath'],
+    #     'define_macros': []
+    # }
 
-    libraries = []
     if os.name == 'posix':
-        libraries.append('m')
+        npymath_info['libraries'].append('m')
 
     from numpy.distutils.misc_util import Configuration
     config = Configuration(
@@ -23,18 +28,16 @@ def configuration(parent_package='', top_path=None):
     p = Path(CLIB_ABS_PATH)
     for abs_prog_path in p.glob("*.pyx"):
         fn = abs_prog_path.name # hoge.pyx
-        name = fn.split(".")[0] # hoge
+        *name, ext = fn.split(".")
+        name = ".".join(name) # hoge
         config.add_extension(
             name=name,
             sources=[fn],
             language="c++",
-            # include_dirs=[np.get_include()],
-            # libraries=libraries,
             **npymath_info,
         )
-        print(f"* \033[34m{fn}\033[0m is compiled by Cython to \033[34m{name}.c\033[0m file.")
+        print(f"* \033[34m{fn}\033[0m is compiled by Cython to \033[34m{name}.cpp\033[0m file.")
 
-    config.ext_modules = cythonize(config.ext_modules)
     # config.add_subpackage('tests')
     return config
 

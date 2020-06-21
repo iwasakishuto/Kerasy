@@ -18,6 +18,25 @@ cwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(cwd, 'README.rst'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
+# Optional setuptools features
+# We need to import setuptools early, if we want setuptools features,
+# as it monkey-patches the 'setup' function
+# For some commands, use setuptools
+SETUPTOOLS_COMMANDS = {
+    'develop', 'release', 'bdist_egg', 'bdist_rpm',
+    'bdist_wininst', 'install_egg_info', 'build_sphinx',
+    'egg_info', 'easy_install', 'upload', 'bdist_wheel',
+    '--single-version-externally-managed',
+}
+if SETUPTOOLS_COMMANDS.intersection(sys.argv):
+    import setuptools
+    extra_setuptools_args = {
+        "zip_safe": False,
+        "include_package_data" : True,
+    }
+else:
+    extra_setuptools_args = dict()
+
 class CleanCommand(Clean):
     """ Custom clean command to remove build artifacts. """
     description = "Remove build artifacts from the source tree"
@@ -46,6 +65,10 @@ class CleanCommand(Clean):
                     shutil.rmtree(os.path.join(dirpath, dirname))
 
 cmdclass = {'clean': CleanCommand}
+if "sdist" in sys.argv:
+    import setuptools
+    from distutils.command.sdist import sdist
+    cmdclass['sdist'] = sdist
 
 def configuration(parent_package='', top_path=None):
     if os.path.exists('MANIFEST'):
@@ -125,6 +148,7 @@ def setup_package():
             'Programming Language :: Python :: 3',
             'Programming Language :: Python :: 3.6',
         ],
+        **extra_setuptools_args,
     )
 
     if len(sys.argv) == 1 or (

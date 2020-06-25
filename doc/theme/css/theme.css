@@ -4185,9 +4185,33 @@ p.caption::before {
     color: black;
 }
 
-.wy-menu-vertical li.toctree-l2.current>a {
-  background: #fff8cd;
-  padding: 0.4045em 2.427em
+/* toctree L2 */
+.wy-menu-vertical li.toctree-l2.current>a.current {
+  background-color: #ffed81;
+  padding: 0.4045em 2.427em 0.4045em 1.2em;
+}
+.wy-menu-vertical li.toctree-l2.current>a.current:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+/* toctree L3 */
+.wy-menu-vertical li.toctree-l2:not(.inactive)>a {
+  background-color: #fff8cd;
+  padding: 0.4045em 2.427em;
+}
+.wy-menu-vertical li.toctree-l2:not(.inactive)>a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+/* toctree L4 */
+.wy-menu-vertical li.toctree-l4>a{
+  background-color:#fcfaed;
+  padding: 0.4em 1em 0.4em 3.4em;
+  color: black!important
+}
+.wy-menu-vertical li.toctree-l4>a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .wy-menu-vertical li.current ul {

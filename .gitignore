@@ -6,11 +6,12 @@ __pycache__
 Icon?
 ! */*icon*
 
+# Make documentation
+pyproject.toml
 pelican
 MkDocs
 README.md
 MEMO.md
-
 pelican2mkdocs.py
 checkLibs.py
 

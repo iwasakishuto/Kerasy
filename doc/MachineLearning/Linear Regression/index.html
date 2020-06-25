@@ -175,54 +175,6 @@
       </a>
     </li>
     
-      
-
-
-
-      
-
-  <li class="toctree-l2">
-    <a href="#linear-regression-ridge-l2">
-      Linear Regression (Ridge, L2)
-      <span class="toctree-expand"></span>
-    </a>
-  </li>
-
-
-
-      
-
-  <li class="toctree-l2">
-    <a href="#linear-regression-lasso-l1">
-      Linear Regression (LASSO, L1)
-      <span class="toctree-expand"></span>
-    </a>
-  </li>
-
-
-
-      
-
-  <li class="toctree-l2">
-    <a href="#bayesian-linear-regression">
-      Bayesian Linear Regression
-      <span class="toctree-expand"></span>
-    </a>
-  </li>
-
-
-
-      
-
-  <li class="toctree-l2">
-    <a href="#evidence-approximation-bayesian-regression">
-      Evidence Approximation Bayesian Regression
-      <span class="toctree-expand"></span>
-    </a>
-  </li>
-
-
-
 
   
         
@@ -358,154 +310,237 @@
           <div role="main">
             <div class="section">
               
-                <div class="admonition tip">
+                <div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <div class="topRibbon">
+          <h3>Linear Regression</h3>
+        </div>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-11-27(水)</span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/ML/linear.py">ML/linear.py</a></span></li>
+            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/machinelearning.html">MachineLearning</a></span></li> -->
+        </ul>
+    </div>
+</div>
+        <section class="article">
+            <div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/linear.ipynb">Kerasy.examples.linear.ipynb</a></p>
 </div>
 
-<h2 id="linear-regression">Linear Regression</h2>
-<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
+## Linear Regression<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">(</span><span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
 </code></pre></div>
 
 
 <p>The simplest model for regression is</p>
-<p>$$y(\mathbf{x},\mathbf{w}) = w_0 + w_1x_1 + \cdots + w_Dx_D$$</p>
-<p>However, because of the linearity for the input variables $x_i$, this model has a poor expressive ability. Therefore, we extend it by considering linear combinations of <strong>fixed nonlinear functions</strong> of the input variables, of the form</p>
-<p>$$y(\mathbf{x},\mathbf{w}) = \sum_{j=0}^{M-1}w_j\phi_j(\mathbf{x}) = \mathbf{w}^T\boldsymbol{\phi}(\mathbf{x})$$</p>
-<p>In terms of the target variable $t$, we assume that it is given by a $y(\mathbf{x},\mathbf{w})$ <strong>(deterministic)</strong> with additive <strong>Gaussian noise</strong> so that</p>
-<p>$$p(t|\mathbf{x},\mathbf{w},\beta) = \mathcal{N}\left(t|y(\mathbf{x},\mathbf{w}),\beta^{-1}\right)$$</p>
+<div class="math">$$y(\mathbf{x},\mathbf{w}) = w_0 + w_1x_1 + \cdots + w_Dx_D$$</div>
+<p>However, because of the linearity for the input variables <span class="math">\(x_i\)</span>, this model has a poor expressive ability. Therefore, we extend it by considering linear combinations of <strong>fixed nonlinear functions</strong> of the input variables, of the form</p>
+<div class="math">$$y(\mathbf{x},\mathbf{w}) = \sum_{j=0}^{M-1}w_j\phi_j(\mathbf{x}) = \mathbf{w}^T\boldsymbol{\phi}(\mathbf{x})$$</div>
+<p>In terms of the target variable <span class="math">\(t\)</span>, we assume that it is given by a <span class="math">\(y(\mathbf{x},\mathbf{w})\)</span> <strong>(deterministic)</strong> with additive <strong>Gaussian noise</strong> so that</p>
+<div class="math">$$p(t|\mathbf{x},\mathbf{w},\beta) = \mathcal{N}\left(t|y(\mathbf{x},\mathbf{w}),\beta^{-1}\right)$$</div>
 <p>Therefore, if we observe data, we obtain the following expression for the likelihood function</p>
-<p>$$
+<div class="math">$$
 \begin{aligned}
-p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) = \prod_{n=1}^N\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}<em>n),\beta^{-1}\right)\
+p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) = \prod_{n=1}^N\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}_n),\beta^{-1}\right)\\
 \begin{cases}
 \begin{aligned}
-\ln p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) &amp;=\sum</em>{n=1}^N\ln\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}<em>n),\beta^{-1}\right)\
-&amp;= \frac{N}{2}\ln\beta - \frac{N}{2}\ln(2\pi) - \beta E_D(\mathbf{w})\
-E_D(\mathbf{w}) &amp;= \frac{1}{2}\sum</em>{n=1}^N\left{t_n - \mathbf{w}^T\phi(\mathbf{x}_n)\right}^2
+\ln p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) &amp;=\sum_{n=1}^N\ln\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}_n),\beta^{-1}\right)\\
+&amp;= \frac{N}{2}\ln\beta - \frac{N}{2}\ln(2\pi) - \beta E_D(\mathbf{w})\\
+E_D(\mathbf{w}) &amp;= \frac{1}{2}\sum_{n=1}^N\left\{t_n - \mathbf{w}^T\phi(\mathbf{x}_n)\right\}^2
 \end{aligned}
 \end{cases}
 \end{aligned}
-$$</p>
-<p>As we obtain such a likelihood, it is easy to maximize them respect to $\mathbf{w}$ and $\beta$. (Setting the gradient to zero.)</p>
-<p>$$
+$$</div>
+<p>As we obtain such a likelihood, it is easy to maximize them respect to <span class="math">\(\mathbf{w}\)</span> and <span class="math">\(\beta\)</span>. (Setting the gradient to zero.)</p>
+<div class="math">$$
 \begin{aligned}
-\nabla\ln p(\mathbf{t}|\mathbf{w},\beta) &amp;= \sum_{n=1}^N\left{t_n - \mathbf{w}^T\phi(\mathbf{x}<em>n)\right}\phi(\mathbf{x}_n)^T = 0\
-0 &amp;= \sum</em>{n=1}^Nt_n\phi(\mathbf{x}<em>n)^T - \mathbf{w}^T\left(\sum</em>{n=1}^N\phi(\mathbf{x}<em>n)\phi(\mathbf{x}_n)^T\right)\
-\therefore\mathbf{w}</em>{\text{ML}} &amp;= \left(\Phi^T\Phi\right)^{-1}\Phi^T\mathbf{t}\
-\frac{1}{\beta_{\text{ML}}} &amp;= \frac{1}{N}\sum_{n=1}^N\left{t_n -\mathbf{w}_{\text{ML}}^T\phi(\mathbf{x}_n)\right}^2
+\nabla\ln p(\mathbf{t}|\mathbf{w},\beta) &amp;= \sum_{n=1}^N\left\{t_n - \mathbf{w}^T\phi(\mathbf{x}_n)\right\}\phi(\mathbf{x}_n)^T = 0\\
+0 &amp;= \sum_{n=1}^Nt_n\phi(\mathbf{x}_n)^T - \mathbf{w}^T\left(\sum_{n=1}^N\phi(\mathbf{x}_n)\phi(\mathbf{x}_n)^T\right)\\
+\therefore\mathbf{w}_{\text{ML}} &amp;= \left(\Phi^T\Phi\right)^{-1}\Phi^T\mathbf{t}\\
+\frac{1}{\beta_{\text{ML}}} &amp;= \frac{1}{N}\sum_{n=1}^N\left\{t_n -\mathbf{w}_{\text{ML}}^T\phi(\mathbf{x}_n)\right\}^2
 \end{aligned}
-$$</p>
+$$</div>
 <ul>
-<li>$\Phi$ is an $N\times M$ matrix, called the <strong>design matrix</strong>, whose elements are given by $\Phi_{nj} = \phi_j(\mathbf{x}_n)$</li>
-<li>The quantity $\Phi^{\dagger}\equiv\left(\Phi^T\Phi\right)^{-1}\Phi^T$ is known as the <font color="red"><b>Moore-Penrose pseudo-inverse</b></font> of the matrix $\Phi$</li>
+<li><span class="math">\(\Phi\)</span> is an <span class="math">\(N\times M\)</span> matrix, called the <strong>design matrix</strong>, whose elements are given by <span class="math">\(\Phi_{nj} = \phi_j(\mathbf{x}_n)\)</span></li>
+<li>The quantity <span class="math">\(\Phi^{\dagger}\equiv\left(\Phi^T\Phi\right)^{-1}\Phi^T\)</span> is known as the <font color="red"><b>Moore-Penrose pseudo-inverse</b></font> of the matrix <span class="math">\(\Phi\)</span></li>
 </ul>
-<h2 id="linear-regression-ridge-l2">Linear Regression (Ridge, L2)</h2>
-<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegressionRidge</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
+## Linear Regression (Ridge, L2)<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegressionRidge</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
 </code></pre></div>
 
 
-<p>As you see at the <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/linear.ipynb">notebook</a>, it is likely to <font color="red"><b>over-fit</b></font> especially when model is too complicated. ($M\rightarrow\text{Large}$) For avoiding it, we introduce the idea of <strong>adding a regularization term to an error function.</strong></p>
-<p>$$E_D(\mathbf{w}) + \lambda E_{\mathbf{w}}(\mathbf{w})$$</p>
-<p>where $\lambda$ is the regularization coefficient that controls the relative importance of the data-dependent error $E_D(\mathbf{w})$ and the regularization term $E_{\mathbf{w}}(\mathbf{w})$.</p>
+<p>As you see at the <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/linear.ipynb">notebook</a>, it is likely to <font color="red"><b>over-fit</b></font> especially when model is too complicated. (<span class="math">\(M\rightarrow\text{Large}\)</span>) For avoiding it, we introduce the idea of <strong>adding a regularization term to an error function.</strong></p>
+<div class="math">$$E_D(\mathbf{w}) + \lambda E_{\mathbf{w}}(\mathbf{w})$$</div>
+<p>where <span class="math">\(\lambda\)</span> is the regularization coefficient that controls the relative importance of the data-dependent error <span class="math">\(E_D(\mathbf{w})\)</span> and the regularization term <span class="math">\(E_{\mathbf{w}}(\mathbf{w})\)</span>.</p>
 <p>One of the simplest forms of regularizer is given by</p>
-<p>$$E_{\mathbf{w}}(\mathbf{w}) = \frac{1}{2}\mathbf{w}^T\mathbf{w}$$</p>
-<p>Then, the total error function and Maximum likelihood estimated $\mathbf{w}$ is expressed as</p>
-<p>$$
-\frac{1}{2}\sum_{n=1}^N\left{t_n- \mathbf{w}^T\phi(\mathbf{x}<em>n)\right}^2 + \frac{\lambda}{2}\mathbf{w}^T\mathbf{w}\
-\mathbf{w}</em>{\text{ML}} = \left(\lambda\mathbf{I} + \Phi^T\Phi\right)^{-1}\Phi^T\mathbf{t}
-$$</p>
-<h2 id="linear-regression-lasso-l1">Linear Regression (LASSO, L1)</h2>
-<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegressionLASSO</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
+<div class="math">$$E_{\mathbf{w}}(\mathbf{w}) = \frac{1}{2}\mathbf{w}^T\mathbf{w}$$</div>
+<p>Then, the total error function and Maximum likelihood estimated <span class="math">\(\mathbf{w}\)</span> is expressed as</p>
+<div class="math">$$
+\frac{1}{2}\sum_{n=1}^N\left\{t_n- \mathbf{w}^T\phi(\mathbf{x}_n)\right\}^2 + \frac{\lambda}{2}\mathbf{w}^T\mathbf{w}\\
+\mathbf{w}_{\text{ML}} = \left(\lambda\mathbf{I} + \Phi^T\Phi\right)^{-1}\Phi^T\mathbf{t}
+$$</div>
+## Linear Regression (LASSO, L1)<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">LinearRegressionLASSO</span><span class="p">(</span><span class="n">lambda_</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
 </code></pre></div>
 
 
 <p>Consider the regularizer given by</p>
-<p>$$E_{\mathbf{w}}(\mathbf{w}) = |\mathbf{w}|$$</p>
+<div class="math">$$E_{\mathbf{w}}(\mathbf{w}) = \|\mathbf{w}\|$$</div>
 <p>This function is not differentiable, so we use <font color="red"><b>ADMM(Alternating Direction Method of Multipliers)</b></font>. In this algorithm, we use <font color="red"><b>Extended Lagrange multiplier</b></font>.</p>
-<p>$$\begin{aligned}
-L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right) &amp;= \frac{1}{2}|\mathbf{y} - \mathbf{Xw}|^2 + \lambda|\mathbf{z}| + \boldsymbol{\alpha}^T\left(\mathbf{w}-\mathbf{z}\right) + \frac{\rho}{2}|\mathbf{w}-\mathbf{z}|^2\
+<div class="math">$$\begin{aligned}
+L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right) &amp;= \frac{1}{2}\|\mathbf{y} - \mathbf{Xw}\|^2 + \lambda|\mathbf{z}| + \boldsymbol{\alpha}^T\left(\mathbf{w}-\mathbf{z}\right) + \frac{\rho}{2}\|\mathbf{w}-\mathbf{z}\|^2\\
 \text{subject to  }\mathbf{w} &amp;= \mathbf{z}
-\end{aligned}$$</p>
-<p>We minimize $L_{\rho}$ respect to $\mathbf{w}$ and $\mathbf{z}$ <strong>repeatedly</strong>.</p>
-<p>$$
+\end{aligned}$$</div>
+<p>We minimize <span class="math">\(L_{\rho}\)</span> respect to <span class="math">\(\mathbf{w}\)</span> and <span class="math">\(\mathbf{z}\)</span> <strong>repeatedly</strong>.</p>
+<div class="math">$$
 \begin{cases}
   \begin{aligned}
-    \mathbf{w}&amp;\leftarrow\underset{\mathbf{w}}{\text{argmin}}L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right)\text{ with fixed with $\mathbf{z},\boldsymbol{\alpha}$}\
-    &amp;=\left(\mathbf{X}^T\mathbf{X} + \rho\mathbf{I}\right)^{-1}\left(\mathbf{X}^T\mathbf{y} - \boldsymbol{\alpha} + \rho\mathbf{z}\right)\
-    \mathbf{z}&amp;\leftarrow\underset{\mathbf{z}}{\text{argmin}}L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right)\text{ with fixed with $\mathbf{w},\boldsymbol{\alpha}$}\
-    &amp;= \text{prox}<em>{\frac{\lambda}{\rho}|\ast|}\left(w_i + \frac{\alpha_i}{\rho}\right)\
+    \mathbf{w}&amp;\leftarrow\underset{\mathbf{w}}{\text{argmin}}L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right)\text{ with fixed with $\mathbf{z},\boldsymbol{\alpha}$}\\
+    &amp;=\left(\mathbf{X}^T\mathbf{X} + \rho\mathbf{I}\right)^{-1}\left(\mathbf{X}^T\mathbf{y} - \boldsymbol{\alpha} + \rho\mathbf{z}\right)\\
+    \mathbf{z}&amp;\leftarrow\underset{\mathbf{z}}{\text{argmin}}L_{\rho}\left(\mathbf{w},\mathbf{z},\boldsymbol{\alpha}\right)\text{ with fixed with $\mathbf{w},\boldsymbol{\alpha}$}\\
+    &amp;= \text{prox}_{\frac{\lambda}{\rho}|\ast|}\left(w_i + \frac{\alpha_i}{\rho}\right)\\
     \boldsymbol{\alpha}&amp;\leftarrow\boldsymbol{\alpha} + \rho\left(\mathbf{w}-\mathbf{z}\right)
   \end{aligned}
-\end{cases}\
-\text{prox}</em>{c|\ast|}(z_0) := \underset{z}{\text{argmin}}\left{c|z| + \frac{1}{2}\left(z-z_0\right)^2\right} = \begin{cases}z_0-c &amp; (c &lt; z_0)\0 &amp; (-c\leq z_0 \leq c)\z_0 + c &amp; (z_0 &lt; -c)\end{cases}
-$$</p>
-<hr />
+\end{cases}\\
+\text{prox}_{c|\ast|}(z_0) := \underset{z}{\text{argmin}}\left\{c|z| + \frac{1}{2}\left(z-z_0\right)^2\right\} = \begin{cases}z_0-c &amp; (c &lt; z_0)\\0 &amp; (-c\leq z_0 \leq c)\\z_0 + c &amp; (z_0 &lt; -c)\end{cases}
+$$</div>
+<hr>
 <p>A more general regularizer is sometimes used, for which the regularized error takes the form</p>
-<p>$$\frac{1}{2}\sum_{n=1}^N\left{t_n-\mathbf{w}^T\phi(\mathbf{x}<em>n)\right}^2 + \frac{\lambda}{2}\sum</em>{j=1}^M|w_j|^q$$</p>
-<hr />
-<h2 id="bayesian-linear-regression">Bayesian Linear Regression</h2>
-<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">BayesianLinearRegression</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
+<div class="math">$$\frac{1}{2}\sum_{n=1}^N\left\{t_n-\mathbf{w}^T\phi(\mathbf{x}_n)\right\}^2 + \frac{\lambda}{2}\sum_{j=1}^M|w_j|^q$$</div>
+<hr>
+## Bayesian Linear Regression<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">BayesianLinearRegression</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
 </code></pre></div>
 
 
 <p>We turn to a <strong>Bayesian treatment</strong> of linear regression, which will <strong>avoid the over-fitting problem</strong> of maximum likelihood, and which will also lead to <strong>automatic methods</strong> of determining model complexity <strong>using the training data alone.</strong> (Not requiring <strong>Hold-out methods</strong>)</p>
 <ol>
-<li>We assume that the prior distribution of $\mathbf{w}$ is given by a Gaussian distribution of the form
-$$p(\mathbf{w}|\alpha) = \mathcal{N}\left(\mathbf{w}|\mathbf{0},\alpha^{-1}\mathbf{I}\right)$$</li>
+<li>We assume that the prior distribution of <span class="math">\(\mathbf{w}\)</span> is given by a Gaussian distribution of the form
+<div class="math">$$p(\mathbf{w}|\alpha) = \mathcal{N}\left(\mathbf{w}|\mathbf{0},\alpha^{-1}\mathbf{I}\right)$$</div>
+</li>
 <li>As I mentioned before, likelihood is given by
-$$p(t|\mathbf{x},\mathbf{w},\beta) = \mathcal{N}\left(t|y(\mathbf{x},\mathbf{w}),\beta^{-1}\right)\
-p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) = \prod_{n=1}^N\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}_n),\beta^{-1}\right)$$</li>
+<div class="math">$$p(t|\mathbf{x},\mathbf{w},\beta) = \mathcal{N}\left(t|y(\mathbf{x},\mathbf{w}),\beta^{-1}\right)\\
+p(\mathbf{t}|\mathbf{X},\mathbf{w},\beta) = \prod_{n=1}^N\mathcal{N}\left(t_n|\mathbf{w}^T\phi(\mathbf{x}_n),\beta^{-1}\right)$$</div>
+</li>
 <li>From the Bayes' theorem, <strong>posterior distribution is proportional to the product of prior distribution and likelihood</strong>. Therefore, posterior distribution is described as
-$$p(\mathbf{w}|\mathbf{t}) = \mathcal{N}\left(\mathbf{m}_N,\mathbf{S}_N\right)\
-\begin{cases}\mathbf{m}_N &amp;= \beta\mathbf{S}_N\Phi^T\mathbf{t}\\mathbf{S}_N^{-1} &amp;= \alpha\mathbf{I} + \beta\Phi^T\Phi\end{cases}$$</li>
+<div class="math">$$p(\mathbf{w}|\mathbf{t}) = \mathcal{N}\left(\mathbf{m}_N,\mathbf{S}_N\right)\\
+\begin{cases}\mathbf{m}_N &amp;= \beta\mathbf{S}_N\Phi^T\mathbf{t}\\\mathbf{S}_N^{-1} &amp;= \alpha\mathbf{I} + \beta\Phi^T\Phi\end{cases}$$</div>
+</li>
 <li>Finally, the <strong>predictive distribution</strong> defined by:
-$$\begin{aligned}
-p(t|\mathbf{t},\alpha,\beta) &amp;= \int p(t|\mathbf{w},\beta)p(\mathbf{w}|\mathbf{t},\alpha,\beta)d\mathbf{w}\
-&amp;= \mathcal{N}\left(t|\mathbf{m}_N^T\phi(\mathbf{x}),\sigma^2_N(\mathbf{x})\right)\
+<div class="math">$$\begin{aligned}
+p(t|\mathbf{t},\alpha,\beta) &amp;= \int p(t|\mathbf{w},\beta)p(\mathbf{w}|\mathbf{t},\alpha,\beta)d\mathbf{w}\\
+&amp;= \mathcal{N}\left(t|\mathbf{m}_N^T\phi(\mathbf{x}),\sigma^2_N(\mathbf{x})\right)\\
 \sigma^2_N(\mathbf{x}) &amp;= \frac{1}{\beta} + \phi(\mathbf{x})^T\mathbf{S}\phi(\mathbf{x})
-\end{aligned}$$</li>
+\end{aligned}$$</div>
+</li>
 </ol>
 <div class="admonition summary">
   <p class="admonition-title">Reference</p>
   <p>If you want to know the derivation process (calculation process) in detail, please visit <a href="https://iwasakishuto.github.io/University/3A/生物データマイニング論-4.html">here</a>.</p>
 </div>
 
-<h2 id="evidence-approximation-bayesian-regression">Evidence Approximation Bayesian Regression</h2>
-<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">EvidenceApproxBayesianRegression</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
+## Evidence Approximation Bayesian Regression<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">linear</span><span class="o">.</span><span class="n">EvidenceApproxBayesianRegression</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">basisargs</span><span class="p">)</span>
 </code></pre></div>
 
 
-<p>In a fully Bayesian treatment of the linear basis function model, we would <strong>introduce prior distributions over the hyperparameters $\alpha$, and $\beta$.</strong></p>
-<p>$$
+<p>In a fully Bayesian treatment of the linear basis function model, we would <strong>introduce prior distributions over the hyperparameters <span class="math">\(\alpha\)</span>, and <span class="math">\(\beta\)</span>.</strong></p>
+<div class="math">$$
 \begin{aligned}
 p(t|\mathbf{t},\mathbf{X},\mathbf{x},\alpha,\beta)
-&amp;= \int p(t|\mathbf{w},\mathbf{x},\beta)p(\mathbf{w}|\mathbf{t},\mathbf{X},\alpha,\beta)d\mathbf{w}\
+&amp;= \int p(t|\mathbf{w},\mathbf{x},\beta)p(\mathbf{w}|\mathbf{t},\mathbf{X},\alpha,\beta)d\mathbf{w}\\
 &amp;\Rightarrow \int p(t|\mathbf{w},\mathbf{x},\beta)p(\mathbf{w}|\mathbf{t},\mathbf{X},\alpha,\beta)p(\alpha,\beta|\mathbf{t},\mathbf{X})d\mathbf{w}d\alpha d\beta \quad (\ast)
 \end{aligned}
-$$</p>
-<p>Marginalize with respect to these hyperparameters as well as with respect to the parameters $\mathbf{w}$ to make predictions.</p>
-<p>As, the <strong>complete marginalization over all of these variables is analytically intractable</strong>, We will maximize $(\ast)$ in line with the framework of <font color="red"><b>empirical Bayes</b></font> (or <strong>type 2 maximum likelihood</strong>, <strong>generalized maximum likelihood</strong>, <strong>evidence approximation</strong>)</p>
+$$</div>
+<p>Marginalize with respect to these hyperparameters as well as with respect to the parameters <span class="math">\(\mathbf{w}\)</span> to make predictions.</p>
+<p>As, the <strong>complete marginalization over all of these variables is analytically intractable</strong>, We will maximize <span class="math">\((\ast)\)</span> in line with the framework of <font color="red"><b>empirical Bayes</b></font> (or <strong>type 2 maximum likelihood</strong>, <strong>generalized maximum likelihood</strong>, <strong>evidence approximation</strong>)</p>
 <p>In the framework, we repeat the following process.</p>
 <ol>
-<li>Obtain the marginal likelihood function by first integrating over the parameters $\mathbf{w}$
-$$p(\mathbf{t}|\alpha,\beta) = \int p(\mathbf{t}|\mathbf{w},\mathbf{X},\beta)p(\mathbf{w}|\alpha)d\mathbf{w}$$</li>
-<li>Maximize $p(\mathbf{t}|\alpha,\beta)$ with respect to $\alpha$ and $\beta$.
-$$
+<li>Obtain the marginal likelihood function by first integrating over the parameters <span class="math">\(\mathbf{w}\)</span>
+<div class="math">$$p(\mathbf{t}|\alpha,\beta) = \int p(\mathbf{t}|\mathbf{w},\mathbf{X},\beta)p(\mathbf{w}|\alpha)d\mathbf{w}$$</div>
+</li>
+<li>Maximize <span class="math">\(p(\mathbf{t}|\alpha,\beta)\)</span> with respect to <span class="math">\(\alpha\)</span> and <span class="math">\(\beta\)</span>.
+<div class="math">$$
 \begin{cases}
   \begin{aligned}
-    \gamma &amp;= \sum_{i}\frac{\lambda_i}{\lambda_i + \alpha^{\text{old}}}\
-    \alpha^{\text{new}} &amp;= \frac{\gamma}{\mathbf{m}<em>N^T\mathbf{m}_N}\
-    \frac{1}{\beta^{\text{new}}} &amp;= \frac{1}{N-\gamma}\sum</em>{n=1}^N\left{t_n - \mathbf{m}_N^T\phi(\mathbf{x}_n)\right}^2
+    \gamma &amp;= \sum_{i}\frac{\lambda_i}{\lambda_i + \alpha^{\text{old}}}\\
+    \alpha^{\text{new}} &amp;= \frac{\gamma}{\mathbf{m}_N^T\mathbf{m}_N}\\
+    \frac{1}{\beta^{\text{new}}} &amp;= \frac{1}{N-\gamma}\sum_{n=1}^N\left\{t_n - \mathbf{m}_N^T\phi(\mathbf{x}_n)\right\}^2
   \end{aligned}
 \end{cases}
-$$</li>
+$$</div>
+</li>
 </ol>
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
     <li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/#!prml-book">Pattern Recognition and Machine Learning by Christopher Bishop</a></li>
   </ul>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+        </section>
+    </div>
+</div>
 </div>
               
             </div>

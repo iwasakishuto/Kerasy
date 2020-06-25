@@ -167,7 +167,7 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../Linear Regression/">Linear Regression</a>
+    <a class="" href="../Linear%20Regression/">Linear Regression</a>
   </li>
         
           
@@ -189,6 +189,88 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#bernoulli-hmm">
+      Bernoulli HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#multinomial-hmm">
+      Multinomial HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#binomial-hmm">
+      Binomial HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#gaussian-hmm">
+      Gaussian HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#definition">definition</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#conversion-function">conversion function</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+
+  <li class="toctree-l2">
+    <a href="#gaussian-mixture-hmm">
+      Gaussian Mixture HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#correspondence-between-code-and-formula">Correspondence between code and formula</a>
+        </li>
+    
+    </ul>
+  </li>
+
 
   
         
@@ -196,7 +278,7 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../EM algorithm/">EM algorithm</a>
+    <a class="" href="../EM%20algorithm/">EM algorithm</a>
   </li>
         
           
@@ -210,7 +292,7 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../Support Vector Machine/">Support Vector Machine</a>
+    <a class="" href="../Support%20Vector%20Machine/">Support Vector Machine</a>
   </li>
         
       </ul>
@@ -231,7 +313,7 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../../BioInformatics/Tandem Repeats/">Tandem Repeats</a>
+    <a class="" href="../../BioInformatics/Tandem%20Repeats/">Tandem Repeats</a>
   </li>
         
           
@@ -245,7 +327,14 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../../BioInformatics/Secondary Structure/">Secondary Structure</a>
+    <a class="" href="../../BioInformatics/Microarray/">Microarray</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../BioInformatics/Secondary%20Structure/">Secondary Structure</a>
   </li>
         
           
@@ -259,7 +348,7 @@
 
 
   <li class="navtree toctree-l2 inactive">
-    <a class="" href="../../BioInformatics/String Search/">String Search</a>
+    <a class="" href="../../BioInformatics/String%20Search/">String Search</a>
   </li>
         
       </ul>
@@ -303,32 +392,16 @@
           <div role="main">
             <div class="section">
               
-                <div id="contents">
-<div class="row">
-    <div class="small-12 columns article">
-        <div class="topRibbon">
-          <h3>HMM</h3>
-        </div>
-        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
-    <div class="small-12 columns">
-        <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2020-01-10(金)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/ML/HMM.py">ML/HMM.py</a></span></li>
-            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/machinelearning.html">MachineLearning</a></span></li> -->
-        </ul>
-    </div>
-</div>
-        <section class="article">
-            <div class="admonition tip">
+                <div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/HMM.ipynb">Kerasy.examples.HMM.ipynb</a></p>
 </div>
 
 <p>The <strong><em>hidden Markov model</em> (HMM)</strong> is a very powerful statistical method of characterizing the observed data samples of a discrete-time series. It's <strong>joint probability distribution</strong> over both latent and observed variables is then given by</p>
-<div class="math">$$
-p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})=p\left(\mathbf{z}_{1} | \boldsymbol{\pi}\right)\left[\prod_{n=2}^{N} p\left(\mathbf{z}_{n} | \mathbf{z}_{n-1}, \mathbf{A}\right)\right] \prod_{m=1}^{N} p\left(\mathbf{x}_{m} | \mathbf{z}_{m}, \boldsymbol{\phi}\right)\qquad (13.10)
-$$</div>
-<p>where <span class="math">\(\mathbf{Z}=\left\{z_1,\ldots,z_N\right\}\)</span> are the discrete latent variables, <span class="math">\(\mathbf{X}=\left\{x_1,\ldots,x_N\right\}\)</span> are the corresponding observations, and <span class="math">\(\boldsymbol{\theta} = \left\{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right\}\)</span> denotes the set of parameters governing the model.</p>
+<p>$$
+p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})=p\left(\mathbf{z}<em>{1} | \boldsymbol{\pi}\right)\left[\prod</em>{n=2}^{N} p\left(\mathbf{z}<em>{n} | \mathbf{z}</em>{n-1}, \mathbf{A}\right)\right] \prod_{m=1}^{N} p\left(\mathbf{x}<em>{m} | \mathbf{z}</em>{m}, \boldsymbol{\phi}\right)\qquad (13.10)
+$$</p>
+<p>where $\mathbf{Z}=\left{z_1,\ldots,z_N\right}$ are the discrete latent variables, $\mathbf{X}=\left{x_1,\ldots,x_N\right}$ are the corresponding observations, and $\boldsymbol{\theta} = \left{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right}$ denotes the set of parameters governing the model.</p>
 <table>
 <thead>
 <tr>
@@ -340,113 +413,103 @@ $$</div>
 <tbody>
 <tr>
 <td align="left">initial state</td>
-<td align="center">
-<div class="math">$$\pi_{k} \equiv p\left(z_{1 k}=1\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$p\left(\mathbf{z}_{1} \mid \boldsymbol{\pi}\right)=\prod_{k=1}^{K} \pi_{k}^{z_{1 k}}\quad (13.8)$$</div>
-</td>
+<td align="center">$$\pi_{k} \equiv p\left(z_{1 k}=1\right)$$</td>
+<td align="center">$$p\left(\mathbf{z}<em>{1} \mid \boldsymbol{\pi}\right)=\prod</em>{k=1}^{K} \pi_{k}^{z_{1 k}}\quad (13.8)$$</td>
 </tr>
 <tr>
 <td align="left">transition probability</td>
-<td align="center">
-<div class="math">$$A_{j k} \equiv p\left(z_{n k}=1\mid z_{n-1, j}=1\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$p\left(\mathbf{z}_{n} \mid \mathbf{z}_{n-1}, \mathbf{A}\right)=\prod_{k=1}^{K} \prod_{j=1}^{K} A_{j k}^{z_{n-1, j} z_{n k}}\quad (13.7)$$</div>
-</td>
+<td align="center">$$A_{j k} \equiv p\left(z_{n k}=1\mid z_{n-1, j}=1\right)$$</td>
+<td align="center">$$p\left(\mathbf{z}<em>{n} \mid \mathbf{z}</em>{n-1}, \mathbf{A}\right)=\prod_{k=1}^{K} \prod_{j=1}^{K} A_{j k}^{z_{n-1, j} z_{n k}}\quad (13.7)$$</td>
 </tr>
 <tr>
 <td align="left">emission probability</td>
 <td align="center"><strong>depend on your model.</strong></td>
-<td align="center">
-<div class="math">$$p\left(\mathbf{x}_n\mid\mathbf{z}_n,\boldsymbol{\phi}\right) = \prod_{k=1}^Kp\left(\mathbf{x}_n\mid\phi_k\right)^{z_{nk}}\quad (13.9)$$</div>
-</td>
+<td align="center">$$p\left(\mathbf{x}<em>n\mid\mathbf{z}_n,\boldsymbol{\phi}\right) = \prod</em>{k=1}^Kp\left(\mathbf{x}<em>n\mid\phi_k\right)^{z</em>{nk}}\quad (13.9)$$</td>
 </tr>
 </tbody>
 </table>
-<p>If we have observed a data set <span class="math">\(\mathbf{X} = \left\{x_1,\ldots,x_N\right\}\)</span>, we can determine the parameters of an HMM using maximum likelihood. The likelihood function is given by</p>
-<div class="math">$$
+<p>If we have observed a data set $\mathbf{X} = \left{x_1,\ldots,x_N\right}$, we can determine the parameters of an HMM using maximum likelihood. The likelihood function is given by</p>
+<p>$$
 p(\mathbf{X} | \boldsymbol{\theta})=\sum_{\mathbf{Z}} p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})\qquad (13.11)
-$$</div>
-<p>However, <span class="math">\(\sum_{\mathbf{Z}}\)</span> leads to complex expressions, so we turn to the <strong>expectation maximization (EM) algorithm</strong>.</p>
+$$</p>
+<p>However, $\sum_{\mathbf{Z}}$ leads to complex expressions, so we turn to the <strong>expectation maximization (EM) algorithm</strong>.</p>
 <blockquote>
-<p>The EM algorithm starts with some initial selection for the model parameters, which we denote by <span class="math">\(\boldsymbol{\theta}^{\text{old}}\)</span>.</p>
-<p>In the E step, we take these parameter values and find the posterior distribution of the latent variables <span class="math">\(p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right)\)</span>. We then, <strong>use this posterior distribution to evaluate the expectation of the logarithm of the complete-data likelihood function</strong>, as a function of the parameters <span class="math">\(\boldsymbol{\theta}\)</span>, to give the function <span class="math">\(Q\left(\boldsymbol{\theta},\boldsymbol{\theta}^{\text{old}}\right)\)</span> defined by
-<div class="math">$$
+<p>The EM algorithm starts with some initial selection for the model parameters, which we denote by $\boldsymbol{\theta}^{\text{old}}$.</p>
+<p>In the E step, we take these parameter values and find the posterior distribution of the latent variables $p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right)$. We then, <strong>use this posterior distribution to evaluate the expectation of the logarithm of the complete-data likelihood function</strong>, as a function of the parameters $\boldsymbol{\theta}$, to give the function $Q\left(\boldsymbol{\theta},\boldsymbol{\theta}^{\text{old}}\right)$ defined by
+$$
 Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\text {old }}\right)=\sum_{\mathbf{Z}} p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) \ln p\left(\mathbf{X},\mathbf{Z} | \boldsymbol{\theta}\right)\qquad (13.12)
-$$</div>
-At this point, it is convenient to introduce some notation. We shall use <span class="math">\(\gamma(\mathbf{z}_n)\)</span> to denote <strong>the marginal posterior distribution of a latent variable <span class="math">\(\mathbf{z}_n\)</span></strong>, and <span class="math">\(\xi\left(z_{n-1, j}, z_{n k}\right)\)</span> to denote <strong>the joint posterior distribution of two successive latent variables</strong>, so that
-<div class="math">$$
-\begin{aligned} \gamma\left(\mathbf{z}_{n}\right) &amp;=p\left(\mathbf{z}_{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.13)\\ \xi\left(\mathbf{z}_{n-1}, \mathbf{z}_{n}\right) &amp;=p\left(\mathbf{z}_{n-1}, \mathbf{z}_{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.14) \end{aligned}
-$$</div>
-If we substitute the joint distribution <span class="math">\(p\left(\mathbf{X},\mathbf{Z}|\boldsymbol{\theta}\right)\)</span> given by <span class="math">\((13.10)\)</span> into <span class="math">\((13.12)\)</span>, and make use of the definition of <span class="math">\(\gamma\)</span> and <span class="math">\(\xi\)</span>, we obtain
-<div class="math">$$
-\begin{aligned} Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)=&amp; \sum_{k=1}^{K} \gamma\left(z_{1 k}\right) \ln \pi_{k}+\sum_{n=2}^{N} \sum_{j=1}^{K} \sum_{k=1}^{K} \xi\left(z_{n-1, j}, z_{n k}\right) \ln A_{j k} \\ &amp;+\sum_{n=1}^{N} \sum_{k=1}^{K}\gamma\left(z_{n k}\right) \sum_{i=1}^Dx_{ni} \ln \phi_{i k} \end{aligned}\qquad (13.17)
-$$</div>
-The goal of the E step will be to evaluate the quantities <span class="math">\(\gamma\left(\mathbf{z}_n\right)\)</span> and <span class="math">\(\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right)\)</span> efficiently. <strong>(→ forward-backward algorithm.)</strong></p>
-<p>In the M step, we maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to the parameters <span class="math">\(\boldsymbol{\theta} = \left\{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right\}\)</span> in which we treat <span class="math">\(\gamma\left(\mathbf{z}_n\right)\)</span> and <span class="math">\(\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right)\)</span> as constant. Maximization with respect to <span class="math">\(\boldsymbol{\pi}\)</span> and <span class="math">\(\mathbf{A}\)</span> is easily achieved using appropriate <strong>Lagrange multipliers</strong> with the results
-<div class="math">$$
+$$
+At this point, it is convenient to introduce some notation. We shall use $\gamma(\mathbf{z}<em>n)$ to denote <strong>the marginal posterior distribution of a latent variable $\mathbf{z}_n$</strong>, and $\xi\left(z</em>{n-1, j}, z_{n k}\right)$ to denote <strong>the joint posterior distribution of two successive latent variables</strong>, so that
+$$
+\begin{aligned} \gamma\left(\mathbf{z}<em>{n}\right) &amp;=p\left(\mathbf{z}</em>{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.13)\ \xi\left(\mathbf{z}<em>{n-1}, \mathbf{z}</em>{n}\right) &amp;=p\left(\mathbf{z}<em>{n-1}, \mathbf{z}</em>{n} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right) &amp;(13.14) \end{aligned}
+$$
+If we substitute the joint distribution $p\left(\mathbf{X},\mathbf{Z}|\boldsymbol{\theta}\right)$ given by $(13.10)$ into $(13.12)$, and make use of the definition of $\gamma$ and $\xi$, we obtain
+$$
+\begin{aligned} Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)=&amp; \sum_{k=1}^{K} \gamma\left(z_{1 k}\right) \ln \pi_{k}+\sum_{n=2}^{N} \sum_{j=1}^{K} \sum_{k=1}^{K} \xi\left(z_{n-1, j}, z_{n k}\right) \ln A_{j k} \ &amp;+\sum_{n=1}^{N} \sum_{k=1}^{K}\gamma\left(z_{n k}\right) \sum_{i=1}^Dx_{ni} \ln \phi_{i k} \end{aligned}\qquad (13.17)
+$$
+The goal of the E step will be to evaluate the quantities $\gamma\left(\mathbf{z}<em>n\right)$ and $\xi\left(\mathbf{z}</em>{n-1},\mathbf{z}_n\right)$ efficiently. <strong>(→ forward-backward algorithm.)</strong></p>
+<p>In the M step, we maximize $Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)$ with respect to the parameters $\boldsymbol{\theta} = \left{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right}$ in which we treat $\gamma\left(\mathbf{z}<em>n\right)$ and $\xi\left(\mathbf{z}</em>{n-1},\mathbf{z}<em>n\right)$ as constant. Maximization with respect to $\boldsymbol{\pi}$ and $\mathbf{A}$ is easily achieved using appropriate <strong>Lagrange multipliers</strong> with the results
+$$
 \begin{aligned}
-\pi_{k}&amp;= \frac{\gamma\left(z_{1 k}\right)}{\sum_{j=1}^{K} \gamma\left(z_{1 j}\right)} &amp; (13.18)\\
-A_{j k}&amp;= \frac{\sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n k}\right)}{\sum_{l=1}^{K} \sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n l}\right)} &amp; (13.19)\\
+\pi</em>{k}&amp;= \frac{\gamma\left(z_{1 k}\right)}{\sum_{j=1}^{K} \gamma\left(z_{1 j}\right)} &amp; (13.18)\
+A_{j k}&amp;= \frac{\sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n k}\right)}{\sum_{l=1}^{K} \sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n l}\right)} &amp; (13.19)\
 \end{aligned}
-$$</div>
-To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to <span class="math">\(\phi_k\)</span>, we notice that only the final term in <span class="math">\((13.17)\)</span> depends on <span class="math">\(\phi_k\)</span>, and the quantities <span class="math">\(\gamma\left(z_{nk}\right)\)</span> are playing the role of the responsibilities. If the parameters <span class="math">\(\phi_k\)</span> are independent for the different components, then this term decouples into a sum of terms one for each value <span class="math">\(k\)</span>, each of which can be maximized independently. We are then simply maximizing the weighted log likelihood function for the emission density <span class="math">\(p\left(\mathbf{x}|\phi_k\right)\)</span> with weights <span class="math">\(\gamma\left(z_{nk}\right)\)</span>.</p>
+$$
+To maximize $Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)$ with respect to $\phi_k$, we notice that only the final term in $(13.17)$ depends on $\phi_k$, and the quantities $\gamma\left(z_{nk}\right)$ are playing the role of the responsibilities. If the parameters $\phi_k$ are independent for the different components, then this term decouples into a sum of terms one for each value $k$, each of which can be maximized independently. We are then simply maximizing the weighted log likelihood function for the emission density $p\left(\mathbf{x}|\phi_k\right)$ with weights $\gamma\left(z_{nk}\right)$.</p>
 </blockquote>
-<h2>Bernoulli HMM</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BernoulliHMM</span><span class="p">(</span>
+<h2 id="bernoulli-hmm">Bernoulli HMM</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BernoulliHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>For the case of discrete Bernoulli observed variables, the conditional distribution of the observations takes the form</p>
-<div class="math">$$p\left(x|\mathbf{z}\right) = \prod_{k=1}^{K}\left(\theta_k^x\left(1-\theta_k\right)^{1-x}\right)^{z_k}$$</div>
+<p>$$p\left(x|\mathbf{z}\right) = \prod_{k=1}^{K}\left(\theta_k^x\left(1-\theta_k\right)^{1-x}\right)^{z_k}$$</p>
 <p>and the corresponding M-step equations are given by</p>
-<div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}$$</div>
-<h2>Multinomial HMM</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
+<p>$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}$$</p>
+<h2 id="multinomial-hmm">Multinomial HMM</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>For the case of discrete multinomial observed variables, the conditional distribution of the observations takes the form</p>
-<div class="math">$$p\left(\mathbf{x}|\mathbf{z}\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</div>
-<p><strong>※ <em>When <span class="math">\(k\)</span> is <span class="math">\(2\)</span> and, the multinomial distribution is the Bernoulli distribution.</em></strong></p>
+<p>$$p\left(\mathbf{x}|\mathbf{z}\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</p>
+<p><strong>※ <em>When $k$ is $2$ and, the multinomial distribution is the Bernoulli distribution.</em></strong></p>
 <p>and the corresponding M-step equations are given by</p>
-<div class="math">$$\mu_{ik} = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_{ni}}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}\qquad (13.23)$$</div>
-<h2>Binomial HMM</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BinomialHMM</span><span class="p">(</span>
+<p>$$\mu_{ik} = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_{ni}}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}\qquad (13.23)$$</p>
+<h2 id="binomial-hmm">Binomial HMM</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BinomialHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
 <p>For the case of discrete binomial observed variables, the conditional distribution of the observations takes the form</p>
-<div class="math">$$p\left(x|n,\mathbf{z}\right) = \prod_{k=1}^{K}\left(\begin{array}{l}n \\ x\end{array}\right) \left(\theta_k^x\left(1-\theta_k\right)^{n-x}\right)^{z_k}$$</div>
+<p>$$p\left(x|n,\mathbf{z}\right) = \prod_{k=1}^{K}\left(\begin{array}{l}n \ x\end{array}\right) \left(\theta_k^x\left(1-\theta_k\right)^{n-x}\right)^{z_k}$$</p>
 <p><strong>※ <em>A single success/failure experiment is also called a Bernoulli trial or Bernoulli experiment and a sequence of outcomes is called a Bernoulli process; for a single trial, i.e., n = 1, the binomial distribution is a Bernoulli distribution.</em></strong></p>
 <p>and the corresponding M-step equations are given by</p>
-<div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)n_n}$$</div>
-<h2>Gaussian HMM</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
+<p>$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)n_n}$$</p>
+<h2 id="gaussian-hmm">Gaussian HMM</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;itmc&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">covariance_type</span><span class="o">=</span><span class="s2">&quot;diag&quot;</span><span class="p">,</span> <span class="n">min_covariance</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
-</pre></div>
+</code></pre></div>
 
 
-<p>Gaussian emission densities we have <span class="math">\(p(\mathbf{x}|\boldsymbol{\phi}_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)\)</span>, and maximization of the function <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> then gives</p>
-<div class="math">$$
+<p>Gaussian emission densities we have $p(\mathbf{x}|\boldsymbol{\phi}_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)$, and maximization of the function $Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)$ then gives</p>
+<p>$$
 \begin{aligned}
-\boldsymbol{\mu_k} &amp;= \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^{N}\gamma\left(z_{nk}\right)} &amp;(13.20)\\
-\boldsymbol{\Sigma_k} &amp;=\frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)^T}{\sum_{n=1}^N\gamma\left(z_{nk}\right)} &amp;(13.21)
+\boldsymbol{\mu_k} &amp;= \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^{N}\gamma\left(z_{nk}\right)} &amp;(13.20)\
+\boldsymbol{\Sigma_k} &amp;=\frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)\left(\mathbf{x}<em>n-\boldsymbol{\mu}_k\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)^T}{\sum</em>{n=1}^N\gamma\left(z_{nk}\right)} &amp;(13.21)
 \end{aligned}
-$$</div>
+$$</p>
 <h4 id="covariance-type">Covariance type</h4>
 
-<h5>definition</h5>
+<h5 id="definition">definition</h5>
 <table>
 <thead>
 <tr>
@@ -460,40 +523,32 @@ $$</div>
 <tr>
 <td align="center"><strong>spherical</strong></td>
 <td align="center">Each state uses a single variance value that applies to all features.</td>
-<td align="center">
-<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)} &amp; &amp; &amp; 0 \\ &amp; \sigma^{(k)} &amp; &amp; \\ &amp; &amp; \ddots &amp; \\ 0 &amp; &amp; &amp; \sigma^{(k)} \end{array}\right)$$</div>
-</td>
+<td align="center">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)} &amp; &amp; &amp; 0 \ &amp; \sigma^{(k)} &amp; &amp; \ &amp; &amp; \ddots &amp; \ 0 &amp; &amp; &amp; \sigma^{(k)} \end{array}\right)$$</td>
 <td align="center"><code>nh</code> * 1</td>
 </tr>
 <tr>
 <td align="center"><strong>diag</strong></td>
 <td align="center">Each state uses a diagonal covariance matrix.</td>
-<td align="center">
-<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}_{1} &amp; &amp; &amp; 0 \\ &amp; \sigma^{(k)}_{2} &amp; &amp; \\ &amp; &amp; \ddots &amp; \\ 0 &amp; &amp; &amp; \sigma^{(k)}_{\text{nf}} \end{array}\right)$$</div>
-</td>
+<td align="center">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}<em>{1} &amp; &amp; &amp; 0 \ &amp; \sigma^{(k)}</em>{2} &amp; &amp; \ &amp; &amp; \ddots &amp; \ 0 &amp; &amp; &amp; \sigma^{(k)}_{\text{nf}} \end{array}\right)$$</td>
 <td align="center"><code>nh</code> * <code>nf</code></td>
 </tr>
 <tr>
 <td align="center"><strong>full</strong></td>
 <td align="center">Each state uses a full (i.e. unrestricted) covariance matrix.</td>
-<td align="center">
-<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}_{1} &amp; \sigma^{(k)}_{2} &amp; \cdots &amp; \sigma^{(k)}_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \\ \sigma^{(k)}_{2} &amp; \sigma^{(k)}_{3} &amp; \cdots &amp; \sigma^{(k)}_{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ \sigma^{(k)}_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma^{(k)}_{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</div>
-</td>
+<td align="center">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma^{(k)}<em>{1} &amp; \sigma^{(k)}</em>{2} &amp; \cdots &amp; \sigma^{(k)}<em>{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \ \sigma^{(k)}</em>{2} &amp; \sigma^{(k)}<em>{3} &amp; \cdots &amp; \sigma^{(k)}</em>{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\ \sigma^{(k)}<em>{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma^{(k)}</em>{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</td>
 <td align="center"><code>nh</code> * <code>nf</code> * (<code>nf</code> + 1) // 2,</td>
 </tr>
 <tr>
 <td align="center"><strong>tied</strong></td>
 <td align="center">All states use <strong>the same</strong> full covariance matrix.</td>
-<td align="center">
-<div class="math">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma_{1} &amp; \sigma_{2} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \\ \sigma_{2} &amp; \sigma_{3} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma_{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</div>
-</td>
+<td align="center">$$\boldsymbol{\Sigma_k} = \left(\begin{array}{cccc} \sigma_{1} &amp; \sigma_{2} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} \ \sigma_{2} &amp; \sigma_{3} &amp; \cdots &amp; \sigma_{\frac{\left(\text{nf}-2\right)\cdot\left(\text{nf}-1\right)}{2} + 1}\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\ \sigma_{\frac{\left(\text{nf}-1\right)\cdot\text{nf}}{2} + 1} &amp; &amp; &amp; \sigma_{\frac{\text{nf}\ast\left(\text{nf}+1\right)}{2}} \end{array}\right)$$</td>
 <td align="center"><code>nf</code> * (<code>nf</code> + 1) // 2</td>
 </tr>
 </tbody>
 </table>
-<h5>conversion function</h5>
+<h5 id="conversion-function">conversion function</h5>
 <p>conversion functions are described at <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/utils/np_utils.py">kerasy/utils/np_utils.py</a>.</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compress_based_on_covariance_type_from_tied_shape</span><span class="p">(</span><span class="n">tied_cv</span><span class="p">,</span> <span class="n">covariance_type</span><span class="p">,</span> <span class="n">n_gaussian</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">compress_based_on_covariance_type_from_tied_shape</span><span class="p">(</span><span class="n">tied_cv</span><span class="p">,</span> <span class="n">covariance_type</span><span class="p">,</span> <span class="n">n_gaussian</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create all the covariance matrices</span>
 <span class="sd">    from a given template.</span>
@@ -504,15 +559,15 @@ $$</div>
 <span class="sd">    Create the correct shape of covariance matris</span>
 <span class="sd">    from each feature based on the covariance type.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-</pre></div>
+</code></pre></div>
 
 
-<h2>Gaussian Mixture HMM</h2>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
-</pre></div>
+<h2 id="gaussian-mixture-hmm">Gaussian Mixture HMM</h2>
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
+</code></pre></div>
 
 
-<h4>Correspondence between code and formula</h4>
+<h4 id="correspondence-between-code-and-formula">Correspondence between code and formula</h4>
 <table>
 <thead>
 <tr>
@@ -524,55 +579,33 @@ $$</div>
 <tbody>
 <tr>
 <td align="center"><code>log_cond_prob</code></td>
-<td align="center">
-<div class="math">$$[n][k] = p\left(\mathbf{x}_n\mid z_{nk}\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$p\left(\mathbf{X}\mid\mathbf{Z}\right)$$</div>
-</td>
+<td align="center">$$[n][k] = p\left(\mathbf{x}<em>n\mid z</em>{nk}\right)$$</td>
+<td align="center">$$p\left(\mathbf{X}\mid\mathbf{Z}\right)$$</td>
 </tr>
 <tr>
 <td align="center"><code>log_prob</code></td>
 <td align="center">constant.</td>
-<td align="center">
-<div class="math">$$\begin{aligned}p\left(\mathbf{X}\right) &amp;=\sum_{\mathbf{z}_n}\alpha(\mathbf{z}_n)\beta(\mathbf{z}_n)\quad \text{for all $\mathbf{z}_n$}\\&amp;=\sum_{\mathbf{z}_N}\alpha(\mathbf{z}_N)\end{aligned}$$</div>
-</td>
+<td align="center">$$\begin{aligned}p\left(\mathbf{X}\right) &amp;=\sum_{\mathbf{z}<em>n}\alpha(\mathbf{z}_n)\beta(\mathbf{z}_n)\quad \text{for all $\mathbf{z}_n$}\&amp;=\sum</em>{\mathbf{z}_N}\alpha(\mathbf{z}_N)\end{aligned}$$</td>
 </tr>
 <tr>
 <td align="center"><code>log_alpha</code></td>
-<td align="center">
-<div class="math">$$[n][k] = \alpha\left(z_{nk}\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$\alpha\left(\mathbf{z}_n\right) \equiv p\left(\mathbf{x}_1,\ldots,\mathbf{x}_n,\mathbf{z}_n\right)$$</div>
-</td>
+<td align="center">$$[n][k] = \alpha\left(z_{nk}\right)$$</td>
+<td align="center">$$\alpha\left(\mathbf{z}_n\right) \equiv p\left(\mathbf{x}_1,\ldots,\mathbf{x}_n,\mathbf{z}_n\right)$$</td>
 </tr>
 <tr>
 <td align="center"><code>log_beta</code></td>
-<td align="center">
-<div class="math">$$[n][k] = \beta\left(z_{nk}\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$\beta\left(\mathbf{z}_n\right)\equiv\left(\mathbf{x}_{n+1},\ldots,\mathbf{x}_N\mid\mathbf{z}_n\right)$$</div>
-</td>
+<td align="center">$$[n][k] = \beta\left(z_{nk}\right)$$</td>
+<td align="center">$$\beta\left(\mathbf{z}<em>n\right)\equiv\left(\mathbf{x}</em>{n+1},\ldots,\mathbf{x}_N\mid\mathbf{z}_n\right)$$</td>
 </tr>
 <tr>
 <td align="center"><code>posterior_prob</code></td>
-<td align="center">
-<div class="math">$$[n][k] = \gamma\left(z_{nk}\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$\begin{aligned}\gamma\left(\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_n\mid\mathbf{X}\right)= \frac{p\left(\mathbf{z}_n,\mathbf{X}\right)}{p\left(\mathbf{X}\right)} \\&amp;= \frac{\alpha\left(\mathbf{z}_n\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</div>
-</td>
+<td align="center">$$[n][k] = \gamma\left(z_{nk}\right)$$</td>
+<td align="center">$$\begin{aligned}\gamma\left(\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_n\mid\mathbf{X}\right)= \frac{p\left(\mathbf{z}_n,\mathbf{X}\right)}{p\left(\mathbf{X}\right)} \&amp;= \frac{\alpha\left(\mathbf{z}_n\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</td>
 </tr>
 <tr>
 <td align="center"><code>log_xi_sum</code></td>
-<td align="center">
-<div class="math">$$[k][j]= \sum_{n=2}^N\xi\left(z_{n-1,k},z_{n,j}\right)$$</div>
-</td>
-<td align="center">
-<div class="math">$$\begin{aligned}\xi\left(\mathbf{z}_{n-1},\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}_{n-1},\mathbf{z}_n\mid\mathbf{X}\right) \\&amp;= \frac{\alpha\left(\mathbf{z}_{n-1}\right)p\left(\mathbf{x}_n\mid\mathbf{z}_n\right)p\left(\mathbf{z}_n\mid\mathbf{z}_{n-1}\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</div>
-</td>
+<td align="center">$$[k][j]= \sum_{n=2}^N\xi\left(z_{n-1,k},z_{n,j}\right)$$</td>
+<td align="center">$$\begin{aligned}\xi\left(\mathbf{z}<em>{n-1},\mathbf{z}_n\right) &amp;= p\left(\mathbf{z}</em>{n-1},\mathbf{z}<em>n\mid\mathbf{X}\right) \&amp;= \frac{\alpha\left(\mathbf{z}</em>{n-1}\right)p\left(\mathbf{x}<em>n\mid\mathbf{z}_n\right)p\left(\mathbf{z}_n\mid\mathbf{z}</em>{n-1}\right)\beta\left(\mathbf{z}_n\right)}{p\left(\mathbf{X}\right)}\end{aligned}$$</td>
 </tr>
 </tbody>
 </table>
@@ -583,72 +616,6 @@ $$</div>
     <li><a href="https://dl.acm.org/doi/book/10.5555/560905">Spoken Language Processing: A Guide to Theory, Algorithm, and System Development</a></li>
   </ul>
 </div>
-
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        fonts: [['STIX', 'TeX']]," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
-        </section>
-    </div>
-</div>
-</div>
               
             </div>
           </div>
@@ -656,7 +623,7 @@ $$</div>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../EM algorithm/" class="btn btn-neutral float-right" title="EM algorithm">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../EM%20algorithm/" class="btn btn-neutral float-right" title="EM algorithm">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
         <a href="../Cluster/" class="btn btn-neutral" title="Cluster"><span class="icon icon-circle-arrow-left"></span> Previous</a>
@@ -688,7 +655,7 @@ $$</div>
         <span><a href="../Cluster/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../EM algorithm/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../EM%20algorithm/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>

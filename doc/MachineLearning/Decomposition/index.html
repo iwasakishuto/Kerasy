@@ -161,6 +161,72 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#pca">
+      PCA
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#kernel-pca">
+      Kernel PCA
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#sne">
+      SNE
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#tsne">
+      tSNE
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#umap">
+      UMAP
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#tsne-vs-umap">tSNE vs. UMAP</a>
+        </li>
+    
+    </ul>
+  </li>
+
 
   
         
@@ -308,13 +374,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Decomposition</h3>
+            <h3>Decomposition</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,8 +389,12 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <div class="frame">
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<div class="frame">
   <h4>Purpose</h4>
   <p>The purpose of <b>decomposition (dimensionality reduction, feature extraction)</b> is to find the <font color="red"><b>"best"</b></font> <b>principal subspace</b> where data are expressed with much less dimensions, but keep the information as much as possible.</p>
 </div>
@@ -336,11 +404,12 @@
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/decomposition.ipynb">Kerasy.examples.decomposition.ipynb</a></p>
 </div>
 
-## PCA<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<h2 id="pca">PCA</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Consider a dataset <span class="math">\(\{\mathbf{x}_n\}\)</span>. If we consider a <span class="math">\(D\)</span>-dimensional vector <span class="math">\(\mathbf{u}_1\)</span>, each data point <span class="math">\(\mathbf{x}_n\in\mathbb{R}^{D}\)</span> is projected onto a scalar value <span class="math">\(\mathbf{u}_1^T\mathbf{x}_n\)</span>. In that (one-dimensional) space,</p>
+
 <ul>
 <li>Mean:
 <div class="math">$$\tilde{\mathbf{x}} = \frac{1}{N}\sum_{n=1}^N\mathbf{x}_n$$</div>
@@ -349,89 +418,138 @@
 <div class="math">$$\frac{1}{N}\sum_{n=1}^N\left\{\mathbf{u}_1^T\mathbf{x}_n - \mathbf{u}_1^T\tilde{\mathbf{x}}\right\}^2 = \mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}= \frac{1}{N}\sum_{n=1}^N\left(\mathbf{x}-\tilde{\mathbf{x}}\right)\left(\mathbf{x}-\tilde{\mathbf{x}}\right)^T$$</div>
 </li>
 </ul>
+
 <p>We now maximize the projected variance <span class="math">\(\mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}\)</span> with respect to <span class="math">\(\mathbf{u}_1\)</span>, because we can think <font color="red"><b>"Larger variance" ↔︎ "Features are more expressed"</b></font>.</p>
+
 <p>To avoid <span class="math">\(\|\mathbf{u}_1\|\rightarrow\infty\)</span>, we introduce the normalization condition <span class="math">\(\mathbf{u}_1^T\mathbf{u}_1=1\)</span> using Lagrange multiplier <span class="math">\(\lambda_1\)</span>.</p>
+
 <p>Then, the object function is given by</p>
+
 <div class="math">$$\begin{aligned}
 L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}_1\right)\\
 \frac{\partial L}{\partial \mathbf{u}_1} &amp;= 2\mathbf{S}\mathbf{u}_1 - 2\lambda_1\mathbf{u}_1 = 0\\
 \therefore\mathbf{u}_1^T\mathbf{Su}_1 &amp;= \lambda_1 \quad (\because \text{left-multiplied $\mathbf{u}_1^T$})
 \end{aligned}$$</div>
+
 <p>The variance will be a maximum when we set <span class="math">\(\mathbf{u}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_1\)</span>. This eigenvector is known as the first principal component.</p>
+
 <p>We can define additional principal components in the same way.</p>
+
 <div class="admonition summary">
   <p class="admonition-title">Summary</p>
   <p>If we consider an M-dimensional projection space, the optimal linear projection is defined by the M eigenvectors u1,...,uM of the data covariance matrix S corresponding to the M largest eigenvalues λ1,...,λM.</p>
 </div>
 
-## Kernel PCA<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">KernelPCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kernelargs</span><span class="p">)</span>
+<h2 id="kernel-pca">Kernel PCA</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">KernelPCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kernelargs</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>The main idea is same with PCA, but we will perform it <strong>in the feature space</strong>, which implicitly defines a nonlinear principal component model in the original data space.</p>
+
 <p>If we <font color="red"><b>assume that the projected data set has zero mean</b></font>, The covariance matrix in feature space is given by</p>
+
 <div class="math">$$
 \mathbf{C} = \frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x}_n)\phi(\mathbf{x}_n)^T
 $$</div>
+
 <p>and its <strong>eigenvector expansion</strong> is defined by</p>
+
 <div class="math">$$\begin{aligned}
 \mathbf{C}\mathbf{v}_i &amp;= \lambda_i\mathbf{v}_i\\
 \frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x}_n)\underset{\text{scalar}}{\left\{\phi(\mathbf{x}_n)^T\mathbf{v}_i\right\}} &amp;= \lambda_i\mathbf{v}_i\quad (\ast)\\
 \end{aligned}$$</div>
+
 <p>From this equation, we see that the vector <span class="math">\(\mathbf{v}_i\)</span> is given by a linear combination of the <span class="math">\(\phi(\mathbf{x}_n)\)</span></p>
+
 <div class="math">$$\mathbf{v}_i = \sum_{n=1}^N a_{in}\phi(\mathbf{x}_n)$$</div>
+
 <p>Substituting this expansion back into the eigenvector equation <span class="math">\((\ast)\)</span>, we obtain</p>
+
 <div class="math">$$\begin{aligned}
 \frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x_n})\phi(\mathbf{x}_n)^T\sum_{m=1}^Na_{im}\phi(\mathbf{x}_m) &amp;= \lambda_i\sum_{n=1}^Na_{in}\phi(\mathbf{x}_n)\\
 \frac{1}{N}\sum_{n=1}^Nk(\mathbf{x}_l,\mathbf{x}_n)\sum_{m=1}^Na_{i,m}k(\mathbf{x}_n,\mathbf{x}_m) &amp;= \lambda_i\sum_{n=1}^Na_{in}k(\mathbf{x}_l,\mathbf{x}_n)\quad(\because\text{multiplied $\phi(\mathbf{x}_l)^T$})\\
 \mathbf{K}^2\mathbf{a}_i &amp;= \lambda_iN\mathbf{Ka}_i\quad (\because\text{written in matrix notation})\\
 \end{aligned}$$</div>
+
 <p>We can find solutions for <span class="math">\(\mathbf{a}_i\)</span> by solving the following eigenvalue problem. The variance in feature space will be a maximum when we set <span class="math">\(\mathbf{a}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_i\)</span>.</p>
+
 <div class="math">$$\mathbf{Ka}_i = \lambda_iN\mathbf{a}_i$$</div>
+
 <p>Having solved the eigenvector problem, the projection of a point <span class="math">\(\mathbf{x}\)</span> onto eigenvector <span class="math">\(i\)</span> is given by</p>
+
 <div class="math">$$y_i(\mathbf{x}) = \phi(\mathbf{x})^T\mathbf{v}_i = \sum_{n=1}^Na_{in}\phi(\mathbf{x})^T\phi(\mathbf{x}_n) = \sum_{n=1}^Na_{in}k(\mathbf{x},\mathbf{x}_n)$$</div>
+
 <p>If <font color="red"><b>projected data set doesn't have zero mean</b></font>, the projected data points after centralizing are given by</p>
+
 <div class="math">$$\tilde{\phi(\mathbf{x}_n)} = \phi(\mathbf{x}_n)-\frac{1}{N}\sum_{l=1}^N\phi(\mathbf{x}_l)$$</div>
+
 <p>and the corresponding elements of the Gram matrix are given by</p>
+
 <div class="math">$$\tilde{\mathbf{K}} = \mathbf{K} - \mathbf{1_NK} - \mathbf{K1_N} +\mathbf{1_NK1_N}$$</div>
+
 <p>where <span class="math">\(\mathbf{1}_N\)</span> denotes the <span class="math">\(N\times N\)</span> matrix in which every element takes the value <span class="math">\(1/N\)</span>.</p>
+
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
   <p>I don't understand clearly how to deal with new data point xn.</p>
 </div>
 
-## SNE<p><font color="red"><b>Stochastic Neighbor Embedding (SNE)</b></font> starts by <b>converting the high-dimensional Euclidean distances between datapoints into conditional probabilities</b>. The similarity of datapoint <span class="math">\(\mathbf{x}_j\)</span> to datapoint <span class="math">\(\mathbf{x}_i\)</span> is conditional probability <span class="math">\(p_{j|i}\)</span>, that <span class="math">\(\mathbf{x}_i\)</span> would pick <span class="math">\(\mathbf{x}_j\)</span> as its neighbor <b>if neighbors were picked in propotion to their probability density under <font color="red">Gaussian centered at <span class="math">\(\mathbf{x}_i\)</span></font></b>.</p>
+<h2 id="sne">SNE</h2>
+<p><font color="red"><b>Stochastic Neighbor Embedding (SNE)</b></font> starts by <b>converting the high-dimensional Euclidean distances between datapoints into conditional probabilities</b>. The similarity of datapoint <span class="math">\(\mathbf{x}_j\)</span> to datapoint <span class="math">\(\mathbf{x}_i\)</span> is conditional probability <span class="math">\(p_{j|i}\)</span>, that <span class="math">\(\mathbf{x}_i\)</span> would pick <span class="math">\(\mathbf{x}_j\)</span> as its neighbor <b>if neighbors were picked in propotion to their probability density under <font color="red">Gaussian centered at <span class="math">\(\mathbf{x}_i\)</span></font></b>.</p>
+
 <p>Mathmatically, the conditional probability <span class="math">\(p_{j|i}\)</span> is given by</p>
+
 <div class="math">$$p_{j|i} = \frac{\exp\left(-\|\mathbf{x}_i-\mathbf{x}_j\|^2/2\boldsymbol{\sigma}_i^2\right)}{\sum_{k\neq i}\exp\left(-\|\mathbf{x}_i-\mathbf{x}_k\|^2/2\boldsymbol{\sigma}_i^2\right)}$$</div>
+
 <p>Because we are only interested in modeling pairwise similarities, we set the value of <span class="math">\(p_{i|i}\)</span> to zero.</p>
+
 <p>For the low-dimensional counterparts <span class="math">\(\mathbf{y}_i\)</span> and <span class="math">\(\mathbf{y}_j\)</span> of the high-dimensional data points <span class="math">\(\mathbf{x}_i\)</span> and <span class="math">\(\mathbf{x}_j\)</span>, it is possible to compute a similar conditional probability, which we denote by <span class="math">\(q_{j|i}\)</span></p>
+
 <div class="math">$$q_{j|i} = \frac{\exp\left(-\|\mathbf{y}_i-\mathbf{y}_j\|^2\right)}{\sum_{k\neq i}\exp\left(-\|\mathbf{y}_i-\mathbf{y}_k\|^2\right)}$$</div>
+
 <p>Again, we set <span class="math">\(q_{i|i} = 0\)</span>, and the variance of the Gaussian to <span class="math">\(\frac{1}{\sqrt{2}}\)</span></p>
+
 <p>Then, the cost function is given by</p>
+
 <div class="math">$$C = \sum_i\mathrm{KL}(P_i\|Q_i) = \sum_i\sum_j p_{j|i}\log\frac{p_{j|i}}{q_{j|i}}$$</div>
+
 <p>in which <span class="math">\(P_i\)</span> represents <b>the conditional probability distribution over all other data points given data points <span class="math">\(\mathbf{x}_i\)</span></b></p>
+
 <p>The remaining parameter to be selected is the variance <span class="math">\(\boldsymbol{\sigma_i}\)</span>. It is defined to produce a <span class="math">\(P_i\)</span> with a fixed <font color="red"><b>perplexity</b></font> that is specified by the user. The perplexity is defined as</p>
+
 <div class="math">$$Perp(P_i) = 2^{H(P_i)},\quad H(P_i) = -\sum_jp_{j|i}\log_2p_{j|i}$$</div>
+
 <p>The minimization of the cost function is performed using a gradient descent method. The gradient has a surprisingly simple form</p>
+
 <div class="math">$$\frac{\partial C}{\partial \mathbf{y}_i} = 2\sum_j\left(p_{j|i} - q_{j|i} + p_{i|j} - q_{i|j}\right)\left(\mathbf{y}_i-\mathbf{y}_j\right)$$</div>
-## tSNE<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">tSNE</span><span class="p">(</span><span class="n">initial_momentum</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">final_momoentum</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_gain</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">prec_max_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<h2 id="tsne">tSNE</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">tSNE</span><span class="p">(</span><span class="n">initial_momentum</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">final_momoentum</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_gain</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">prec_max_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>As an alternative to minimizing the sum of the Kullback-Leibler divergence between a joint probability distribution <span class="math">\(p_{j|i}\)</span> and <span class="math">\(q_{j|i}\)</span>, it is also possible to minimize a single Kullback-Leibler divergence between a joint probability distribution:</p>
+
 <div class="math">$$C = KL\left(P\|Q\right) = \sum_i\sum_jp_{ij}\log\frac{p_{ij}}{q_{ij}}$$</div>
+
 <p>In t-SNE,
 - Employ a <b>Student t-distribution with one degree of freedom (which is the same as a Cauchy distribution)</b> as the heavy-tailed distribution in the <b>low-dimensional map.</b> Using this distribution, the joint probabilities <span class="math">\(q_{ij}\)</span> are defined as
 </p>
+
 <div class="math">$$q_{ij} = \frac{\left(1 + \|\mathbf{y}_i-\mathbf{y}_j\|^2\right)^{-1}}{\sum_{k\neq l}\left(1 + \|\mathbf{y}_k-\mathbf{y}_l\|^2\right)^{-1}}$$</div>
+
 <p>
 - If there is an outlier <span class="math">\(\mathbf{x}_i\)</span>, low-dimensional map point <span class="math">\(\mathbf{y}_i\)</span> has very little effect on the cost function, so set
 </p>
+
 <div class="math">$$p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n}$$</div>
+
 <p>
 to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for all datapoints <span class="math">\(\mathbf{x}_i\)</span></p>
+
 <p>The gradient is given by</p>
+
 <div class="math">$$\frac{\partial C}{\partial \mathbf{y}_i} = 4\sum_j\left(p_{ij} - q_{ij}\right) \left(\mathbf{y}_i - \mathbf{y}_j\right)\left(1 + \|\mathbf{y}_i - \mathbf{y}_j\|^2\right)^{-1}$$</div>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -440,11 +558,12 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
   </ul>
 </div>
 
-## UMAP<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">metric_kwds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_dist</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">sigma_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">sigma_lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma_upper</span><span class="o">=</span><span class="mf">1e3</span><span class="p">)</span>
+<h2 id="umap">UMAP</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">UMAP</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">metric_kwds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">min_dist</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">sigma_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">sigma_lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sigma_upper</span><span class="o">=</span><span class="mf">1e3</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>UMAP is constructed from a theoretical framework based in Riemannian geometry and algebraic topology.</p>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -452,7 +571,8 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
   </ul>
 </div>
 
-#### tSNE vs. UMAP<table>
+<h4 id="tsne-vs-umap">tSNE vs. UMAP</h4>
+<table>
 <thead>
 <tr>
 <th align="center"></th>
@@ -534,6 +654,7 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
 </tr>
 </tbody>
 </table>
+
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -595,10 +716,13 @@ to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for al
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

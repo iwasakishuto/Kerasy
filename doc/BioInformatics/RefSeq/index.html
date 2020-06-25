@@ -238,6 +238,32 @@
       </a>
     </li>
     
+      
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#refseq-number">
+      RefSeq Number
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#faq">
+      FAQ
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
 
   
         
@@ -308,13 +334,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>RefSeq</h3>
+            <h3>RefSeq</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,15 +349,22 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <h2><a href="https://www.ncbi.nlm.nih.gov/refseq/">RefSeq</a></h2>
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<h2 id="refseq"><a href="https://www.ncbi.nlm.nih.gov/refseq/">RefSeq</a></h2>
 <p>In kerasy, we can use <code>kerasy.datasets.ncbi.getSeq</code> method to collect sequence data from <strong><a href="https://www.ncbi.nlm.nih.gov/refseq/">Reference Sequence (RefSeq) database</a></strong>, which is an <strong>open access</strong>, annotated and <span class="marker-info" aria-label="sophisticated and integrated dataset">curated collection</span>
 of publicly available nucleotide sequences (DNA, RNA) and their protein products.</p>
+
 <p>This database is built by <strong><a href="https://www.ncbi.nlm.nih.gov/">NCBI(National Center for Biotechnology Information)</a></strong>, and, unlike <strong><a href="https://www.ncbi.nlm.nih.gov/genbank/">GenBank</a></strong>, which is also build by it <strong>provides only a single record</strong> for each natural biological molecule (i.e. DNA, RNA or protein) for major organisms <strong>ranging from viruses to bacteria to eukaryotes.</strong></p>
+
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">ncbi</span><span class="o">.</span><span class="n">getSeq</span><span class="p">(</span><span class="n">refSeq_num</span><span class="p">,</span> <span class="n">asfasta</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-## RefSeq Number<table>
+<h2 id="refseq-number">RefSeq Number</h2>
+<table>
 <thead>
 <tr>
 <th align="center">Accession prefix</th>
@@ -379,12 +410,18 @@ of publicly available nucleotide sequences (DNA, RNA) and their protein products
 </tr>
 </tbody>
 </table>
+
 <p>Ref: <strong><a href="https://www.ncbi.nlm.nih.gov/books/NBK21091/table/ch18.T.entrez_queries_to_retrieve_sets_o/">Table 7. [Entrez queries to retrieve sets of RefSeq records.]. - The NCBI Handbook - NCBI Bookshelf</a></strong></p>
-## FAQ<p>If the method doesn't work, please look at <a href="https://www.ncbi.nlm.nih.gov/genome/doc/ftpfaq/">Genomes Download FAQ</a></p>
-        </section>
+
+<h2 id="faq">FAQ</h2>
+<p>If the method doesn't work, please look at <a href="https://www.ncbi.nlm.nih.gov/genome/doc/ftpfaq/">Genomes Download FAQ</a></p>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

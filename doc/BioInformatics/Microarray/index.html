@@ -245,6 +245,39 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#1-design-of-dna-miroarrays">
+      1. Design of DNA Miroarrays
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#2-kinetics-of-the-binding-process">
+      2. Kinetics of the Binding Process
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#3-data-preprocessing-and-normalization">
+      3. Data Preprocessing and Normalization
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
 
   
         
@@ -308,13 +341,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Microarray</h3>
+            <h3>Microarray</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,21 +356,33 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <h2>1. Design of DNA Miroarrays</h2>
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<h2 id="1-design-of-dna-miroarrays">1. Design of DNA Miroarrays</h2>
 <p>The idea of DNA microarray technology is to monitor gene expression processes by <strong>measuring levels of RNA species</strong> in biological samples. There are two main techinques for doing that.</p>
+
 <ol>
 <li><strong>[complementary-DNA arrays]</strong> RNA molecules in the samples are labeled by using appropriate techniques and presented to an array of spots, where <strong>complementary-DNA (cDNA)</strong> fragments corresponding to known coding DNA sequences are placed.</li>
 <li><strong>[oligonucleotide arrays]</strong> By a reverse transcription mechanism, copy RNA sequences back to a DNA strand, label the DNA with fluorescent dyes and hybridize it to a complementary-DNA probe fixed on the microarray.</li>
 </ol>
+
 <p>After hybridization of the labeled target molecules, estimation of the level of RNA in the sample by <strong>reading the intensity of the signals</strong> from the dots of the DNA array.</p>
+
 <p>The basic difference between the two microarray formats is in <strong>the lengths of the complementary-DNA probes.</strong> </p>
+
 <ol>
 <li><strong>[complementary-DNA arrays]</strong> In cDNA arrays, the lengths of the cDNA strands differ between spots, and <strong>the different probe lengths change the reaction rates between spots.</strong> Therefore, the results must be compared to controls.</li>
 <li><strong>[oligonucleotide arrays]</strong> In oligonucleotide arrays the probes are of constant length in the range of 20–50 base pairs, so the readouts of fluorescence intensities are <strong>comparable between different spots.</strong></li>
 </ol>
-## 2. Kinetics of the Binding Process<p>The hybridization reaction can be represented by the following scheme</p>
+
+<h2 id="2-kinetics-of-the-binding-process">2. Kinetics of the Binding Process</h2>
+<p>The hybridization reaction can be represented by the following scheme</p>
+
 <div class="math">$$R + L \overset{k_f}{\underset{k_r}{\rightleftarrows}}C$$</div>
+
 <table>
 <thead>
 <tr>
@@ -381,27 +424,39 @@
 </tr>
 </tbody>
 </table>
+
 <ul>
 <li>The rate of forward (binding) of target molecules to immobilized probes is proportional to <strong>the product of the concentrations of the target strands and free probes</strong>.</li>
 <li>The rate of reverse (unbinding) process is a first-order reaction with a rate proportional to <span class="math">\(C\)</span>. </li>
 </ul>
+
 <p>This results in the following balance of flows:</p>
+
 <div class="math">$$\frac{dC}{dt} = k_fRL - k_rC$$</div>
+
 <p>We assume that at the beginning, i.e., at <span class="math">\(t=0\)</span>, there are no hybridization complexes, and total number of oligonucleotides are available for hybridization.</p>
+
 <div class="math">$$C(0)=0, L(0)=L_0, R(0)=R_T$$</div>
+
 <p>Since one RNA strand binds to one oligonucleotide, resulting in one binding coplex, the following equalities for the flows hold</p>
+
 <div class="math">$$\frac{dR}{dt} = VN_A\frac{dL}{dt} = -\frac{dC}{dt},$$</div>
+
 <p>which results in <span class="math">\(R(t)+C(t)=R_T\)</span> and <span class="math">\(VN_AL(t)+C(t)=VN_AL_0\)</span>. So <span class="math">\(L(t)\)</span> and <span class="math">\(R(t)\)</span> can be expressed in terms of <span class="math">\(C(t)\)</span>, and get the following equation:</p>
+
 <div class="math">$$
 \begin{aligned}
 \frac{dC}{dt} &amp;= k_fRL - k_rC \\
 &amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\\
 \end{aligned}
 $$</div>
+
 <p>Often it is possible to approximate the above dynamics to only one exponent. Specifically, one of the following two asymptotic situations may hold.</p>
+
 <ol>
 <li><strong>[Often]</strong> There is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., <span class="math">\(R_T\gg C\)</span>, or <span class="math">\((R_T − C)/RT \approx 1\)</span>, which results in</li>
 </ol>
+
 <div class="math">$$
 \begin{aligned}
 \frac{dC}{dt} 
@@ -412,24 +467,31 @@ $$</div>
 &amp; K_D=k_r/k_f, \quad \tau_R = \frac{1}{k_f\left(K_D + R_T/N_AV\right)}
 \end{aligned}
 $$</div>
+
 <ol>
 <li>There is a large excess of free RNA strands with respect to the number of binding complexes, i.e., <span class="math">\(L_0 \gg C/N_AV\)</span>, or <span class="math">\((L_0 − C/N_AV )/L_0 \approx 1\)</span>, which leads to</li>
 </ol>
+
 <div class="math">$$
 \begin{aligned}
 C(t) &amp;= \frac{R_TL_0}{K_D+L_0}\left[1-\exp\left(-\frac{t}{\tau_T}\right)\right]\\
 \tau_L &amp;= \frac{1}{k_f\left(K_D+L_0\right)}
 \end{aligned}
 $$</div>
+
 <p>Microarray experiments are very often planned in such a way that there is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., case <span class="math">\(1\)</span> holds. From the equation</p>
+
 <div class="math">$$
 \begin{aligned}
 C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\\
 &amp;\underset{t\rightarrow\infty}{\Rightarrow}\frac{R_TL_0}{K_D+R_T/N_AV},
 \end{aligned}
 $$</div>
+
 <p>one can see that, after <strong>equilibrium has been reached</strong>, or <strong>at a predefined instant of time</strong>, the intensity of the fluorescence signal measured at a microarray spot is proportional to the level of the corresponding RNA species in the analyzed sample, i.e., <span class="math">\(C \sim L_0\)</span></p>
-## 3. Data Preprocessing and Normalization<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+
+<h2 id="3-data-preprocessing-and-normalization">3. Data Preprocessing and Normalization</h2>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
         linebreak = "false";
@@ -490,10 +552,13 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

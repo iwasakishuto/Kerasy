@@ -231,6 +231,126 @@
       </a>
     </li>
     
+      
+
+
+
+  <li class="toctree-l2 current">
+    <ul class="subnav-l2 current">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#dynamic-programming-method">Dynamic Programming Method</a>
+        </li>
+    
+      
+          
+
+  <li class="toctree-l3">
+    <a href="#suffix-array-induced-sorting-method">
+      Suffix Array - Induced Sorting Method
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l3">
+    <ul class="subnav-l3 toc-hidden">
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#s-factorization">s-factorization</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#theorem-5-paper1">Theorem 5 (paper1)</a>
+        </li>
+    
+      
+          
+
+  <li class="toctree-l4">
+    <a href="#find-repetitions-of-type1">
+      Find repetitions of (type1)
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l4">
+    <ul class="subnav-l4 toc-hidden">
+    
+      
+          
+
+  <li class="toctree-l5 current with-children">
+    <a href="#rightmax-periodicities">
+      rightmax periodicities
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l5 current">
+    <ul class="subnav-l5 current">
+    
+      
+        <li class="toctree-l6">
+          <a class="toctree-l7" href="#theorem-51-paper2">Theorem 5.1 (paper2)</a>
+        </li>
+    
+      
+        <li class="toctree-l6">
+          <a class="toctree-l7" href="#proof-51-paper2">Proof 5.1 (paper2)</a>
+        </li>
+    
+      
+        <li class="toctree-l6">
+          <a class="toctree-l7" href="#theorem-52-paper2">Theorem 5.2 (paper2)</a>
+        </li>
+    
+      
+        <li class="toctree-l6">
+          <a class="toctree-l7" href="#proof-52-paper2">Proof 5.2 (paper2)</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+    
+      
+        <li class="toctree-l5">
+          <a class="toctree-l6" href="#leftmax-periodicities">leftmax periodicities</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#find-repetitions-of-type2">Find repetitions of (type2)</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#terminology">terminology</a>
+        </li>
+    
+    </ul>
+  </li>
+
 
   
         
@@ -308,13 +428,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Tandem Repeats</h3>
+            <h3>Tandem Repeats</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,14 +443,21 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <div class="admonition tip">
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/tandem.ipynb">Kerasy.examples.tandem.ipynb</a></p>
 </div>
 
-## Tandem Repeats<p><strong>Tandem Repeats</strong> are simple sequence repeats that are extremely common throughout the genomes of a wide range of species. <strong>Tandem repeats are helpful to determine the inherited traits</strong> of gene from its parent and in determining the ancestor relationship. Tandem repeats are proven to be biologically significant as they can help in discovery of dynamic mutations for genetic diseases.</p>
+<h2 id="tandem-repeats">Tandem Repeats</h2>
+<p><strong>Tandem Repeats</strong> are simple sequence repeats that are extremely common throughout the genomes of a wide range of species. <strong>Tandem repeats are helpful to determine the inherited traits</strong> of gene from its parent and in determining the ancestor relationship. Tandem repeats are proven to be biologically significant as they can help in discovery of dynamic mutations for genetic diseases.</p>
+
 <p>There are two main methods like <strong>dynamic programming</strong>, <strong>suffix array induced sorting</strong>, to find exact tandem repeats.</p>
+
 <table>
 <thead>
 <tr>
@@ -380,18 +505,24 @@
 </tr>
 </tbody>
 </table>
+
 <p><small><em>here, <strong><span class="math">\(n\)</span></strong> is the length of the sequence and <strong><span class="math">\(m\)</span></strong> is the average length of the suffix.</em></small></p>
+
 <p>The time required to identify tandem repeats mainly depends on construction of the required data structure.</p>
+
 <ul>
 <li>For <strong>Dynamic programming</strong> method, a square matrix of size of the sequence is constructed and values are calculated which takes the time and space complexity of <span class="math">\(O\left(n^2\right)\)</span>.</li>
 <li>In <strong>SA-IS</strong> method, the time and space needed for construction is <span class="math">\(O\left(n\right)\)</span>.</li>
 </ul>
-### Dynamic Programming Method<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">tandem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;DP&quot;</span><span class="p">)</span>
+
+<h3 id="dynamic-programming-method">Dynamic Programming Method</h3>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">tandem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;DP&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>To find all tandem repeats in a sequence we <strong>perform slight modifications to the Smith-Waterman algorithm for local alignments.</strong> The time complexity of the method will be <span class="math">\(O\left(n\ast n\right)\)</span> as we will be filling a two-dimensional matrix. We then align the sequence with itself to find tandem repeats.</p>
+
 <p>The modifications we perform to the algorithm are:</p>
+
 <ul>
 <li>Align the string with itself by placing the string on the top and on the left.</li>
 <li><strong>Set all diagonal elements to zero</strong> so we don't align a character by itself.</li>
@@ -403,20 +534,30 @@
 </li>
 <li>The scores in this matrix represent the length of the tandem repeat. We repeat the longest tandem repeat in the sequences. If we have multiple repeats of the same length, we repeat all of them.</li>
 </ul>
-### Suffix Array - Induced Sorting Method<p><small>※ If you are not familiar with Suffix Array, please look at <strong><a href="https://iwasakishuto.github.io/Kerasy/doc/BioInformatics/String%20Search/">String Search page</a></strong>.</small></p>
+
+<h3 id="suffix-array-induced-sorting-method">Suffix Array - Induced Sorting Method</h3>
+<p><small>※ If you are not familiar with Suffix Array, please look at <strong><a href="https://iwasakishuto.github.io/Kerasy/doc/BioInformatics/String%20Search/">String Search page</a></strong>.</small></p>
+
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">tandem</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;SAIS&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>In Kerasy, we use the <span class="math">\(O(n)\)</span> searching method which is introduced in "<a href="http://monge.univ-mlv.fr/~koutcher/PAPERS/KolpakovKucherovFOCS99.pdf">Finding Maximal Repetitions in a Word in Linear Time</a>"</p>
+
 <p>Since various auxiliary data, theorems, and algorithms are used in this implementation, only the important ones are shown below.</p>
-###### s-factorization<p><strong>s-factorization</strong>, or <strong>Lempel-Ziv(LZ77) decomposition</strong> of a string <span class="math">\(S\)</span> is a factorization <span class="math">\(S=f_1\cdots f_n\)</span> where each factor <span class="math">\(f_k\)</span> is either</p>
+
+<h6 id="s-factorization">s-factorization</h6>
+<p><strong>s-factorization</strong>, or <strong>Lempel-Ziv(LZ77) decomposition</strong> of a string <span class="math">\(S\)</span> is a factorization <span class="math">\(S=f_1\cdots f_n\)</span> where each factor <span class="math">\(f_k\)</span> is either</p>
+
 <ol>
 <li>a single character if that character does not occur in <span class="math">\(f_1\cdots f_{k-1}\)</span>.</li>
 <li>the longest prefix of the rest of the string which occurs at least twice in <span class="math">\(f_1\cdots f_{ks}\)</span>.</li>
 </ol>
+
 <p>Most recent efficient linear time algorithms are off-line, running in <span class="math">\(O\left(N\right)\)</span> time for integer alphabets using <span class="math">\(O\left(N\right)\)</span> space. They first construct the <strong>suffix array</strong> of the string, then compute two arrays called <strong>Longest Common Prefix(LCP) array</strong>, and <strong>Longest Previous Factor(LPF) array</strong> from which the <strong>LZ factorization</strong> can be easily computed.</p>
-###### Theorem 5 (<a href="#paper1">paper1</a>)<p>Let <span class="math">\(w=u_1u_2\cdots u_k\)</span> be the <em>s-factorization</em> of <span class="math">\(w\)</span>, and let <span class="math">\(r\)</span> be a maximal repetition in <span class="math">\(w\)</span>, we can classify <span class="math">\(r\)</span> into two classes:</p>
+
+<h6 id="theorem-5-paper1">Theorem 5 (<a href="#paper1">paper1</a>)</h6>
+<p>Let <span class="math">\(w=u_1u_2\cdots u_k\)</span> be the <em>s-factorization</em> of <span class="math">\(w\)</span>, and let <span class="math">\(r\)</span> be a maximal repetition in <span class="math">\(w\)</span>, we can classify <span class="math">\(r\)</span> into two classes:</p>
+
 <div class="math">$$
 \begin{aligned}
     &amp;\begin{cases}
@@ -426,8 +567,13 @@
     &amp;\text{initpos}(u_i) &lt; \text{initpos}(r) &lt; \text{endpos}(r) &lt; \text{endpos}(u_i)&amp;\cdots\left(\text{type}2\right)\\
 \end{aligned}
 $$</div>
+
 <p>See more detail: <a href="https://arxiv.org/pdf/1211.3642.pdf">Simpler and Faster Lempel Ziv Factorization</a></p>
-#### Find repetitions of (type1)##### rightmax periodicities<p>Let us focus on maximal repetitions <span class="math">\(r\)</span> which have a <strong><em>period</em></strong> in <span class="math">\(u\)</span>. (<strong>rightmax periodicities</strong>) We need two auxiliary functions:</p>
+
+<h4 id="find-repetitions-of-type1">Find repetitions of (type1)</h4>
+<h5 id="rightmax-periodicities">rightmax periodicities</h5>
+<p>Let us focus on maximal repetitions <span class="math">\(r\)</span> which have a <strong><em>period</em></strong> in <span class="math">\(u\)</span>. (<strong>rightmax periodicities</strong>) We need two auxiliary functions:</p>
+
 <table>
 <thead>
 <tr>
@@ -464,26 +610,38 @@ $$</div>
 </tr>
 </tbody>
 </table>
-###### Theorem 5.1 (<a href="#paper2">paper2</a>)<p>Let</p>
+
+<h6 id="theorem-51-paper2">Theorem 5.1 (<a href="#paper2">paper2</a>)</h6>
+<p>Let</p>
+
 <ul>
 <li><span class="math">\(m = |t|, n = |u|\)</span></li>
 <li><span class="math">\(j\)</span> is an integer.</li>
 <li><span class="math">\(r\)</span> is a substring of <span class="math">\(tu\)</span> with at least one character in <span class="math">\(t\)</span> and at least <span class="math">\(j\)</span> characters in <span class="math">\(u\)</span>, and with <span class="math">\(|r|\geq2j\)</span>.</li>
 </ul>
+
 <p>Then, <span class="math">\(r\)</span> is a periodicity with period length <span class="math">\(j\)</span> <font color="red"><b>iff it begins at or after <span class="math">\(t[m-LS(j)+1]\)</span> and ends at or before <span class="math">\(u[j+LP(j+1)]\)</span>.</b></font></p>
-###### Proof 5.1 (<a href="#paper2">paper2</a>)<p>Let</p>
+
+<h6 id="proof-51-paper2">Proof 5.1 (<a href="#paper2">paper2</a>)</h6>
+<p>Let</p>
+
 <ul>
 <li><span class="math">\(a &gt; 0\)</span> be the number of characters of <span class="math">\(r\)</span> in <span class="math">\(t\)</span></li>
 <li><span class="math">\(b \geq 0\)</span> be the number of characters of <span class="math">\(r\)</span> in <span class="math">\(u[j+1\ldots n]\)</span></li>
 <li><span class="math">\(i=|r|= a+b+j\)</span></li>
 </ul>
+
 <p>For <span class="math">\(r\)</span> to be a periodicity with period length <span class="math">\(j\)</span>, <font color="red"><b>it is necessary and sufficient for the first <span class="math">\(i-j\)</span> characters of <span class="math">\(r\)</span> to match the last <span class="math">\(i-j\)</span> characters of <span class="math">\(r\)</span>.</b></font> (<span class="math">\(r[1\ldots a+b]\)</span> matches <span class="math">\(r[1+j\ldots i]\)</span>.)</p>
+
 <p>This can be broken into two separate conditions:</p>
+
 <ol>
 <li><span class="math">\(r[1\ldots a]\)</span> matches <span class="math">\(r[1+j\ldots a+j]\)</span></li>
 <li><span class="math">\(r[a+1\ldots a+b]\)</span> matches <span class="math">\(r[a+j+1\ldots i]\)</span></li>
 </ol>
+
 <p>These condition is equivalent to</p>
+
 <ol>
 <li>requiring "<span class="math">\(r[1+j\ldots a+j]=r[1+j]\ldots u[j]\)</span> is suffix of <span class="math">\(t\)</span>" is equivalent to requiring "<span class="math">\(r\)</span> to <strong>begin at or after <span class="math">\(t[m-LS(j)+1]\)</span>.</strong>"
 <div class="math">$$\begin{aligned}
@@ -502,12 +660,22 @@ $$</div>
 \end{aligned}$$</div>
 </li>
 </ol>
+
 <p>Thus, conditions <span class="math">\(1\)</span> and <span class="math">\(2\)</span> together are equivalent to the requirement stated in Theorem 5.1.</p>
-###### Theorem 5.2 (<a href="#paper2">paper2</a>)<p>Let <span class="math">\(j(1\leq j\leq n)\)</span> is an integer. There exists a rightmax periodicity (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span> iff <span class="math">\(LS(j)+LP(j+1)\geq j\)</span>. When this inequality holds, there is exactly one rightmax periodicity with period length <span class="math">\(j\)</span>, and this periodicity occurs at <span class="math">\(t[m-LS(j)+1]\ldots u[j+LP(j+1)]\)</span></p>
-###### Proof 5.2 (<a href="#paper2">paper2</a>)<p><strong>If the inequality fails</strong>, then there can be no substring of length <span class="math">\(2j\)</span> or more which meets the beginning and ending requirements of <a href="#Theorem-5.1">Theoreme 5.1</a>, and hence <strong>no periodicity with period length <span class="math">\(j\)</span> occurs with at least one character in <span class="math">\(t\)</span> and at least <span class="math">\(j\)</span> characters in <span class="math">\(u\)</span>.</strong> <font color="red"><b>This implies there are no rightmax periodicities (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span>.</b></font></p>
+
+<h6 id="theorem-52-paper2">Theorem 5.2 (<a href="#paper2">paper2</a>)</h6>
+<p>Let <span class="math">\(j(1\leq j\leq n)\)</span> is an integer. There exists a rightmax periodicity (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span> iff <span class="math">\(LS(j)+LP(j+1)\geq j\)</span>. When this inequality holds, there is exactly one rightmax periodicity with period length <span class="math">\(j\)</span>, and this periodicity occurs at <span class="math">\(t[m-LS(j)+1]\ldots u[j+LP(j+1)]\)</span></p>
+
+<h6 id="proof-52-paper2">Proof 5.2 (<a href="#paper2">paper2</a>)</h6>
+<p><strong>If the inequality fails</strong>, then there can be no substring of length <span class="math">\(2j\)</span> or more which meets the beginning and ending requirements of <a href="#Theorem-5.1">Theoreme 5.1</a>, and hence <strong>no periodicity with period length <span class="math">\(j\)</span> occurs with at least one character in <span class="math">\(t\)</span> and at least <span class="math">\(j\)</span> characters in <span class="math">\(u\)</span>.</strong> <font color="red"><b>This implies there are no rightmax periodicities (in <span class="math">\(tu\)</span>) with period length <span class="math">\(j\)</span>.</b></font></p>
+
 <p>On the other hand, if the inequality holds, then <a href="#Theorem-5.1">Theoreme 5.1</a> states that every substring (with length <span class="math">\(2j\)</span> or more) which starts in <span class="math">\(t[m-LS(j)+1\ldots m]\)</span> and ends in <span class="math">\(u[j\ldots j+LP(j+1)]\)</span> is a periodicity with period length <span class="math">\(j\)</span>.</p>
+
 <p>Moreover, these are the only such periodicities which have at least one character in <span class="math">\(t\)</span> and at least one period length in <span class="math">\(u\)</span>. Of these periodicities, only one is maximal - the one that starts as far left as possible (<span class="math">\(t[m-LS(j)+1]\)</span>) and continues as far right as possible (<span class="math">\(u[j+LP(j+1)]\)</span>).</p>
-##### leftmax periodicities<p>As described in the table below, we can find <strong>leftmax periodicities</strong> (type1) symmetrically.</p>
+
+<h5 id="leftmax-periodicities">leftmax periodicities</h5>
+<p>As described in the table below, we can find <strong>leftmax periodicities</strong> (type1) symmetrically.</p>
+
 <table>
 <thead>
 <tr>
@@ -526,8 +694,12 @@ $$</div>
 </tr>
 </tbody>
 </table>
-#### Find repetitions of (type2)<p>The task is greatly simplified by the fact that every repetition of type 2 occurs entirely inside some s-factor <span class="math">\(u_i\)</span> and each <span class="math">\(u_i\)</span> has an earlier occurrence in <span class="math">\(w\)</span>.</p>
+
+<h4 id="find-repetitions-of-type2">Find repetitions of (type2)</h4>
+<p>The task is greatly simplified by the fact that every repetition of type 2 occurs entirely inside some s-factor <span class="math">\(u_i\)</span> and each <span class="math">\(u_i\)</span> has an earlier occurrence in <span class="math">\(w\)</span>.</p>
+
 <p>Let <span class="math">\(v_i\)</span> be thhe earlier occurrence of <span class="math">\(u_i\)</span>, and let <span class="math">\(\Delta_i = \text{initpos}(u_i) - \text{initpos}(v_i).\)</span> Obiously, each repetition of type2 occurring inside <span class="math">\(u_i\)</span> is a copy of a maximal repetition occurring inside <span class="math">\(v_i\)</span> shifted by <span class="math">\(\Deltai\)</span> to the right.</p>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -542,7 +714,9 @@ $$</div>
 </div>
 
 <hr>
-### terminology<table>
+
+<h3 id="terminology">terminology</h3>
+<table>
 <thead>
 <tr>
 <th align="center">Name</th>
@@ -633,6 +807,7 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var align = "center",
         indent = "0em",
@@ -694,10 +869,13 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

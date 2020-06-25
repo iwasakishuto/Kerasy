@@ -252,6 +252,39 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#nussinov-algorithm">
+      Nussinov Algorithm
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#zuker-algorithm">
+      Zuker Algorithm
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#five-types-of-loops">Five types of "loops"</a>
+        </li>
+    
+    </ul>
+  </li>
+
 
   
         
@@ -308,13 +341,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>Secondary Structure</h3>
+            <h3>Secondary Structure</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,8 +356,12 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <div class="admonition tip">
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/structure.ipynb">Kerasy.examples.structure.ipynb</a></p>
 </div>
@@ -337,10 +372,11 @@
 secondary structure, so <b>the correctness of secondary structure should be evaluated based on the <font color="red">free energy.</font></b></p>
 </div>
 
-## Nussinov Algorithm<p>Nussinov Algorithm calculate the free energy by <strong>the number of base-pairs.</strong></p>
+<h2 id="nussinov-algorithm">Nussinov Algorithm</h2>
+<p>Nussinov Algorithm calculate the free energy by <strong>the number of base-pairs.</strong></p>
+
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Nussinov</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
-
 
 <ul>
 <li>params:<ul>
@@ -350,6 +386,7 @@ secondary structure, so <b>the correctness of secondary structure should be eval
 </ul>
 </li>
 </ul>
+
 <table>
 <thead>
 <tr>
@@ -378,6 +415,7 @@ secondary structure, so <b>the correctness of secondary structure should be eval
 </tr>
 </tbody>
 </table>
+
 <div class="math">$$
 \begin{aligned}
   \gamma(i,j) &amp;= \max
@@ -402,9 +440,10 @@ secondary structure, so <b>the correctness of secondary structure should be eval
   \end{cases}
 \end{aligned}
 $$</div>
-## Zuker Algorithm<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Zuker</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-</code></pre></div>
 
+<h2 id="zuker-algorithm">Zuker Algorithm</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Zuker</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
 
 <ul>
 <li>params:<ul>
@@ -421,10 +460,15 @@ $$</div>
 </ul>
 </li>
 </ul>
+
 <p>The free energy of a secondary structure is approximated as the sum of the free energy of <b>"loops".</b></p>
+
 <div class="math">$$E = \sum_iE_i$$</div>
+
 <p>The free energy of individual loop is <b>given</b> by experimental data. (ex. <span class="math">\(\mathrm{C-G: }-3.4\mathrm{kcal/mol}\)</span>, <span class="math">\(\mathrm{U-A: }-0.9\mathrm{kcal/mol}\)</span>)</p>
-### Five types of "loops"<table>
+
+<h3 id="five-types-of-loops">Five types of "loops"</h3>
+<table>
     <thead>
         <tr>
             <th align="center">hairpin loop</th>
@@ -478,6 +522,7 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <div class="math">$$
 \begin{aligned}
     W(i,j) &amp;= \min
@@ -494,6 +539,7 @@ $$</div>
     \end{cases}\\    
 \end{aligned}
 $$</div>
+
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
   <p>None of the algorithms we see this week can deal with <span class="marker-info" aria-label="a nucleic acid secondary structure containing at least two stem-loop structures in which half of one stem is intercalated between the two halves of another stem.">pseudoknot</span></p>
@@ -561,10 +607,13 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

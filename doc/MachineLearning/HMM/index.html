@@ -189,6 +189,88 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#bernoulli-hmm">
+      Bernoulli HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#multinomial-hmm">
+      Multinomial HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#binomial-hmm">
+      Binomial HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#gaussian-hmm">
+      Gaussian HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#definition">definition</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#conversion-function">conversion function</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+
+  <li class="toctree-l2">
+    <a href="#gaussian-mixture-hmm">
+      Gaussian Mixture HMM
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#correspondence-between-code-and-formula">Correspondence between code and formula</a>
+        </li>
+    
+    </ul>
+  </li>
+
 
   
         
@@ -308,13 +390,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>HMM</h3>
+            <h3>HMM</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,17 +405,24 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <div class="admonition tip">
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/HMM.ipynb">Kerasy.examples.HMM.ipynb</a></p>
 </div>
 
 <p>The <strong><em>hidden Markov model</em> (HMM)</strong> is a very powerful statistical method of characterizing the observed data samples of a discrete-time series. It's <strong>joint probability distribution</strong> over both latent and observed variables is then given by</p>
+
 <div class="math">$$
 p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})=p\left(\mathbf{z}_{1} | \boldsymbol{\pi}\right)\left[\prod_{n=2}^{N} p\left(\mathbf{z}_{n} | \mathbf{z}_{n-1}, \mathbf{A}\right)\right] \prod_{m=1}^{N} p\left(\mathbf{x}_{m} | \mathbf{z}_{m}, \boldsymbol{\phi}\right)\qquad (13.10)
 $$</div>
+
 <p>where <span class="math">\(\mathbf{Z}=\left\{z_1,\ldots,z_N\right\}\)</span> are the discrete latent variables, <span class="math">\(\mathbf{X}=\left\{x_1,\ldots,x_N\right\}\)</span> are the corresponding observations, and <span class="math">\(\boldsymbol{\theta} = \left\{\boldsymbol{\pi},\mathbf{A},\boldsymbol{\phi}\right\}\)</span> denotes the set of parameters governing the model.</p>
+
 <table>
 <thead>
 <tr>
@@ -372,11 +459,15 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <p>If we have observed a data set <span class="math">\(\mathbf{X} = \left\{x_1,\ldots,x_N\right\}\)</span>, we can determine the parameters of an HMM using maximum likelihood. The likelihood function is given by</p>
+
 <div class="math">$$
 p(\mathbf{X} | \boldsymbol{\theta})=\sum_{\mathbf{Z}} p(\mathbf{X}, \mathbf{Z} | \boldsymbol{\theta})\qquad (13.11)
 $$</div>
+
 <p>However, <span class="math">\(\sum_{\mathbf{Z}}\)</span> leads to complex expressions, so we turn to the <strong>expectation maximization (EM) algorithm</strong>.</p>
+
 <blockquote>
 <p>The EM algorithm starts with some initial selection for the model parameters, which we denote by <span class="math">\(\boldsymbol{\theta}^{\text{old}}\)</span>.</p>
 <p>In the E step, we take these parameter values and find the posterior distribution of the latent variables <span class="math">\(p\left(\mathbf{Z} | \mathbf{X}, \boldsymbol{\theta}^{\text {old }}\right)\)</span>. We then, <strong>use this posterior distribution to evaluate the expectation of the logarithm of the complete-data likelihood function</strong>, as a function of the parameters <span class="math">\(\boldsymbol{\theta}\)</span>, to give the function <span class="math">\(Q\left(\boldsymbol{\theta},\boldsymbol{\theta}^{\text{old}}\right)\)</span> defined by
@@ -401,55 +492,73 @@ A_{j k}&amp;= \frac{\sum_{n=2}^{N} \xi\left(z_{n-1, j}, z_{n k}\right)}{\sum_{l=
 $$</div>
 To maximize <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> with respect to <span class="math">\(\phi_k\)</span>, we notice that only the final term in <span class="math">\((13.17)\)</span> depends on <span class="math">\(\phi_k\)</span>, and the quantities <span class="math">\(\gamma\left(z_{nk}\right)\)</span> are playing the role of the responsibilities. If the parameters <span class="math">\(\phi_k\)</span> are independent for the different components, then this term decouples into a sum of terms one for each value <span class="math">\(k\)</span>, each of which can be maximized independently. We are then simply maximizing the weighted log likelihood function for the emission density <span class="math">\(p\left(\mathbf{x}|\phi_k\right)\)</span> with weights <span class="math">\(\gamma\left(z_{nk}\right)\)</span>.</p>
 </blockquote>
-## Bernoulli HMM<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BernoulliHMM</span><span class="p">(</span>
+
+<h2 id="bernoulli-hmm">Bernoulli HMM</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BernoulliHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>For the case of discrete Bernoulli observed variables, the conditional distribution of the observations takes the form</p>
+
 <div class="math">$$p\left(x|\mathbf{z}\right) = \prod_{k=1}^{K}\left(\theta_k^x\left(1-\theta_k\right)^{1-x}\right)^{z_k}$$</div>
+
 <p>and the corresponding M-step equations are given by</p>
+
 <div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}$$</div>
-## Multinomial HMM<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
+
+<h2 id="multinomial-hmm">Multinomial HMM</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">MultinomialHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
-
 
 <p>For the case of discrete multinomial observed variables, the conditional distribution of the observations takes the form</p>
+
 <div class="math">$$p\left(\mathbf{x}|\mathbf{z}\right) = \prod_{i=1}^D\prod_{k=1}^{K}\mu_{ik}^{x_iz_k}\quad (13.22)$$</div>
+
 <p><strong>※ <em>When <span class="math">\(k\)</span> is <span class="math">\(2\)</span> and, the multinomial distribution is the Bernoulli distribution.</em></strong></p>
+
 <p>and the corresponding M-step equations are given by</p>
+
 <div class="math">$$\mu_{ik} = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_{ni}}{\sum_{n=1}^N\gamma\left(z_{nk}\right)}\qquad (13.23)$$</div>
-## Binomial HMM<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BinomialHMM</span><span class="p">(</span>
+
+<h2 id="binomial-hmm">Binomial HMM</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">BinomialHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;ite&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>For the case of discrete binomial observed variables, the conditional distribution of the observations takes the form</p>
+
 <div class="math">$$p\left(x|n,\mathbf{z}\right) = \prod_{k=1}^{K}\left(\begin{array}{l}n \\ x\end{array}\right) \left(\theta_k^x\left(1-\theta_k\right)^{n-x}\right)^{z_k}$$</div>
+
 <p><strong>※ <em>A single success/failure experiment is also called a Bernoulli trial or Bernoulli experiment and a sequence of outcomes is called a Bernoulli process; for a single trial, i.e., n = 1, the binomial distribution is a Bernoulli distribution.</em></strong></p>
+
 <p>and the corresponding M-step equations are given by</p>
+
 <div class="math">$$\theta_k = \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^N\gamma\left(z_{nk}\right)n_n}$$</div>
-## Gaussian HMM<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
+
+<h2 id="gaussian-hmm">Gaussian HMM</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianHMM</span><span class="p">(</span>
     <span class="n">n_hstates</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="s2">&quot;viterbi&quot;</span><span class="p">,</span>
     <span class="n">up_params</span><span class="o">=</span><span class="s2">&quot;itmc&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">covariance_type</span><span class="o">=</span><span class="s2">&quot;diag&quot;</span><span class="p">,</span> <span class="n">min_covariance</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p>Gaussian emission densities we have <span class="math">\(p(\mathbf{x}|\boldsymbol{\phi}_k) = \mathcal{N}\left(\mathbf{x}|\boldsymbol{\mu_k},\boldsymbol{\Sigma_k}\right)\)</span>, and maximization of the function <span class="math">\(Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^{\mathrm{old}}\right)\)</span> then gives</p>
+
 <div class="math">$$
 \begin{aligned}
 \boldsymbol{\mu_k} &amp;= \frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)x_n}{\sum_{n=1}^{N}\gamma\left(z_{nk}\right)} &amp;(13.20)\\
 \boldsymbol{\Sigma_k} &amp;=\frac{\sum_{n=1}^N\gamma\left(z_{nk}\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)\left(\mathbf{x}_n-\boldsymbol{\mu}_k\right)^T}{\sum_{n=1}^N\gamma\left(z_{nk}\right)} &amp;(13.21)
 \end{aligned}
 $$</div>
+
 <h4 id="covariance-type">Covariance type</h4>
 
-##### definition<table>
+<h5 id="definition">definition</h5>
+<table>
 <thead>
 <tr>
 <th align="center">Name</th>
@@ -493,7 +602,10 @@ $$</div>
 </tr>
 </tbody>
 </table>
-##### conversion function<p>conversion functions are described at <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/utils/np_utils.py">kerasy/utils/np_utils.py</a>.</p>
+
+<h5 id="conversion-function">conversion function</h5>
+<p>conversion functions are described at <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/utils/np_utils.py">kerasy/utils/np_utils.py</a>.</p>
+
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">compress_based_on_covariance_type_from_tied_shape</span><span class="p">(</span><span class="n">tied_cv</span><span class="p">,</span> <span class="n">covariance_type</span><span class="p">,</span> <span class="n">n_gaussian</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create all the covariance matrices</span>
@@ -507,12 +619,12 @@ $$</div>
 <span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div>
 
-
-## Gaussian Mixture HMM<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
+<h2 id="gaussian-mixture-hmm">Gaussian Mixture HMM</h2>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">HMM</span><span class="o">.</span><span class="n">GaussianMixtureHMM</span><span class="p">()</span>
 </code></pre></div>
 
-
-#### Correspondence between code and formula<table>
+<h4 id="correspondence-between-code-and-formula">Correspondence between code and formula</h4>
+<table>
 <thead>
 <tr>
 <th align="center">code</th>
@@ -575,6 +687,7 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -644,10 +757,13 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

@@ -266,6 +266,156 @@
       </a>
     </li>
     
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#suffix-array">
+      Suffix Array
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2 current">
+    <ul class="subnav-l2 current">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step1-definition-of-sl-type">Step1. Definition of S/L-type</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step2-definition-of-lms">Step2. Definition of LMS</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step3-initialize-suffix-array">Step3. Initialize Suffix Array.</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step4-prepare-the-empty-buckets">Step4. Prepare the empty buckets</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step5-sort-the-lms">Step5. Sort the LMS</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step6-induced-sorting-for-l-type-suffixes">Step6. Induced sorting for L-type suffixes</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#step7-induced-sorting-for-s-type-suffixes">Step7. Induced sorting for S-type suffixes</a>
+        </li>
+    
+      
+          
+
+  <li class="toctree-l3">
+    <a href="#recursion-of-sa-is">
+      Recursion of SA-IS
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l3">
+    <ul class="subnav-l3 toc-hidden">
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step4">Step4'</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step5">Step5'</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step6">Step6'</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step7">Step7'</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step5-recursion">Step5 (Recursion)</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step6-recursion">Step6 (Recursion)</a>
+        </li>
+    
+      
+        <li class="toctree-l4">
+          <a class="toctree-l5" href="#step7-recursion">Step7 (Recursion)</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#computational-complexity">Computational complexity</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+
+  <li class="toctree-l2">
+    <a href="#burrows-wheeler-transform-bwt">
+      Burrows-Wheeler Transform; BWT
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+  <li class="toctree-l2">
+    <ul class="subnav-l2 toc-hidden">
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#reverse-bwt-with-suffix-array">Reverse BWT with Suffix Array</a>
+        </li>
+    
+      
+        <li class="toctree-l3">
+          <a class="toctree-l4" href="#reverse-bwt-without-suffix-array">Reverse BWT without Suffix Array</a>
+        </li>
+    
+    </ul>
+  </li>
+
+      
+
+  <li class="toctree-l2">
+    <a href="#longest-common-prefix-lcp">
+      Longest Common Prefix; LCP
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
 
   
         
@@ -308,13 +458,11 @@
   <hr/>
 </div>
           <div role="main">
-            <div class="section">
-              
-                <div id="contents">
+<div id="contents">
 <div class="row">
     <div class="small-12 columns article">
         <div class="topRibbon">
-          <h3>String Search</h3>
+            <h3>String Search</h3>
         </div>
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
@@ -325,17 +473,22 @@
         </ul>
     </div>
 </div>
-        <section class="article">
-            <div class="admonition tip">
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<div class="admonition tip">
   <p class="admonition-title">Notebook</p>
   <p>Example Notebook: <a href="https://nbviewer.jupyter.org/github/iwasakishuto/Kerasy/blob/gh-pages/examples/string.ipynb">Kerasy.examples.string.ipynb</a></p>
 </div>
 
-## Suffix Array<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">SAIS</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+<h2 id="suffix-array">Suffix Array</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">SAIS</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p><strong>Suffix array</strong> is a sorted array of all suffixes of a string, and can be built in <span class="math">\(\mathrm{O}(n)\)</span>. This procedure is as following:</p>
+
 <ol>
 <li>Define the each character S/L-type.</li>
 <li>Find the <strong>LMS(Left Most S-type)</strong></li>
@@ -345,7 +498,9 @@
 <li>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes.</li>
 <li>Scan SA in <strong>backward</strong> order and fill <strong>S-type</strong> suffixes.</li>
 </ol>
-#### Step1. Definition of S/L-type<ul>
+
+<h4 id="step1-definition-of-sl-type">Step1. Definition of S/L-type</h4>
+<ul>
 <li>If <span class="math">\(i\)</span>-th suffix is [smaller, bigger] then <span class="math">\(i+1\)</span>-th suffix in lexicographical order, <span class="math">\(i\)</span>-th character is [S,L]-type. Exceptionally, "$" is the initial character and defined S-type.</li>
 <li>In the above definition, obviously the following holds:<ul>
 <li><span class="math">\(i\)</span>-th suffix is <strong>S-tyep</strong> when<ul>
@@ -362,6 +517,7 @@
 </ul>
 </li>
 </ul>
+
 <table>
 <thead>
 <tr>
@@ -378,26 +534,43 @@
 </tr>
 </tbody>
 </table>
-#### Step2. Definition of LMS<p>If <span class="math">\(S[i]\)</span> is the <strong>S-type</strong> character and <span class="math">\(S[i-1]\)</span> is the L-type, <span class="math">\(S[i]\)</span> is called <strong>LMS(Left Most S-type)</strong>.</p>
+
+<h4 id="step2-definition-of-lms">Step2. Definition of LMS</h4>
+<p>If <span class="math">\(S[i]\)</span> is the <strong>S-type</strong> character and <span class="math">\(S[i-1]\)</span> is the L-type, <span class="math">\(S[i]\)</span> is called <strong>LMS(Left Most S-type)</strong>.</p>
+
 <p><img alt="step2" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step2.png"></p>
-#### Step3. Initialize Suffix Array.<p><img alt="step3" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step3.png"></p>
-#### Step4. Prepare the empty buckets<p><img alt="step4" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step4.png"></p>
-#### Step5. Sort the LMS<p>※ This sorting is not easy, but ignore for consistency of explanation. <strong>(Touch again later.)</strong></p>
+
+<h4 id="step3-initialize-suffix-array">Step3. Initialize Suffix Array.</h4>
+<p><img alt="step3" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step3.png"></p>
+
+<h4 id="step4-prepare-the-empty-buckets">Step4. Prepare the empty buckets</h4>
+<p><img alt="step4" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step4.png"></p>
+
+<h4 id="step5-sort-the-lms">Step5. Sort the LMS</h4>
+<p>※ This sorting is not easy, but ignore for consistency of explanation. <strong>(Touch again later.)</strong></p>
+
 <p><img alt="step5" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step5.png"></p>
+
 <div class="admonition summary">
   <p class="admonition-title">Induced Sorting</p>
   <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/theorem.png">
   <p><center>We induce the order from the already known suffix order.</center></p>
 </div>
 
-#### Step6. Induced sorting for <strong>L-type</strong> suffixes<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. If <span class="math">\(S[\text{Focusing Number}-1]\)</span> is L-type, put <span class="math">\(\text{Focusing Number}-1\)</span> into the corresponding bucket from the smaller. This is justified by</p>
+<h4 id="step6-induced-sorting-for-l-type-suffixes">Step6. Induced sorting for <strong>L-type</strong> suffixes</h4>
+<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. If <span class="math">\(S[\text{Focusing Number}-1]\)</span> is L-type, put <span class="math">\(\text{Focusing Number}-1\)</span> into the corresponding bucket from the smaller. This is justified by</p>
+
 <ul>
 <li>Same bucket (Same initial)</li>
 <li>L-tyep (Smaller than S-type)</li>
 <li>One right is the smallest of the rest.</li>
 </ul>
+
 <p><img alt="Step6" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step6.gif"></p>
-#### Step7. Induced sorting for <strong>S-type</strong> suffixes<p>Scan SA in <strong>backward</strong> order and fill <strong>S-type</strong> suffixes. At this time, <font color="red"><b>we have to reorder the LMS.</b></font></p>
+
+<h4 id="step7-induced-sorting-for-s-type-suffixes">Step7. Induced sorting for <strong>S-type</strong> suffixes</h4>
+<p>Scan SA in <strong>backward</strong> order and fill <strong>S-type</strong> suffixes. At this time, <font color="red"><b>we have to reorder the LMS.</b></font></p>
+
 <table>
 <thead>
 <tr>
@@ -414,29 +587,49 @@
 </tr>
 </tbody>
 </table>
+
 <p>Finally, we get</p>
+
 <p><img alt="Step7-4" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step7-4.png"></p>
+
 <div class="admonition qtitle">
   <p class="admonition-title">How to Sort LMS suffix?? (Step5)</p>
   <p>We could sort entire SA if LMS is correctly sorted. Then How to sort LMS?? The answer of this question is <font color="red"><b>"Sort without Sorting"</b></font>.</p>
 </div>
 
-### Recursion of SA-IS#### Step4'<p><img alt="Step4_prime" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step4_prime.png"></p>
-#### Step5'<p>At this time, we couldn't know the order of LMS, so we <font color="red"><b>"equality" instead of "inequality"</b></font>.</p>
+<h3 id="recursion-of-sa-is">Recursion of SA-IS</h3>
+<h4 id="step4">Step4'</h4>
+<p><img alt="Step4_prime" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step4_prime.png"></p>
+
+<h4 id="step5">Step5'</h4>
+<p>At this time, we couldn't know the order of LMS, so we <font color="red"><b>"equality" instead of "inequality"</b></font>.</p>
+
 <p><img alt="Step5_prime" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step5_prime.png"></p>
-#### Step6'<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. At this moment, <font color="red"><b>equality relationship is also passed</b></font>.</p>
+
+<h4 id="step6">Step6'</h4>
+<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. At this moment, <font color="red"><b>equality relationship is also passed</b></font>.</p>
+
 <p><img alt="Step6_prime" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step6_prime.gif"></p>
-#### Step7'<p>Scan SA in <strong>backward</strong> order and fill <strong>S-type</strong> suffixes.</p>
+
+<h4 id="step7">Step7'</h4>
+<p>Scan SA in <strong>backward</strong> order and fill <strong>S-type</strong> suffixes.</p>
+
 <p><img alt="Step7_prime" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step7_prime.gif"></p>
+
 <div class="admonition summary">
   <p class="admonition-title">Encode LMS-substrings</p>
   <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/encoding.png">
   <p><center>We induce the order from the already known suffix order.</center></p>
 </div>
 
-#### Step5 (Recursion)<p><center><img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step5_recursion.png" alt="Step5_recursion" width=50%></center></p>
-#### Step6 (Recursion)<p><center><img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step6_recursion.png" alt="Step6_recursion" width=50%></center></p>
-#### Step7 (Recursion)<table>
+<h4 id="step5-recursion">Step5 (Recursion)</h4>
+<p><center><img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step5_recursion.png" alt="Step5_recursion" width=50%></center></p>
+
+<h4 id="step6-recursion">Step6 (Recursion)</h4>
+<p><center><img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step6_recursion.png" alt="Step6_recursion" width=50%></center></p>
+
+<h4 id="step7-recursion">Step7 (Recursion)</h4>
+<table>
 <thead>
 <tr>
 <th align="center"></th>
@@ -450,9 +643,14 @@
 </tr>
 </tbody>
 </table>
+
 <p>We could sort LMS correctly!!</p>
-### Computational complexity<p>In the each recursion step, it is guaranteed that the length of encoded strings is less than half of the previous length.</p>
+
+<h3 id="computational-complexity">Computational complexity</h3>
+<p>In the each recursion step, it is guaranteed that the length of encoded strings is less than half of the previous length.</p>
+
 <div class="math">$$\mathrm{O}(n) + \mathrm{O}(n/2) + \mathrm{O}(n/4) + \cdots = \mathrm{O}(2n)$$</div>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -460,9 +658,9 @@
   </ul>
 </div>
 
-## Burrows-Wheeler Transform; BWT<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">mkBWT</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">SA</span><span class="p">)</span>
+<h2 id="burrows-wheeler-transform-bwt">Burrows-Wheeler Transform; BWT</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">mkBWT</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">SA</span><span class="p">)</span>
 </code></pre></div>
-
 
 <table>
 <thead>
@@ -479,15 +677,21 @@
 </tr>
 </tbody>
 </table>
+
 <p>BWT is useful for <strong>compression</strong>, since <strong>it tends to rearrange a character string into runs of similar characters.</strong>  More importantly, <font color="red"><b>this transformation is reversible, without needing to store any additional data</b></font>. The BWT is thus a "free" method of improving the efficiency of text compression algorithms, costing only some extra computation.</p>
-### Reverse BWT with Suffix Array<p>We will denote <span class="math">\(T\)</span> and <span class="math">\(ISA\)</span> as followings.</p>
+
+<h3 id="reverse-bwt-with-suffix-array">Reverse BWT with Suffix Array</h3>
+<p>We will denote <span class="math">\(T\)</span> and <span class="math">\(ISA\)</span> as followings.</p>
+
 <div class="math">$$
 \begin{cases}
 SA[k] = v &amp;\Longleftrightarrow ISA[v] = k\\
 \mathrm{T}[i] &amp;\Longleftrightarrow \mathrm{ISA}\left[\mathrm{SA}[i] - 1\right]\\
 \end{cases}
 $$</div>
+
 <p>This means that <font color="red"><b>the order of suffix whose initial character is <span class="math">\(BWT[i]\)</span> is <span class="math">\(T[i]\)</span></b></font>, and under the above definition, the following equation holds.</p>
+
 <div class="math">$$
 \begin{aligned}
 \mathrm{BWT}\left[\mathrm{T}\left[i\right]\right]
@@ -498,9 +702,14 @@ $$</div>
 &amp;= \text{$BWT[i]$'s one left character in $S$}
 \end{aligned}
 $$</div>
+
 <p><img alt="BWT-without-SA1" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA1.png"></p>
+
 <p><b>Now that we can get the original <span class="math">\(S\)</span> from BWT <font color="red">and</font> SA.</b></p>
-### Reverse BWT without Suffix Array<p>In fact, we could recover the original strings <strong>only from</strong> BWT, <strong>because we can make <span class="math">\(T\)</span> only from BWT.</strong> One of the important properties to realize it is <font color="red"><b>LF Mapping</b></font>.</p>
+
+<h3 id="reverse-bwt-without-suffix-array">Reverse BWT without Suffix Array</h3>
+<p>In fact, we could recover the original strings <strong>only from</strong> BWT, <strong>because we can make <span class="math">\(T\)</span> only from BWT.</strong> One of the important properties to realize it is <font color="red"><b>LF Mapping</b></font>.</p>
+
 <div class="admonition summary">
   <p class="admonition-title">LF Mapping</p>
   <img src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA2.png" alt="BWT-without-SA2">
@@ -508,6 +717,7 @@ $$</div>
 </div>
 
 <p>To calculate <span class="math">\(T[i]\)</span> only from BWT, we will introduce auxiliary storages <span class="math">\(C[x]\)</span>, and <span class="math">\(Occ(x,i)\)</span></p>
+
 <table>
 <thead>
 <tr>
@@ -526,14 +736,18 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <p>Using these variable, we can calculate <span class="math">\(T[i]\)</span> by</p>
+
 <div class="math">$$T[i] =
 \begin{cases}
   0 &amp;(\mathrm{BWT}[i] = \text{\$})\\
   C\left[\mathrm{BWT}[i]\right] + Occ(\mathrm{BWT}[i], i) - 1 &amp; (\text{otherwise.})\\
 \end{cases}
 $$</div>
+
 <p>The above formula is guaranteed by the following properties.</p>
+
 <div class="math">$$
 \begin{cases}
   [lb(W),ub(W)] &amp;= \text{the index range of words in SA whose prefix is W}\\
@@ -544,7 +758,9 @@ $$</div>
   ub(xW) &amp;= C(x) + Occ(x, ub(W)) - 1 &amp;\cdots (2)
 \end{cases}
 $$</div>
+
 <p>These properties (especially the recursion (1) and (2)) are proved by</p>
+
 <table>
 <thead>
 <tr>
@@ -559,7 +775,9 @@ $$</div>
 </tr>
 </tbody>
 </table>
+
 <p>This allows us to search the occurrence range of characters with a specific prefix.</p>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -567,12 +785,14 @@ $$</div>
   </ul>
 </div>
 
-## Longest Common Prefix; LCP<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">mkHeight</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">SA</span><span class="p">)</span>
+<h2 id="longest-common-prefix-lcp">Longest Common Prefix; LCP</h2>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">mkHeight</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">SA</span><span class="p">)</span>
 </code></pre></div>
 
-
 <p><strong>LCP(Longest Common Prefix)</strong> is "how many characters two strings have in common with each other", and <strong>LCP array</strong> is an array where each adjacent index stores lcp between <span class="math">\(i\)</span>-th suffix and <span class="math">\(i+1\)</span>-th suffix.</p>
+
 <p>Speaking of <strong>LCParray</strong>, it usually refers to the suffix array,</p>
+
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
   <ul>
@@ -641,10 +861,13 @@ $$</div>
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
 </script>
-        </section>
+
+<!-- EoC -->
+
+<p></section>
     </div>
 </div>
-</div>
+</div></p>
               
             </div>
           </div>

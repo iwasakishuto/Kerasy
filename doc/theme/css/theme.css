@@ -4198,18 +4198,19 @@ p.caption::before {
 .wy-menu-vertical li.toctree-l2:not(.inactive)>a {
   background-color: #fff8cd;
   padding: 0.4045em 2.427em;
+  color: black!important
 }
 .wy-menu-vertical li.toctree-l2:not(.inactive)>a:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
 }
 /* toctree L4 */
-.wy-menu-vertical li.toctree-l4>a{
+.wy-menu-vertical li.toctree-l3>a.toctree-l4{
   background-color:#fcfaed;
   padding: 0.4em 1em 0.4em 3.4em;
   color: black!important
 }
-.wy-menu-vertical li.toctree-l4>a:hover {
+.wy-menu-vertical li.toctree-l3>a.toctree-l4:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: white;
 }

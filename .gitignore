@@ -14,6 +14,7 @@ README.md
 MEMO.md
 pelican2mkdocs.py
 checkLibs.py
+insertheaderfooter.py
 
 # PyPI
 dist/

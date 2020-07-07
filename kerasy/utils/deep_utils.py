@@ -9,13 +9,6 @@ def set_weight(ver, val):
 
 def mk_class_get(all_classes={}, kerasy_abst_class=[], genre=""):
     def get(identifier, **kwargs):
-        f"""
-        Retrieves a Kerasy {genre.capitalize()} instance.
-        @params identifier : {genre.capitalize()} identifier, string name of a {genre}, or
-                             a Kerasy {genre.capitalize()} instance.
-        @params kwargs     : parametes for class initialization.
-        @return {genre:<11}: A Kerasy {genre.capitalize()} instance.
-        """
         if isinstance(identifier, str):
             handleKeyError(lst=list(all_classes.keys()), identifier=identifier)
             instance = all_classes.get(identifier)(**kwargs)
@@ -23,6 +16,13 @@ def mk_class_get(all_classes={}, kerasy_abst_class=[], genre=""):
             handleTypeError(types=[str] + kerasy_abst_class, identifier=identifier)
             instance = identifier
         return instance
+    get.__doc__ = f"""
+    Retrieves a Kerasy {genre.capitalize()} instance.
+    @params identifier : {genre.capitalize()} identifier, string name of a {genre}, or
+                         a Kerasy {genre.capitalize()} instance.
+    @params kwargs     : parametes for class initialization.
+    @return {genre:<11}: A Kerasy {genre.capitalize()} instance.
+    """
     return get
 
 def get_params_size(layer):

@@ -122,6 +122,7 @@ def setup_package():
             f'Cython>={CYTHON_MIN_VERSION}',
             'pydotplus>=2.0.2',
             'bitarray>=0.8.1',
+            'ipython>=7.15.0',
         ],
         extras_require={
           'tests': ['pytest'],

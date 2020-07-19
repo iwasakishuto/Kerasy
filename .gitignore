@@ -18,6 +18,7 @@ PyforDocs
 dist/
 MANIFEST
 kerasy.egg-info/
+build/
 
 # wheel
 wheels/

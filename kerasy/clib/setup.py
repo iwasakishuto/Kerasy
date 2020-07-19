@@ -28,7 +28,7 @@ def configuration(parent_package='', top_path=None):
     p = Path(CLIB_ABS_PATH)
     for abs_prog_path in p.glob("*.pyx"):
         fn = abs_prog_path.name # hoge.pyx
-        *name, ext = fn.split(".")
+        *name, _ = fn.split(".")
         name = ".".join(name) # hoge
         config.add_extension(
             name=name,

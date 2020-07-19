@@ -2,7 +2,7 @@
 import sys
 
 __copyright__    = "Copyright (C) 2020 Shuto Iwasaki"
-__version__      = "0.7.0"
+__version__      = "0.7.1"
 
 __license__      = "MIT"
 __author__       = "Shuto Iwasaki"

@@ -8,7 +8,7 @@ import builtins
 builtins.__KERASY_SETUP__ = True
 
 import kerasy
-from kerasy.clib import CYTHON_MIN_VERSION
+# from kerasy.clib import CYTHON_MIN_VERSION
 
 DISTNAME = 'kerasy'
 DESCRIPTION = 'A set of python modules for machine learning and data mining \
@@ -17,6 +17,8 @@ especially in the biological field.'
 cwd = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(cwd, 'README.rst'), encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
+with open("requirements.txt", mode="r") as f:
+    INSTALL_REQUIRES = [line.rstrip("\n") for line in f.readlines() if line[0]!=("#")]
 
 # Optional setuptools features
 # We need to import setuptools early, if we want setuptools features,
@@ -115,15 +117,7 @@ def setup_package():
         },
         cmdclass=cmdclass,
         python_requires=">=3.6",
-        install_requires=[
-            'numpy>=1.15.1',
-            'scipy>=1.4.1',
-            'seaborn>=0.10.0',
-            f'Cython>={CYTHON_MIN_VERSION}',
-            'pydotplus>=2.0.2',
-            'bitarray>=0.8.1',
-            'ipython>=7.15.0',
-        ],
+        install_requires=INSTALL_REQUIRES,
         extras_require={
           'tests': ['pytest'],
         },

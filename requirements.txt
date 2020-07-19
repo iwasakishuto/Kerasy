@@ -1,0 +1,7 @@
+numpy >= 1.15.1
+scipy >= 1.4.1
+seaborn >= 0.10.0
+Cython >= 0.28.5
+pydotplus >= 2.0.2
+bitarray >= 0.8.1
+ipython >= 7.15.0

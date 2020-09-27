@@ -111,7 +111,7 @@ def setup_package():
         # long_description_content_type='text/markdown',
         project_urls={
             'Bug Reports'  : 'https://github.com/iwasakishuto/Kerasy/issues',
-            'Documentation': 'https://iwasakishuto.github.io/Kerasy/doc/index.html',
+            'Documentation': 'https://iwasakishuto.github.io/Kerasy/index.html',
             'Source Code'  : 'https://github.com/iwasakishuto/Kerasy',
             'Say Thanks!'  : 'https://iwasakishuto.github.io/',
         },

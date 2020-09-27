@@ -342,22 +342,6 @@
   <hr/>
 </div>
           <div role="main">
-<div id="contents">
-<div class="row">
-    <div class="small-12 columns article">
-        <div class="topRibbon">
-            <h3>Microarray</h3>
-        </div>
-        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
-    <div class="small-12 columns">
-        <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2020-06-24(水)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/microarray.py">Bio/microarray.py</a></span></li>
-            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/bioinformatics.html">BioInformatics</a></span></li> -->
-        </ul>
-    </div>
-</div>
-<section class="article">
             <div class="section">
               
                 <!-- SoC -->
@@ -382,7 +366,7 @@
 <h2 id="2-kinetics-of-the-binding-process">2. Kinetics of the Binding Process</h2>
 <p>The hybridization reaction can be represented by the following scheme</p>
 
-<div class="math">$$R + L \overset{k_f}{\underset{k_r}{\rightleftarrows}}C$$</div>
+<p>$$R + L \overset{k_f}{\underset{k_r}{\rightleftarrows}}C$$</p>
 
 <table>
 <thead>
@@ -394,166 +378,104 @@
 </thead>
 <tbody>
 <tr>
-<td align="center"><span class="math">\(R\)</span></td>
+<td align="center">$R$</td>
 <td align="center">numbers of molecules</td>
 <td align="left">The number of oligonucleotide strands available for reaction.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(L\)</span></td>
-<td align="center"><span class="math">\([\text{mol}/L]\)</span></td>
+<td align="center">$L$</td>
+<td align="center" mol>$[\text</td>
 <td align="left">The molar concentration of free target RNA samples.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(C\)</span></td>
+<td align="center">$C$</td>
 <td align="center">numbers of molecules.</td>
 <td align="left">The number of bound complementary complexes.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(k_f\)</span></td>
-<td align="center"><span class="math">\([\text{mol}^{-1}\text{time}^{-1}]\)</span></td>
+<td align="center">$k_f$</td>
+<td align="center" mol>$[\text</td>
 <td align="left">The forward (binding) reaction rates.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(k_r\)</span></td>
-<td align="center"><span class="math">\([\text{time}^{-1}]\)</span></td>
+<td align="center">$k_r$</td>
+<td align="center" time>$[\text</td>
 <td align="left">The reverse (unbinding) reaction rates.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(V\)</span></td>
-<td align="center"><span class="math">\([L]\)</span></td>
-<td align="left">The molar volume of the solution interacting with the probe, so we can compute the number of free target RNA molecules in the solution as <span class="math">\(LVN_A\)</span></td>
+<td align="center">$V$</td>
+<td align="center">$[L]$</td>
+<td align="left">The molar volume of the solution interacting with the probe, so we can compute the number of free target RNA molecules in the solution as $LVN_A$</td>
 </tr>
 </tbody>
 </table>
 
 <ul>
 <li>The rate of forward (binding) of target molecules to immobilized probes is proportional to <strong>the product of the concentrations of the target strands and free probes</strong>.</li>
-<li>The rate of reverse (unbinding) process is a first-order reaction with a rate proportional to <span class="math">\(C\)</span>. </li>
+<li>The rate of reverse (unbinding) process is a first-order reaction with a rate proportional to $C$. </li>
 </ul>
 
 <p>This results in the following balance of flows:</p>
 
-<div class="math">$$\frac{dC}{dt} = k_fRL - k_rC$$</div>
+<p>$$\frac{dC}{dt} = k_fRL - k_rC$$</p>
 
-<p>We assume that at the beginning, i.e., at <span class="math">\(t=0\)</span>, there are no hybridization complexes, and total number of oligonucleotides are available for hybridization.</p>
+<p>We assume that at the beginning, i.e., at $t=0$, there are no hybridization complexes, and total number of oligonucleotides are available for hybridization.</p>
 
-<div class="math">$$C(0)=0, L(0)=L_0, R(0)=R_T$$</div>
+<p>$$C(0)=0, L(0)=L_0, R(0)=R_T$$</p>
 
 <p>Since one RNA strand binds to one oligonucleotide, resulting in one binding coplex, the following equalities for the flows hold</p>
 
-<div class="math">$$\frac{dR}{dt} = VN_A\frac{dL}{dt} = -\frac{dC}{dt},$$</div>
+<p>$$\frac{dR}{dt} = VN_A\frac{dL}{dt} = -\frac{dC}{dt},$$</p>
 
-<p>which results in <span class="math">\(R(t)+C(t)=R_T\)</span> and <span class="math">\(VN_AL(t)+C(t)=VN_AL_0\)</span>. So <span class="math">\(L(t)\)</span> and <span class="math">\(R(t)\)</span> can be expressed in terms of <span class="math">\(C(t)\)</span>, and get the following equation:</p>
+<p>which results in $R(t)+C(t)=R_T$ and $VN_AL(t)+C(t)=VN_AL_0$. So $L(t)$ and $R(t)$ can be expressed in terms of $C(t)$, and get the following equation:</p>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
-\frac{dC}{dt} &amp;= k_fRL - k_rC \\
-&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\\
+\frac{dC}{dt} &amp;= k_fRL - k_rC \
+&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
 \end{aligned}
-$$</div>
+$$</p>
 
 <p>Often it is possible to approximate the above dynamics to only one exponent. Specifically, one of the following two asymptotic situations may hold.</p>
 
 <ol>
-<li><strong>[Often]</strong> There is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., <span class="math">\(R_T\gg C\)</span>, or <span class="math">\((R_T − C)/RT \approx 1\)</span>, which results in</li>
+<li><strong>[Often]</strong> There is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., $R_T\gg C$, or $(R_T − C)/RT \approx 1$, which results in</li>
 </ol>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
 \frac{dC}{dt} 
-&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\\
-&amp;= k_f\left[\underbrace{\frac{R_T-C(t)}{R_T}}_{\approx 1}\cdot R_T\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\\
-&amp;\approx k_fR_TL_0 - \left[\frac{k_fR_T}{VN_A} + k_r\right]C(t)\\
-\therefore C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\\
+&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
+&amp;= k_f\left[\underbrace{\frac{R_T-C(t)}{R_T}}_{\approx 1}\cdot R_T\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
+&amp;\approx k_fR_TL_0 - \left[\frac{k_fR_T}{VN_A} + k_r\right]C(t)\
+\therefore C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\
 &amp; K_D=k_r/k_f, \quad \tau_R = \frac{1}{k_f\left(K_D + R_T/N_AV\right)}
 \end{aligned}
-$$</div>
+$$</p>
 
 <ol>
-<li>There is a large excess of free RNA strands with respect to the number of binding complexes, i.e., <span class="math">\(L_0 \gg C/N_AV\)</span>, or <span class="math">\((L_0 − C/N_AV )/L_0 \approx 1\)</span>, which leads to</li>
+<li>There is a large excess of free RNA strands with respect to the number of binding complexes, i.e., $L_0 \gg C/N_AV$, or $(L_0 − C/N_AV )/L_0 \approx 1$, which leads to</li>
 </ol>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
-C(t) &amp;= \frac{R_TL_0}{K_D+L_0}\left[1-\exp\left(-\frac{t}{\tau_T}\right)\right]\\
+C(t) &amp;= \frac{R_TL_0}{K_D+L_0}\left[1-\exp\left(-\frac{t}{\tau_T}\right)\right]\
 \tau_L &amp;= \frac{1}{k_f\left(K_D+L_0\right)}
 \end{aligned}
-$$</div>
+$$</p>
 
-<p>Microarray experiments are very often planned in such a way that there is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., case <span class="math">\(1\)</span> holds. From the equation</p>
+<p>Microarray experiments are very often planned in such a way that there is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., case $1$ holds. From the equation</p>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
-C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\\
+C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\
 &amp;\underset{t\rightarrow\infty}{\Rightarrow}\frac{R_TL_0}{K_D+R_T/N_AV},
 \end{aligned}
-$$</div>
+$$</p>
 
-<p>one can see that, after <strong>equilibrium has been reached</strong>, or <strong>at a predefined instant of time</strong>, the intensity of the fluorescence signal measured at a microarray spot is proportional to the level of the corresponding RNA species in the analyzed sample, i.e., <span class="math">\(C \sim L_0\)</span></p>
+<p>one can see that, after <strong>equilibrium has been reached</strong>, or <strong>at a predefined instant of time</strong>, the intensity of the fluorescence signal measured at a microarray spot is proportional to the level of the corresponding RNA species in the analyzed sample, i.e., $C \sim L_0$</p>
 
 <h2 id="3-data-preprocessing-and-normalization">3. Data Preprocessing and Normalization</h2>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        fonts: [['STIX', 'TeX']]," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
-
 <!-- EoC -->
 
 <p></section>

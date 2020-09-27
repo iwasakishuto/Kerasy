@@ -10,6 +10,11 @@
    :alt: GitHub version
 
 
+.. image:: https://github.com/iwasakishuto/Kerasy/workflows/Upload%20Python%20Package/badge.svg
+   :target: https://github.com/iwasakishuto/Kerasy/actions
+   :alt: [Upload Python Package
+   
+
 .. image:: https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000
    :target: https://github.com/iwasakishuto/Kerasy/blob/gh-pages/LICENSE
    :alt: license

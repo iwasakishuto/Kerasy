@@ -459,22 +459,6 @@
   <hr/>
 </div>
           <div role="main">
-<div id="contents">
-<div class="row">
-    <div class="small-12 columns article">
-        <div class="topRibbon">
-            <h3>String Search</h3>
-        </div>
-        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
-    <div class="small-12 columns">
-        <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-12-13(金)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/string.py">Bio/string.py</a></span></li>
-            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/bioinformatics.html">BioInformatics</a></span></li> -->
-        </ul>
-    </div>
-</div>
-<section class="article">
             <div class="section">
               
                 <!-- SoC -->
@@ -488,12 +472,12 @@
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">SAIS</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>Suffix array</strong> is a sorted array of all suffixes of a string, and can be built in <span class="math">\(\mathrm{O}(n)\)</span>. This procedure is as following:</p>
+<p><strong>Suffix array</strong> is a sorted array of all suffixes of a string, and can be built in $\mathrm{O}(n)$. This procedure is as following:</p>
 
 <ol>
 <li>Define the each character S/L-type.</li>
 <li>Find the <strong>LMS(Left Most S-type)</strong></li>
-<li>Fill in <span class="math">\(-1\)</span> to initialize Suffix Array.</li>
+<li>Fill in $-1$ to initialize Suffix Array.</li>
 <li>Prepare the empty buckets whose sizes are correspond to the Initial character grouping.</li>
 <li>Sort the <strong>LMS</strong></li>
 <li>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes.</li>
@@ -502,17 +486,17 @@
 
 <h4 id="step1-definition-of-sl-type">Step1. Definition of S/L-type</h4>
 <ul>
-<li>If <span class="math">\(i\)</span>-th suffix is [smaller, bigger] then <span class="math">\(i+1\)</span>-th suffix in lexicographical order, <span class="math">\(i\)</span>-th character is [S,L]-type. Exceptionally, "$" is the initial character and defined S-type.</li>
+<li>If $i$-th suffix is [smaller, bigger] then $i+1$-th suffix in lexicographical order, $i$-th character is [S,L]-type. Exceptionally, "$" is the initial character and defined S-type.</li>
 <li>In the above definition, obviously the following holds:<ul>
-<li><span class="math">\(i\)</span>-th suffix is <strong>S-tyep</strong> when<ul>
-<li><span class="math">\(S[i]\)</span> = "$"</li>
-<li><span class="math">\(S[i] &lt; S[i+1]\)</span></li>
-<li><span class="math">\(S[i] == S[i+1]\)</span> and <span class="math">\(i+1\)</span>-th suffix is <strong>S-type</strong>.</li>
+<li>$i$-th suffix is <strong>S-tyep</strong> when<ul>
+<li>$S[i]$ = "$"</li>
+<li>$S[i] &lt; S[i+1]$</li>
+<li>$S[i] == S[i+1]$ and $i+1$-th suffix is <strong>S-type</strong>.</li>
 </ul>
 </li>
-<li><span class="math">\(i\)</span>-th suffix is <strong>L-tyep</strong> when<ul>
-<li><span class="math">\(S[i] &gt; S[i+1]\)</span></li>
-<li><span class="math">\(S[i] == S[i+1]\)</span> and <span class="math">\(i+1\)</span>-th suffix is <strong>L-type</strong>.</li>
+<li>$i$-th suffix is <strong>L-tyep</strong> when<ul>
+<li>$S[i] &gt; S[i+1]$</li>
+<li>$S[i] == S[i+1]$ and $i+1$-th suffix is <strong>L-type</strong>.</li>
 </ul>
 </li>
 </ul>
@@ -522,9 +506,9 @@
 <table>
 <thead>
 <tr>
-<th align="center"><span class="math">\(i=5\)</span></th>
-<th align="center"><span class="math">\(i=4\)</span></th>
-<th align="center"><span class="math">\(i=3\)</span></th>
+<th align="center">$i=5$</th>
+<th align="center">$i=4$</th>
+<th align="center">$i=3$</th>
 </tr>
 </thead>
 <tbody>
@@ -537,7 +521,7 @@
 </table>
 
 <h4 id="step2-definition-of-lms">Step2. Definition of LMS</h4>
-<p>If <span class="math">\(S[i]\)</span> is the <strong>S-type</strong> character and <span class="math">\(S[i-1]\)</span> is the L-type, <span class="math">\(S[i]\)</span> is called <strong>LMS(Left Most S-type)</strong>.</p>
+<p>If $S[i]$ is the <strong>S-type</strong> character and $S[i-1]$ is the L-type, $S[i]$ is called <strong>LMS(Left Most S-type)</strong>.</p>
 
 <p><img alt="step2" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/step2.png"></p>
 
@@ -559,7 +543,7 @@
 </div>
 
 <h4 id="step6-induced-sorting-for-l-type-suffixes">Step6. Induced sorting for <strong>L-type</strong> suffixes</h4>
-<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. If <span class="math">\(S[\text{Focusing Number}-1]\)</span> is L-type, put <span class="math">\(\text{Focusing Number}-1\)</span> into the corresponding bucket from the smaller. This is justified by</p>
+<p>Scan SA in <strong>forward</strong> order and fill <strong>L-type</strong> suffixes. If $S[\text{Focusing Number}-1]$ is L-type, put $\text{Focusing Number}-1$ into the corresponding bucket from the smaller. This is justified by</p>
 
 <ul>
 <li>Same bucket (Same initial)</li>
@@ -650,7 +634,7 @@
 <h3 id="computational-complexity">Computational complexity</h3>
 <p>In the each recursion step, it is guaranteed that the length of encoded strings is less than half of the previous length.</p>
 
-<div class="math">$$\mathrm{O}(n) + \mathrm{O}(n/2) + \mathrm{O}(n/4) + \cdots = \mathrm{O}(2n)$$</div>
+<p>$$\mathrm{O}(n) + \mathrm{O}(n/2) + \mathrm{O}(n/4) + \cdots = \mathrm{O}(2n)$$</p>
 
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
@@ -672,8 +656,7 @@
 </thead>
 <tbody>
 <tr>
-<td align="center"><strong>BWT(Burrows-Wheeler Transform)</strong> is the "characters just to the left of the suffixes in the suffix array", and it can be used to recover the entire string. It is given by<div class="math">$$BWT[i] = \begin{cases}S[SA[i] - 1] &amp; (\text{if $SA[i]&gt;0$})\\\mathrm{\$} &amp; (\text{otherwise})\end{cases}$$</div>
-</td>
+<td align="center"><strong>BWT(Burrows-Wheeler Transform)</strong> is the "characters just to the left of the suffixes in the suffix array", and it can be used to recover the entire string. It is given by$$BWT[i] = \begin{cases}S[SA[i] - 1] &amp; (\text{if $SA[i]&gt;0$})\\mathrm{\$} &amp; (\text{otherwise})\end{cases}$$</td>
 <td align="center"><img alt="BWT" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT.png"></td>
 </tr>
 </tbody>
@@ -682,34 +665,34 @@
 <p>BWT is useful for <strong>compression</strong>, since <strong>it tends to rearrange a character string into runs of similar characters.</strong>  More importantly, <font color="red"><b>this transformation is reversible, without needing to store any additional data</b></font>. The BWT is thus a "free" method of improving the efficiency of text compression algorithms, costing only some extra computation.</p>
 
 <h3 id="reverse-bwt-with-suffix-array">Reverse BWT with Suffix Array</h3>
-<p>We will denote <span class="math">\(T\)</span> and <span class="math">\(ISA\)</span> as followings.</p>
+<p>We will denote $T$ and $ISA$ as followings.</p>
 
-<div class="math">$$
+<p>$$
 \begin{cases}
-SA[k] = v &amp;\Longleftrightarrow ISA[v] = k\\
-\mathrm{T}[i] &amp;\Longleftrightarrow \mathrm{ISA}\left[\mathrm{SA}[i] - 1\right]\\
+SA[k] = v &amp;\Longleftrightarrow ISA[v] = k\
+\mathrm{T}[i] &amp;\Longleftrightarrow \mathrm{ISA}\left[\mathrm{SA}[i] - 1\right]\
 \end{cases}
-$$</div>
+$$</p>
 
-<p>This means that <font color="red"><b>the order of suffix whose initial character is <span class="math">\(BWT[i]\)</span> is <span class="math">\(T[i]\)</span></b></font>, and under the above definition, the following equation holds.</p>
+<p>This means that <font color="red"><b>the order of suffix whose initial character is $BWT[i]$ is $T[i]$</b></font>, and under the above definition, the following equation holds.</p>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
 \mathrm{BWT}\left[\mathrm{T}\left[i\right]\right]
-&amp;= \mathrm{BWT}\left[\mathrm{ISA}\left[\mathrm{SA}\left[i\right] - 1\right]\right]\\
-&amp;= \mathrm{BWT}\left[k\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\\
-&amp;= \mathrm{S}\left[SA[k] - 1\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\\
-&amp;= \mathrm{S}\left[\left(SA[i] - 1\right) - 1\right]\\
+&amp;= \mathrm{BWT}\left[\mathrm{ISA}\left[\mathrm{SA}\left[i\right] - 1\right]\right]\
+&amp;= \mathrm{BWT}\left[k\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\
+&amp;= \mathrm{S}\left[SA[k] - 1\ |\ \mathrm{SA}[k] = \mathrm{SA}[i] - 1\right]\
+&amp;= \mathrm{S}\left[\left(SA[i] - 1\right) - 1\right]\
 &amp;= \text{$BWT[i]$'s one left character in $S$}
 \end{aligned}
-$$</div>
+$$</p>
 
 <p><img alt="BWT-without-SA1" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/SuffixArray/BWT-without-SA1.png"></p>
 
-<p><b>Now that we can get the original <span class="math">\(S\)</span> from BWT <font color="red">and</font> SA.</b></p>
+<p><b>Now that we can get the original $S$ from BWT <font color="red">and</font> SA.</b></p>
 
 <h3 id="reverse-bwt-without-suffix-array">Reverse BWT without Suffix Array</h3>
-<p>In fact, we could recover the original strings <strong>only from</strong> BWT, <strong>because we can make <span class="math">\(T\)</span> only from BWT.</strong> One of the important properties to realize it is <font color="red"><b>LF Mapping</b></font>.</p>
+<p>In fact, we could recover the original strings <strong>only from</strong> BWT, <strong>because we can make $T$ only from BWT.</strong> One of the important properties to realize it is <font color="red"><b>LF Mapping</b></font>.</p>
 
 <div class="admonition summary">
   <p class="admonition-title">LF Mapping</p>
@@ -717,7 +700,7 @@ $$</div>
   <p><center>The i-th occurrence of a character x in L and the i-th occurrence of x in F correspond to the same occurrence.</center></p>
 </div>
 
-<p>To calculate <span class="math">\(T[i]\)</span> only from BWT, we will introduce auxiliary storages <span class="math">\(C[x]\)</span>, and <span class="math">\(Occ(x,i)\)</span></p>
+<p>To calculate $T[i]$ only from BWT, we will introduce auxiliary storages $C[x]$, and $Occ(x,i)$</p>
 
 <table>
 <thead>
@@ -728,45 +711,45 @@ $$</div>
 </thead>
 <tbody>
 <tr>
-<td align="center"><span class="math">\(C[x]\)</span></td>
-<td align="left">the total occurrence of a characters which is smaller than <span class="math">\(x\)</span> in lexicographical order in BWT.</td>
+<td align="center">$C[x]$</td>
+<td align="left">the total occurrence of a characters which is smaller than $x$ in lexicographical order in BWT.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(Occ(x,i)\)</span></td>
-<td align="left">the total occurrence of a character <span class="math">\(x\)</span> up to <span class="math">\(i\)</span>-th in the BWT.</td>
+<td align="center">$Occ(x,i)$</td>
+<td align="left">the total occurrence of a character $x$ up to $i$-th in the BWT.</td>
 </tr>
 </tbody>
 </table>
 
-<p>Using these variable, we can calculate <span class="math">\(T[i]\)</span> by</p>
+<p>Using these variable, we can calculate $T[i]$ by</p>
 
-<div class="math">$$T[i] =
+<p>$$T[i] =
 \begin{cases}
-  0 &amp;(\mathrm{BWT}[i] = \text{\$})\\
-  C\left[\mathrm{BWT}[i]\right] + Occ(\mathrm{BWT}[i], i) - 1 &amp; (\text{otherwise.})\\
+  0 &amp;(\mathrm{BWT}[i] = \text{\$})\
+  C\left[\mathrm{BWT}[i]\right] + Occ(\mathrm{BWT}[i], i) - 1 &amp; (\text{otherwise.})\
 \end{cases}
-$$</div>
+$$</p>
 
 <p>The above formula is guaranteed by the following properties.</p>
 
-<div class="math">$$
+<p>$$
 \begin{cases}
-  [lb(W),ub(W)] &amp;= \text{the index range of words in SA whose prefix is W}\\
-  lb(\{\}) &amp;= 0\\
-  ub(\{\}) &amp;= len(S) - 1\\
-  Occ(x, -1) &amp;= 0\\
-  lb(xW) &amp;= C(x) + Occ(x, lb(W) - 1) &amp;\cdots (1)\\
+  [lb(W),ub(W)] &amp;= \text{the index range of words in SA whose prefix is W}\
+  lb({}) &amp;= 0\
+  ub({}) &amp;= len(S) - 1\
+  Occ(x, -1) &amp;= 0\
+  lb(xW) &amp;= C(x) + Occ(x, lb(W) - 1) &amp;\cdots (1)\
   ub(xW) &amp;= C(x) + Occ(x, ub(W)) - 1 &amp;\cdots (2)
 \end{cases}
-$$</div>
+$$</p>
 
 <p>These properties (especially the recursion (1) and (2)) are proved by</p>
 
 <table>
 <thead>
 <tr>
-<th align="left"><span class="math">\((1)\)</span></th>
-<th align="left"><span class="math">\((2)\)</span></th>
+<th align="left">$(1)$</th>
+<th align="left">$(2)$</th>
 </tr>
 </thead>
 <tbody>
@@ -790,7 +773,7 @@ $$</div>
 <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">mkHeight</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">SA</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>LCP(Longest Common Prefix)</strong> is "how many characters two strings have in common with each other", and <strong>LCP array</strong> is an array where each adjacent index stores lcp between <span class="math">\(i\)</span>-th suffix and <span class="math">\(i+1\)</span>-th suffix.</p>
+<p><strong>LCP(Longest Common Prefix)</strong> is "how many characters two strings have in common with each other", and <strong>LCP array</strong> is an array where each adjacent index stores lcp between $i$-th suffix and $i+1$-th suffix.</p>
 
 <p>Speaking of <strong>LCParray</strong>, it usually refers to the suffix array,</p>
 
@@ -800,68 +783,6 @@ $$</div>
     <li><a href="http://web.cs.iastate.edu/~cs548/references/linear_lcp.pdf">Linear-Time Longest-Common-Prefix Computation in Suffix Arrays and Its Applications</a><br>(<font size="0.8em">If you read this paper, please look <a href="https://github.com/iwasakishuto/Papers-With-Comments/files/3959678/LCParray.pdf">this</a>. It will help to read.</font>)</li>
   </ul>
 </div>
-
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        fonts: [['STIX', 'TeX']]," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
 
 <!-- EoC -->
 

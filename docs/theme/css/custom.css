@@ -1,0 +1,45 @@
+.wy-side-nav-search {
+    z-index: 200;
+    background-color: #83274e;
+    text-align: center;
+    padding: 0.809em;
+    display: block;
+    color: #fcfcfc;
+    margin-bottom: 0.809em;
+}
+.md-typeset h1 {
+  /*font-size: 24pt;*/
+  font-weight: bold;
+  color: #000;
+  border-bottom: solid 2px #f18b21;
+  padding-bottom: 5px;
+}
+.md-typeset h2 {
+  border-bottom: 1px dotted #888;
+}
+
+h2:before{
+    color: #800000;
+    content: "\f02e";
+    font-family: FontAwesome;
+    padding-right: 10px;
+}
+h3:before{
+    color: #800000;
+    content: "\f111";
+    font-family: FontAwesome;
+    padding-right: 10px;
+}
+.topRibbon h3:before {
+    content: "";
+}
+h4.pro_args:after {
+    color: #800000;
+    content: "\f103";
+    font-family: FontAwesome;
+    padding-left: 1px;
+}
+h4 {
+    padding: 0.25em 0.5em;
+    border-left: solid 4px #800000;
+}

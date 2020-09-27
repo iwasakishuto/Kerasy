@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en" >
+  <head>
+    <link rel="shortcut icon" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" />
+
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Shuto" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content="https://iwasakishuto.github.io/Kerasy//Users/iwasakishuto/Github/portfolio/Kerasy/MkDocs/site/BioInformatics/Microarray/index.html" />
+    <meta property="og:title" content="Microarray" />
+    <meta property="og:description" content="Brief explanation of Microarray and introduction of modules that can be used in Kerasy" />
+    <meta property="og:image" content="https://iwasakishuto.github.io/images/FacebookImage/Kerasy.png" />
+    <meta property="og:type" content="article" />
+
+    <title>Microarray - Kerasy Documentation</title>
+    <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css' />
+
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/theme/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/theme/css/jupyter.css" />
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/theme/css/theme_extra.css" />
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/Kerasy/theme/css/theme.css" />
+
+    <script>
+      // Current page data
+      var mkdocs_page_name = "Microarray";
+      var mkdocs_page_input_path = "BioInformatics/Microarray.md";
+      var mkdocs_page_url = "/Kerasy/BioInformatics/Microarray/";
+    </script>
+    <script src="https://iwasakishuto.github.io/Kerasy/theme/js/jquery-2.1.1.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/theme/js/modernizr-2.8.3.min.js" defer></script>
+    <script src="https://iwasakishuto.github.io/Kerasy/theme/js/theme.js" defer></script>
+
+    <!-- Common CSS in my portofolio  -->
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/jupyter.css" />
+    <link rel="stylesheet" type="text/css" href="https://iwasakishuto.github.io/css/custom.css" media="screen" />
+    <link rel="apple-touch-icon" sizes="152x152" href="https://iwasakishuto.github.io/images/apple-touch-icon/Kerasy.png" type="image/png" />
+    <!-- Use fontawesome Icon -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" rel="stylesheet" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous" />
+    <!-- Syntax highlight -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/github.min.css" />
+    <!-- Custom CSS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ]
+        }
+      });
+      
+    </script>
+    <!-- Mermaid -->
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js" charset="UTF-8"></script>
+    <script>
+      mermaid.initialize({
+        startOnLoad:true
+      });
+    </script>
+    <script src="https://iwasakishuto.github.io/js/smooth-scroll.polyfills.min.js"></script>
+  </head>
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> Kerasy Documentation</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="tocbase current">
+    
+    
+      
+
+
+  <li class="navtree toctree-l1 inactive">
+    <a class="" href="../..">Home</a>
+  </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">DeepLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/CNN/">CNN</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Optimizers/">Optimizers</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/NeuralNetwork/">Neural Network</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/ComputationalGraph/">Computational Graph</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../DeepLearning/Initializers/">Initializers</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">MachineLearning</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Decomposition/">Decomposition</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/sampling/">Sampling</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Linear%20Regression/">Linear Regression</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Cluster/">Cluster</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/HMM/">HMM</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/EM%20algorithm/">EM algorithm</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Tree/">Tree</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../../MachineLearning/Support%20Vector%20Machine/">Support Vector Machine</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+      
+  <li class="navtree toctree-l1 label">
+    <p class="caption">BioInformatics</p>
+  </li>
+
+
+  
+
+  
+    <li class="navtree toctree-l1 group">
+      <ul class="navtree subnav-l1 current">
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Tandem%20Repeats/">Tandem Repeats</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../RefSeq/">RefSeq</a>
+  </li>
+        
+          
+
+
+  
+    
+    <li class="navtree toctree-l2 page current">
+      <a class="current" href="./">
+        Microarray
+          <span class="toctree-expand"></span>
+      </a>
+    </li>
+    
+      
+
+  <li class="toctree-l2 current with-children">
+    <a href="#1-design-of-dna-miroarrays">
+      1. Design of DNA Miroarrays
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#2-kinetics-of-the-binding-process">
+      2. Kinetics of the Binding Process
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+      
+
+  <li class="toctree-l2">
+    <a href="#3-data-preprocessing-and-normalization">
+      3. Data Preprocessing and Normalization
+      <span class="toctree-expand"></span>
+    </a>
+  </li>
+
+
+
+
+  
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Secondary%20Structure/">Secondary Structure</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../Alignment/">Alignment</a>
+  </li>
+        
+          
+
+
+  <li class="navtree toctree-l2 inactive">
+    <a class="" href="../String%20Search/">String Search</a>
+  </li>
+        
+      </ul>
+    </li>
+    
+  </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">Kerasy Documentation</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>BioInformatics &raquo;</li>
+        
+      
+    
+    <li>Microarray</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/iwasakishuto/Kerasy"> Visit github &nbsp; <i class="fab fa-github"></i></a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+<div id="contents">
+<div class="row">
+    <div class="small-12 columns article">
+        <div class="topRibbon">
+            <h3>Microarray</h3>
+        </div>
+        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
+    <div class="small-12 columns">
+        <ul class="inline-list">
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2020-06-24(Wed)</span></li>
+            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/microarray.py">Bio/microarray.py</a></span></li>
+            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/category/bioinformatics.html">BioInformatics</a></span></li> -->
+        </ul>
+    </div>
+</div>
+<section class="article">
+            <div class="section">
+              
+                <!-- SoC -->
+
+<h2 id="1-design-of-dna-miroarrays">1. Design of DNA Miroarrays</h2>
+<p>The idea of DNA microarray technology is to monitor gene expression processes by <strong>measuring levels of RNA species</strong> in biological samples. There are two main techinques for doing that.</p>
+
+<ol>
+<li><strong>[complementary-DNA arrays]</strong> RNA molecules in the samples are labeled by using appropriate techniques and presented to an array of spots, where <strong>complementary-DNA (cDNA)</strong> fragments corresponding to known coding DNA sequences are placed.</li>
+<li><strong>[oligonucleotide arrays]</strong> By a reverse transcription mechanism, copy RNA sequences back to a DNA strand, label the DNA with fluorescent dyes and hybridize it to a complementary-DNA probe fixed on the microarray.</li>
+</ol>
+
+<p>After hybridization of the labeled target molecules, estimation of the level of RNA in the sample by <strong>reading the intensity of the signals</strong> from the dots of the DNA array.</p>
+
+<p>The basic difference between the two microarray formats is in <strong>the lengths of the complementary-DNA probes.</strong> </p>
+
+<ol>
+<li><strong>[complementary-DNA arrays]</strong> In cDNA arrays, the lengths of the cDNA strands differ between spots, and <strong>the different probe lengths change the reaction rates between spots.</strong> Therefore, the results must be compared to controls.</li>
+<li><strong>[oligonucleotide arrays]</strong> In oligonucleotide arrays the probes are of constant length in the range of 20–50 base pairs, so the readouts of fluorescence intensities are <strong>comparable between different spots.</strong></li>
+</ol>
+
+<h2 id="2-kinetics-of-the-binding-process">2. Kinetics of the Binding Process</h2>
+<p>The hybridization reaction can be represented by the following scheme</p>
+
+<p>$$R + L \overset{k_f}{\underset{k_r}{\rightleftarrows}}C$$</p>
+
+<table>
+<thead>
+<tr>
+<th align="center">var</th>
+<th align="center">unit</th>
+<th align="left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">$R$</td>
+<td align="center">numbers of molecules</td>
+<td align="left">The number of oligonucleotide strands available for reaction.</td>
+</tr>
+<tr>
+<td align="center">$L$</td>
+<td align="center" mol>$[\text</td>
+<td align="left">The molar concentration of free target RNA samples.</td>
+</tr>
+<tr>
+<td align="center">$C$</td>
+<td align="center">numbers of molecules.</td>
+<td align="left">The number of bound complementary complexes.</td>
+</tr>
+<tr>
+<td align="center">$k_f$</td>
+<td align="center" mol>$[\text</td>
+<td align="left">The forward (binding) reaction rates.</td>
+</tr>
+<tr>
+<td align="center">$k_r$</td>
+<td align="center" time>$[\text</td>
+<td align="left">The reverse (unbinding) reaction rates.</td>
+</tr>
+<tr>
+<td align="center">$V$</td>
+<td align="center">$[L]$</td>
+<td align="left">The molar volume of the solution interacting with the probe, so we can compute the number of free target RNA molecules in the solution as $LVN_A$</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li>The rate of forward (binding) of target molecules to immobilized probes is proportional to <strong>the product of the concentrations of the target strands and free probes</strong>.</li>
+<li>The rate of reverse (unbinding) process is a first-order reaction with a rate proportional to $C$. </li>
+</ul>
+
+<p>This results in the following balance of flows:</p>
+
+<p>$$\frac{dC}{dt} = k_fRL - k_rC$$</p>
+
+<p>We assume that at the beginning, i.e., at $t=0$, there are no hybridization complexes, and total number of oligonucleotides are available for hybridization.</p>
+
+<p>$$C(0)=0, L(0)=L_0, R(0)=R_T$$</p>
+
+<p>Since one RNA strand binds to one oligonucleotide, resulting in one binding coplex, the following equalities for the flows hold</p>
+
+<p>$$\frac{dR}{dt} = VN_A\frac{dL}{dt} = -\frac{dC}{dt},$$</p>
+
+<p>which results in $R(t)+C(t)=R_T$ and $VN_AL(t)+C(t)=VN_AL_0$. So $L(t)$ and $R(t)$ can be expressed in terms of $C(t)$, and get the following equation:</p>
+
+<p>$$
+\begin{aligned}
+\frac{dC}{dt} &amp;= k_fRL - k_rC \
+&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
+\end{aligned}
+$$</p>
+
+<p>Often it is possible to approximate the above dynamics to only one exponent. Specifically, one of the following two asymptotic situations may hold.</p>
+
+<ol>
+<li><strong>[Often]</strong> There is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., $R_T\gg C$, or $(R_T − C)/RT \approx 1$, which results in</li>
+</ol>
+
+<p>$$
+\begin{aligned}
+\frac{dC}{dt} 
+&amp;= k_f\left[R_T-C(t)\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
+&amp;= k_f\left[\underbrace{\frac{R_T-C(t)}{R_T}}_{\approx 1}\cdot R_T\right]\left[L_0 - \frac{C(t)}{VN_A}\right] - k_rC(t)\
+&amp;\approx k_fR_TL_0 - \left[\frac{k_fR_T}{VN_A} + k_r\right]C(t)\
+\therefore C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\
+&amp; K_D=k_r/k_f, \quad \tau_R = \frac{1}{k_f\left(K_D + R_T/N_AV\right)}
+\end{aligned}
+$$</p>
+
+<ol>
+<li>There is a large excess of free RNA strands with respect to the number of binding complexes, i.e., $L_0 \gg C/N_AV$, or $(L_0 − C/N_AV )/L_0 \approx 1$, which leads to</li>
+</ol>
+
+<p>$$
+\begin{aligned}
+C(t) &amp;= \frac{R_TL_0}{K_D+L_0}\left[1-\exp\left(-\frac{t}{\tau_T}\right)\right]\
+\tau_L &amp;= \frac{1}{k_f\left(K_D+L_0\right)}
+\end{aligned}
+$$</p>
+
+<p>Microarray experiments are very often planned in such a way that there is a large excess of particles in the immobile probe over the potential number of binding targets, i.e., case $1$ holds. From the equation</p>
+
+<p>$$
+\begin{aligned}
+C(t) &amp;= \frac{R_TL_0}{K_D+R_T/N_AV}\left[1-\exp\left(-\frac{t}{\tau_R}\right)\right]\
+&amp;\underset{t\rightarrow\infty}{\Rightarrow}\frac{R_TL_0}{K_D+R_T/N_AV},
+\end{aligned}
+$$</p>
+
+<p>one can see that, after <strong>equilibrium has been reached</strong>, or <strong>at a predefined instant of time</strong>, the intensity of the fluorescence signal measured at a microarray spot is proportional to the level of the corresponding RNA species in the analyzed sample, i.e., $C \sim L_0$</p>
+
+<h2 id="3-data-preprocessing-and-normalization">3. Data Preprocessing and Normalization</h2>
+<!-- EoC -->
+
+<p></section>
+    </div>
+</div>
+</div></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Secondary%20Structure/" class="btn btn-neutral float-right" title="Secondary Structure">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../RefSeq/" class="btn btn-neutral" title="RefSeq"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../RefSeq/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Secondary%20Structure/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

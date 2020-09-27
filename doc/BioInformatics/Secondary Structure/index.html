@@ -342,22 +342,6 @@
   <hr/>
 </div>
           <div role="main">
-<div id="contents">
-<div class="row">
-    <div class="small-12 columns article">
-        <div class="topRibbon">
-            <h3>Secondary Structure</h3>
-        </div>
-        <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
-    <div class="small-12 columns">
-        <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-12-09(月)</span></li>
-            <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/Bio/structure.py">Bio/structure.py</a></span></li>
-            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/bioinformatics.html">BioInformatics</a></span></li> -->
-        </ul>
-    </div>
-</div>
-<section class="article">
             <div class="section">
               
                 <!-- SoC -->
@@ -397,50 +381,44 @@ secondary structure, so <b>the correctness of secondary structure should be eval
 </thead>
 <tbody>
 <tr>
-<td align="center">
-<div class="math">$$\gamma\left(i,j\right)$$</div>
-</td>
-<td align="left">the maximum number of base-pairs <b>for</b> subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
+<td align="center">$$\gamma\left(i,j\right)$$</td>
+<td align="left">the maximum number of base-pairs <b>for</b> subsequence from $i$ to $j$.</td>
 </tr>
 <tr>
-<td align="center">
-<div class="math">$$\omega\left(i,j\right)$$</div>
-</td>
-<td align="left">the maximum number of base-pairs <b>excluding</b> subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
+<td align="center">$$\omega\left(i,j\right)$$</td>
+<td align="left">the maximum number of base-pairs <b>excluding</b> subsequence from $i$ to $j$.</td>
 </tr>
 <tr>
-<td align="center">
-<div class="math">$$Z(i,j)$$</div>
-</td>
-<td align="left">the maximum number of base-pairs <b>if <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> form base pair.</b></td>
+<td align="center">$$Z(i,j)$$</td>
+<td align="left">the maximum number of base-pairs <b>if $x_i$ and $y_j$ form base pair.</b></td>
 </tr>
 </tbody>
 </table>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
   \gamma(i,j) &amp;= \max
   \begin{cases}
-    \gamma(i+1,j)\\
-    \gamma(i,j-1)\\
-    \gamma(i+1,j-1)+\delta(i,j)\\
+    \gamma(i+1,j)\
+    \gamma(i,j-1)\
+    \gamma(i+1,j-1)+\delta(i,j)\
     \max_{i\leq k\verb|&lt;|j}\left[\gamma(i,k) + \gamma(k+1,j)\right]
-  \end{cases}\\
+  \end{cases}\
   \omega(i,j) &amp;= \max
   \begin{cases}
-    \omega(i-1,j)\\
-    \omega(i,j+1)\\
-    \omega(i-1,j+1)+\delta(i-1,j+1)\\
-    \max_{1\leq k\verb|&lt;|i}\left[\omega(k,j) + \gamma(k,i-1)\right]\\
+    \omega(i-1,j)\
+    \omega(i,j+1)\
+    \omega(i-1,j+1)+\delta(i-1,j+1)\
+    \max_{1\leq k\verb|&lt;|i}\left[\omega(k,j) + \gamma(k,i-1)\right]\
     \max_{j\verb|&lt;| k\leq L}\left[\omega(j+1,k) + \gamma(i,k)\right]
-  \end{cases}\\
+  \end{cases}\
   Z(i,j) &amp;=
   \begin{cases}
-    \gamma\left(i+1,j-1\right) + 1 + \omega\left(i,j\right) &amp; (\text{if }i\text{ and }j\text{-th nucleotides can form a base-pair})\\
+    \gamma\left(i+1,j-1\right) + 1 + \omega\left(i,j\right) &amp; (\text{if }i\text{ and }j\text{-th nucleotides can form a base-pair})\
     0 &amp; (\text{otherwise})
   \end{cases}
 \end{aligned}
-$$</div>
+$$</p>
 
 <h2 id="zuker-algorithm">Zuker Algorithm</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">Zuker</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -464,9 +442,9 @@ $$</div>
 
 <p>The free energy of a secondary structure is approximated as the sum of the free energy of <b>"loops".</b></p>
 
-<div class="math">$$E = \sum_iE_i$$</div>
+<p>$$E = \sum_iE_i$$</p>
 
-<p>The free energy of individual loop is <b>given</b> by experimental data. (ex. <span class="math">\(\mathrm{C-G: }-3.4\mathrm{kcal/mol}\)</span>, <span class="math">\(\mathrm{U-A: }-0.9\mathrm{kcal/mol}\)</span>)</p>
+<p>The free energy of individual loop is <b>given</b> by experimental data. (ex. $\mathrm{C-G: }-3.4\mathrm{kcal/mol}$, $\mathrm{U-A: }-0.9\mathrm{kcal/mol}$)</p>
 
 <h3 id="five-types-of-loops">Five types of "loops"</h3>
 <table>
@@ -510,104 +488,42 @@ $$</div>
 </thead>
 <tbody>
 <tr>
-<td align="center"><span class="math">\(W(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span>.</td>
+<td align="center">$W(i,j)$</td>
+<td align="left">the minimum free energy of subsequence from $i$ to $j$.</td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(V(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span> <b>when <span class="math">\(i\)</span> to <span class="math">\(j\)</span> forms a base-pair.</b></td>
+<td align="center">$V(i,j)$</td>
+<td align="left">the minimum free energy of subsequence from $i$ to $j$ <b>when $i$ to $j$ forms a base-pair.</b></td>
 </tr>
 <tr>
-<td align="center"><span class="math">\(M(i,j)\)</span></td>
-<td align="left">the minimum free energy of subsequence <b>when subsequence from <span class="math">\(i\)</span> to <span class="math">\(j\)</span> are in the <font color="red">multi-loop</font> and contain one or more base pairs <font color="red">which close it.</font></b></td>
+<td align="center">$M(i,j)$</td>
+<td align="left">the minimum free energy of subsequence <b>when subsequence from $i$ to $j$ are in the <font color="red">multi-loop</font> and contain one or more base pairs <font color="red">which close it.</font></b></td>
 </tr>
 </tbody>
 </table>
 
-<div class="math">$$
+<p>$$
 \begin{aligned}
     W(i,j) &amp;= \min
     \begin{cases}
-        W(i+1,j)\\W(i,j-1)\\V(i,j)\\\min_{i\leq k&lt;j}\left\{W(i,k) + W(k+1,j)\right\}
-    \end{cases}\\
+        W(i+1,j)\W(i,j-1)\V(i,j)\\min_{i\leq k&lt;j}\left{W(i,k) + W(k+1,j)\right}
+    \end{cases}\
     V(i,j) &amp;= \min
     \begin{cases}
-        F_1(i,j)\\\min_{i&lt;h&lt;l&lt;j}F_2(i,j,h,l) + V(h,l)\\\min_{i+1\leq k&lt;j-1}\left[M(i+1,k) + M(k+1,j)\right]+a+b
-    \end{cases}\\
+        F_1(i,j)\\min_{i&lt;h&lt;l&lt;j}F_2(i,j,h,l) + V(h,l)\\min_{i+1\leq k&lt;j-1}\left[M(i+1,k) + M(k+1,j)\right]+a+b
+    \end{cases}\
     M(i,j) &amp;= \min
     \begin{cases}
-        V(i,j)+b\\M(i+1,j)+c\\M(i,j-1)+c\\\min_{i\leq&lt;k&lt;j}\left[M(i,k) + M(k+1,j)\right]
-    \end{cases}\\    
+        V(i,j)+b\M(i+1,j)+c\M(i,j-1)+c\\min_{i\leq&lt;k&lt;j}\left[M(i,k) + M(k+1,j)\right]
+    \end{cases}\  <br>
 \end{aligned}
-$$</div>
+$$</p>
 
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
   <p>None of the algorithms we see this week can deal with <span class="marker-info" aria-label="a nucleic acid secondary structure containing at least two stem-loop structures in which half of one stem is intercalated between the two halves of another stem.">pseudoknot</span></p>
   <a href="https://en.wikipedia.org/wiki/Pseudoknot"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Pseudoknot.svg/1024px-Pseudoknot.svg.png" alt="Pseudoknot"></a>
 </div>
-
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        fonts: [['STIX', 'TeX']]," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
 
 <!-- EoC -->
 

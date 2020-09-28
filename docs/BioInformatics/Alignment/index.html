@@ -359,17 +359,17 @@
     
       
         <li class="toctree-l5">
-          <a class="toctree-l6" href="#pi_k">$\pi_k$</a>
+          <a class="toctree-l6" href="#pi_k">(\pi_k)</a>
         </li>
     
       
         <li class="toctree-l5">
-          <a class="toctree-l6" href="#a_ij">$A_{ij}$</a>
+          <a class="toctree-l6" href="#a_ij">(A_{ij})</a>
         </li>
     
       
         <li class="toctree-l5">
-          <a class="toctree-l6" href="#phi_ik">$\phi_{i}(k)$</a>
+          <a class="toctree-l6" href="#phi_ik">(\phi_{i}(k))</a>
         </li>
     
     </ul>
@@ -485,33 +485,33 @@
 </li>
 </ul>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
   M(i,j) &amp;= \max
   \begin{cases}
-    M(i-1,j-1) + s(x_i, y_j)\
-    X(i-1,j-1) - s(x_i, y_j)\
+    M(i-1,j-1) + s(x_i, y_j)\\
+    X(i-1,j-1) - s(x_i, y_j)\\
     Y(i-1,j-1) - s(x_i, y_j)
-  \end{cases}\
+  \end{cases}\\
   X(i,j) &amp;= \max
   \begin{cases}
-    M(i-1,j) - d\
-    X(i-1,j) - d\
-  \end{cases}\
+    M(i-1,j) - d\\
+    X(i-1,j) - d\\
+  \end{cases}\\
   Y(i,j) &amp;= \max
   \begin{cases}
-    M(i,j-1) - d\
-    Y(i,j-1) - d\
-  \end{cases}\
-  d &amp;= \text{gap opening penalty}\
-  e &amp;= \text{gap extension penalty}\
-  s(x_i,y_j) &amp;= <br>
+    M(i,j-1) - d\\
+    Y(i,j-1) - d\\
+  \end{cases}\\
+  d &amp;= \text{gap opening penalty}\\
+  e &amp;= \text{gap extension penalty}\\
+  s(x_i,y_j) &amp;=   
     \begin{cases}
-      \text{match score} &amp; (\text{if $x_i=y_j$})\
-      \text{mismatch score} &amp; (\text{otherwise.})\
+      \text{match score} &amp; (\text{if $x_i=y_j$})\\
+      \text{mismatch score} &amp; (\text{otherwise.})\\
     \end{cases}
 \end{aligned}
-$$</p>
+$$</div>
 
 <h2 id="backward-needleman-wunsh-gotoh">Backward Needleman-Wunsh-Gotoh</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">BackwardNeedlemanWunshGotoh</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -529,30 +529,30 @@ $$</p>
 </li>
 </ul>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
   bM(i,j) &amp;= \max
   \begin{cases}
-    bM(i+1,j+1) + s(x_{i+1}, y_{j+1})\
-    bX(i+1,j) - d\
+    bM(i+1,j+1) + s(x_{i+1}, y_{j+1})\\
+    bX(i+1,j) - d\\
     bY(i,j+1) - d
-  \end{cases}\
+  \end{cases}\\
   bX(i,j) &amp;= \max
   \begin{cases}
-    bM(i+1,j+1) + s(x_{i+1},y_{j+1})\
+    bM(i+1,j+1) + s(x_{i+1},y_{j+1})\\
     bX(i+1,j) - e
-  \end{cases}\
+  \end{cases}\\
   bY(i,j) &amp;= \max
   \begin{cases}
-    bM(i+1,j+1) - s(x_{i+1},y_{j+1})\
-    Y(i,j+1) - e\
-  \end{cases}\
+    bM(i+1,j+1) - s(x_{i+1},y_{j+1})\\
+    Y(i,j+1) - e\\
+  \end{cases}\\
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>This algorithm is for find the maximum alignment <font color="red"><b>under the condition of $x_i$ and $y_j$ are aligned.</b></font> It is given by:</p>
+<p>This algorithm is for find the maximum alignment <font color="red"><b>under the condition of <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> are aligned.</b></font> It is given by:</p>
 
-<p>$$A(i,j) = M(i,j) + bM(i,j)$$</p>
+<div class="math">$$A(i,j) = M(i,j) + bM(i,j)$$</div>
 
 <h2 id="smith-waterman">Smith-Waterman</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">SmithWaterman</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -570,27 +570,27 @@ $$</p>
 </li>
 </ul>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
   M(i,j) &amp;= \max
   \begin{cases}
-    0\
-    M(i-1,j-1) + s(x_i, y_j)\
-    X(i-1,j-1) - s(x_i, y_j)\
+    0\\
+    M(i-1,j-1) + s(x_i, y_j)\\
+    X(i-1,j-1) - s(x_i, y_j)\\
     Y(i-1,j-1) - s(x_i, y_j)
-  \end{cases}\
+  \end{cases}\\
   X(i,j) &amp;= \max
   \begin{cases}
-    M(i-1,j) - d\
-    X(i-1,j) - d\
-  \end{cases}\
+    M(i-1,j) - d\\
+    X(i-1,j) - d\\
+  \end{cases}\\
   Y(i,j) &amp;= \max
   \begin{cases}
-    M(i,j-1) - d\
-    Y(i,j-1) - d\
-  \end{cases}\
+    M(i,j-1) - d\\
+    Y(i,j-1) - d\\
+  \end{cases}\\
 \end{aligned}
-$$</p>
+$$</div>
 
 <h2 id="pair-hmm">Pair HMM</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">Bio</span><span class="o">.</span><span class="n">alignment</span><span class="o">.</span><span class="n">PairHMM</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -598,15 +598,15 @@ $$</p>
 
 <p>We can interpret alignment <font color="red"><b>probabilistically.</b></font></p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-P(\pi|x,y) &amp;= \frac{P(x,y,\pi)}{P(x,y)}\
-P(x,y) &amp;= \sum_{\text{alignments }\pi}P(x,y,\pi)\
+P(\pi|x,y) &amp;= \frac{P(x,y,\pi)}{P(x,y)}\\
+P(x,y) &amp;= \sum_{\text{alignments }\pi}P(x,y,\pi)\\
 P(x_i\diamondsuit y_i|x,y)
-&amp;= \frac{\sum_{\pi\in\Omega_{ij}}P(x,y,\pi)}{P(x,y)}\
+&amp;= \frac{\sum_{\pi\in\Omega_{ij}}P(x,y,\pi)}{P(x,y)}\\
 &amp;= \frac{F^M(i,j)\cdot B^M(i,j)}{P(x,y)}
 \end{aligned}
-$$</p>
+$$</div>
 
 <table>
 <thead>
@@ -617,12 +617,16 @@ $$</p>
 </thead>
 <tbody>
 <tr>
-<td align="center">$$P(\pi\mid x,y)$$</td>
-<td align="left">The probability of alignment $\pi$ is obtained given $x_i$ and $y_j$.</td>
+<td align="center">
+<div class="math">$$P(\pi\mid x,y)$$</div>
+</td>
+<td align="left">The probability of alignment <span class="math">\(\pi\)</span> is obtained given <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span>.</td>
 </tr>
 <tr>
-<td align="center">$$P(x_i\diamondsuit y_i\mid x,y)$$</td>
-<td align="left">The probability of $x_i$ and $y_j$ are aligned.</td>
+<td align="center">
+<div class="math">$$P(x_i\diamondsuit y_i\mid x,y)$$</div>
+</td>
+<td align="left">The probability of <span class="math">\(x_i\)</span> and <span class="math">\(y_j\)</span> are aligned.</td>
 </tr>
 </tbody>
 </table>
@@ -645,47 +649,47 @@ $$</p>
 </ul>
 
 <h3 id="viterbi-algorithm">Viterbi Algorithm</h3>
-<p>$$
+<div class="math">$$
 \begin{aligned}
-V^M(i,j) &amp;= p_{x_iy_j}\max\begin{cases}(1-2\delta-\tau)V^M(i-1,j-1)\(1-\varepsilon-\tau)V^X(i-1,j-1)\(1-\varepsilon-\tau)V^Y(i-1,j-1)\end{cases}\
-V^X(i,j) &amp;= q_{x_i}\max\begin{cases}\delta V^M(i-1,j)\\varepsilon V^X(i-1,j)\end{cases}\
-V^Y(i,j) &amp;= q_{y_j}\max\begin{cases}\delta V^M(i,j-1)\\varepsilon V^X(i,j-1)\end{cases}\
+V^M(i,j) &amp;= p_{x_iy_j}\max\begin{cases}(1-2\delta-\tau)V^M(i-1,j-1)\\(1-\varepsilon-\tau)V^X(i-1,j-1)\\(1-\varepsilon-\tau)V^Y(i-1,j-1)\end{cases}\\
+V^X(i,j) &amp;= q_{x_i}\max\begin{cases}\delta V^M(i-1,j)\\\varepsilon V^X(i-1,j)\end{cases}\\
+V^Y(i,j) &amp;= q_{y_j}\max\begin{cases}\delta V^M(i,j-1)\\\varepsilon V^X(i,j-1)\end{cases}\\
 V^E(n,m) &amp;= \tau\max\left(V^M(n,m),V^X(n,m),V^Y(n,m)\right)
 \end{aligned}
-$$</p>
+$$</div>
 
 <h3 id="forward-algorithm">Forward Algorithm</h3>
-<p>$$
+<div class="math">$$
 \begin{aligned}
-F^M(i,j) &amp;= p_{x_iy_j}\text{sum}\begin{cases}(1-2\delta-\tau)F^M(i-1,j-1)\(1-\varepsilon-\tau)F^X(i-1,j-1)\(1-\varepsilon-\tau)F^Y(i-1,j-1)\end{cases}\
-F^X(i,j) &amp;= q_{x_i}\text{sum}\begin{cases}\delta F^M(i-1,j)\\varepsilon F^X(i-1,j)\end{cases}\
-F^Y(i,j) &amp;= q_{y_j}\text{sum}\begin{cases}\delta F^M(i,j-1)\\varepsilon F^X(i,j-1)\end{cases}\
+F^M(i,j) &amp;= p_{x_iy_j}\text{sum}\begin{cases}(1-2\delta-\tau)F^M(i-1,j-1)\\(1-\varepsilon-\tau)F^X(i-1,j-1)\\(1-\varepsilon-\tau)F^Y(i-1,j-1)\end{cases}\\
+F^X(i,j) &amp;= q_{x_i}\text{sum}\begin{cases}\delta F^M(i-1,j)\\\varepsilon F^X(i-1,j)\end{cases}\\
+F^Y(i,j) &amp;= q_{y_j}\text{sum}\begin{cases}\delta F^M(i,j-1)\\\varepsilon F^X(i,j-1)\end{cases}\\
 F^E(n,m)
 &amp;= \tau\ \text{sum}\left(F^M(n,m),F^X(n,m),F^Y(n,m)\right)
 \end{aligned}
-$$</p>
+$$</div>
 
 <h3 id="backward-algorithm">Backward Algorithm</h3>
-<p>$$
+<div class="math">$$
 \begin{aligned}
-B^M(i,j) &amp;= \text{sum}\begin{cases}(1-2\delta-\tau)p_{x_iy_j}B^M(i+1,j+1)\\delta q_{x_{i+1}}B(i+1,j)\\delta q_{y_{j+1}}B^Y(i,j+1)\end{cases}\
-B^X(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{x_{i+1}}B^X(i+1,j)\
-B^Y(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{y_{j+1}}B^Y(i,j+1)\
+B^M(i,j) &amp;= \text{sum}\begin{cases}(1-2\delta-\tau)p_{x_iy_j}B^M(i+1,j+1)\\\delta q_{x_{i+1}}B(i+1,j)\\\delta q_{y_{j+1}}B^Y(i,j+1)\end{cases}\\
+B^X(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{x_{i+1}}B^X(i+1,j)\\
+B^Y(i,j) &amp;= (1-\varepsilon-\tau)p_{x_{i+1},y_{j+1}}B^M(i+1,j+1) + \varepsilon q_{y_{j+1}}B^Y(i,j+1)\\
 \end{aligned}
-$$</p>
+$$</div>
 
 <h3 id="baum-welch-algorithm">Baum-Welch Algorithm</h3>
-<p>Although the ordinary <a href="">Hidden Markov Models</a> calculate the optimal parameters from the perspective of time span $t$, <font color="red"><b>PairHMM focus on the position $u,v$ of each sequence.</b></font></p>
+<p>Although the ordinary <a href="">Hidden Markov Models</a> calculate the optimal parameters from the perspective of time span <span class="math">\(t\)</span>, <font color="red"><b>PairHMM focus on the position <span class="math">\(u,v\)</span> of each sequence.</b></font></p>
 
 <h4 id="estep">Estep</h4>
-<p>$$
+<div class="math">$$
 \begin{aligned}
 \xi_{u,v}\left(i,j\right)
-&amp;=\frac{f_i\left(u,v\right)A_{ij}\phi_j\left(\diamond_1\right)b_j\left(\diamond_2,\diamond_3\right)}{\sum_{k=1}^Kf_k\left(u,v\right)b_k\left(u,v\right)}\
+&amp;=\frac{f_i\left(u,v\right)A_{ij}\phi_j\left(\diamond_1\right)b_j\left(\diamond_2,\diamond_3\right)}{\sum_{k=1}^Kf_k\left(u,v\right)b_k\left(u,v\right)}\\
 \gamma_i\left(u,v\right)
 &amp;=\frac{f_i\left(u,v\right)b_j\left(u,v\right)}{\sum_{k=1}^Kf_k\left(u,v\right)b_k\left(u,v\right)}
 \end{aligned}
-$$</p>
+$$</div>
 
 <table>
 <thead>
@@ -696,93 +700,93 @@ $$</p>
 </thead>
 <tbody>
 <tr>
-<td align="center">$f_i\left(u,v\right)$</td>
-<td X_Y="X,Y" align="left">The probability of ending up in state $i$ after aligning the two sequences $\mathbf</td>
+<td align="center"><span class="math">\(f_i\left(u,v\right)\)</span></td>
+<td align="left">The probability of ending up in state <span class="math">\(i\)</span> after aligning the two sequences <span class="math">\(\mathbf{X,Y}\)</span> up to observation <span class="math">\(u\)</span> and <span class="math">\(v\)</span> respectively.</td>
 </tr>
 <tr>
-<td align="center" ij>$A_</td>
-<td align="left">the transition probability from state $i$ to state $j$.</td>
+<td align="center"><span class="math">\(A_{ij}\)</span></td>
+<td align="left">the transition probability from state <span class="math">\(i\)</span> to state <span class="math">\(j\)</span>.</td>
 </tr>
 <tr>
-<td align="center">$\phi_j\left(\diamond_1\right)$</td>
-<td align="left">the emission probability of emitting $\diamond_1$ in state $j$.</td>
+<td align="center"><span class="math">\(\phi_j\left(\diamond_1\right)\)</span></td>
+<td align="left">the emission probability of emitting <span class="math">\(\diamond_1\)</span> in state <span class="math">\(j\)</span>.</td>
 </tr>
 <tr>
-<td align="center">$b_j\left(\diamond_2,\diamond_3\right)$</td>
-<td X_Y="X,Y" align="left">the probability of being in state $j$, given the sequences $\mathbf</td>
+<td align="center"><span class="math">\(b_j\left(\diamond_2,\diamond_3\right)\)</span></td>
+<td align="left">the probability of being in state <span class="math">\(j\)</span>, given the sequences <span class="math">\(\mathbf{X,Y}\)</span> are aligned from observation <span class="math">\(\diamond_2+1\)</span> and <span class="math">\(\diamond_3+1\)</span> to the end of the sequences respectively.</td>
 </tr>
 </tbody>
 </table>
 
-<p><font color="red"><b> ※ "$\diamond_{[1,2,3]}$" depends on the states ($M,X,Y$) as below:</b></font></p>
+<p><font color="red"><b> ※ "<span class="math">\(\diamond_{[1,2,3]}\)</span>" depends on the states (<span class="math">\(M,X,Y\)</span>) as below:</b></font></p>
 
 <table>
 <thead>
 <tr>
 <th align="center">state\variable</th>
-<th align="center">$\phi_j\left(\diamond_1\right)$</th>
-<th align="center">$b_j\left(\diamond_2,\diamond_3\right)$</th>
+<th align="center"><span class="math">\(\phi_j\left(\diamond_1\right)\)</span></th>
+<th align="center"><span class="math">\(b_j\left(\diamond_2,\diamond_3\right)\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">$M$</td>
-<td align="center" u_1="u+1">$e\left(x_</td>
-<td align="center">$b_j\left(u+1,v+1\right)$</td>
+<td align="center"><span class="math">\(M\)</span></td>
+<td align="center"><span class="math">\(e\left(x_{u+1},y_{v+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u+1,v+1\right)\)</span></td>
 </tr>
 <tr>
-<td align="center">$X$</td>
-<td align="center" u_1="u+1">$e\left(x_</td>
-<td align="center">$b_j\left(u+1,v\right)$</td>
+<td align="center"><span class="math">\(X\)</span></td>
+<td align="center"><span class="math">\(e\left(x_{u+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u+1,v\right)\)</span></td>
 </tr>
 <tr>
-<td align="center">$Y$</td>
-<td align="center" v_1="v+1">$e\left(y_</td>
-<td align="center">$b_j\left(u,v+1\right)$</td>
+<td align="center"><span class="math">\(Y\)</span></td>
+<td align="center"><span class="math">\(e\left(y_{v+1}\right)\)</span></td>
+<td align="center"><span class="math">\(b_j\left(u,v+1\right)\)</span></td>
 </tr>
 </tbody>
 </table>
 
 <h4 id="m-step">M step</h4>
-<h5 id="pi_k">$\pi_k$</h5>
-<p>$$\pi^{\star}_i = \sum_w\gamma_i^w(0,0)$$</p>
+<h5 id="pi_k"><span class="math">(\pi_k)</span></h5>
+<div class="math">$$\pi^{\star}_i = \sum_w\gamma_i^w(0,0)$$</div>
 
-<h5 id="a_ij">$A_{ij}$</h5>
-<p>$$A^{\star}<em u="0">{ij} = \frac{\sum_w\sum</em>^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\xi_{u,v}^{w}\left(i,j\right)}{\sum_w\sum_{u=0}^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\sum_{j}^{K}\xi_{u,v}^{w}\left(i,j\right)}$$</p>
+<h5 id="a_ij"><span class="math">(A_{ij})</span></h5>
+<div class="math">$$A^{\star}_{ij} = \frac{\sum_w\sum_{u=0}^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\xi_{u,v}^{w}\left(i,j\right)}{\sum_w\sum_{u=0}^{\tilde{U}}\sum_{v=0}^{\tilde{V}}\sum_{j}^{K}\xi_{u,v}^{w}\left(i,j\right)}$$</div>
 
 <table>
 <thead>
 <tr>
 <th align="center">final emitting state</th>
-<th align="center">$\tilde{U}$</th>
-<th align="center">$\tilde{V}$</th>
+<th align="center"><span class="math">\(\tilde{U}\)</span></th>
+<th align="center"><span class="math">\(\tilde{V}\)</span></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">$M$</td>
-<td align="center">$U-1$</td>
-<td align="center">$V-1$</td>
+<td align="center"><span class="math">\(M\)</span></td>
+<td align="center"><span class="math">\(U-1\)</span></td>
+<td align="center"><span class="math">\(V-1\)</span></td>
 </tr>
 <tr>
-<td align="center">$X$</td>
-<td align="center">$U-1$</td>
-<td align="center">$V$</td>
+<td align="center"><span class="math">\(X\)</span></td>
+<td align="center"><span class="math">\(U-1\)</span></td>
+<td align="center"><span class="math">\(V\)</span></td>
 </tr>
 <tr>
-<td align="center">$Y$</td>
-<td align="center">$U$</td>
-<td align="center">$V-1$</td>
+<td align="center"><span class="math">\(Y\)</span></td>
+<td align="center"><span class="math">\(U\)</span></td>
+<td align="center"><span class="math">\(V-1\)</span></td>
 </tr>
 </tbody>
 </table>
 
-<h5 id="phi_ik">$\phi_{i}(k)$</h5>
-<p>$$\phi_i\left(k\right) = \frac{\sum_w\sum_{u=0}^{U\ast1}\sum_{v=0}^{V\ast2}\gamma_i^w\left(u,v\right)}{\sum_w\sum_{u=0}^U\sum_{v=0}^V\gamma_i^w\left(u,v\right)}$$</p>
+<h5 id="phi_ik"><span class="math">(\phi_{i}(k))</span></h5>
+<div class="math">$$\phi_i\left(k\right) = \frac{\sum_w\sum_{u=0}^{U\ast1}\sum_{v=0}^{V\ast2}\gamma_i^w\left(u,v\right)}{\sum_w\sum_{u=0}^U\sum_{v=0}^V\gamma_i^w\left(u,v\right)}$$</div>
 
 <ul>
-<li>$\ast1$：$x_u=k_x$ and state $i$ equals the state $M$ or $X$. (in the state $Y$, a gap is present in observation stream $x$ therefore $k_x$ is not present.)</li>
-<li>$\ast2$：$y_v=k_y$ and state $j$ equals the state $M$ or $Y$.</li>
+<li><span class="math">\(\ast1\)</span>：<span class="math">\(x_u=k_x\)</span> and state <span class="math">\(i\)</span> equals the state <span class="math">\(M\)</span> or <span class="math">\(X\)</span>. (in the state <span class="math">\(Y\)</span>, a gap is present in observation stream <span class="math">\(x\)</span> therefore <span class="math">\(k_x\)</span> is not present.)</li>
+<li><span class="math">\(\ast2\)</span>：<span class="math">\(y_v=k_y\)</span> and state <span class="math">\(j\)</span> equals the state <span class="math">\(M\)</span> or <span class="math">\(Y\)</span>.</li>
 </ul>
 
 <div class="admonition reference">
@@ -792,6 +796,68 @@ $$</p>
     <li><a href="http://martijnwieling.nl/files/dialects.pdf">Martijn B. Wieling. "Comparison of Dutch Dialects" (2007) pp.36-50</a></li>
   </ul>
 </div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 <!-- EoC -->
 

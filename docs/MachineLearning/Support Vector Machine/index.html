@@ -375,13 +375,17 @@
 
 <ul>
 <li>The training data:
-$$D = \left{(t_n,\mathbf{x}_n)\in \left{-1, 1\right} \times \mathbb{R}^m | n = 1,\ldots, N\right}$$</li>
+<div class="math">$$D = \left\{(t_n,\mathbf{x}_n)\in \left\{-1, 1\right\} \times \mathbb{R}^m | n = 1,\ldots, N\right\}$$</div>
+</li>
 <li>linear models:
-$$y(\mathbf{x}) = \mathbf{w}^T\phi(\mathbf{x}) + b$$</li>
+<div class="math">$$y(\mathbf{x}) = \mathbf{w}^T\phi(\mathbf{x}) + b$$</div>
+</li>
 <li>For all training data points:
-$$t_ny(\mathbf{x}_n) &gt; 0$$</li>
+<div class="math">$$t_ny(\mathbf{x}_n) &gt; 0$$</div>
+</li>
 <li>Margin is given by:
-$$\frac{1}{|\mathbf{w}|}$$</li>
+<div class="math">$$\frac{1}{\|\mathbf{w}\|}$$</div>
+</li>
 </ul>
 
 <p>※ If there are any uncertain points, please check <a href="https://iwasakishuto.github.io/University/3A/生物データマイニング論-3-3.html">here</a>.</p>
@@ -393,58 +397,58 @@ $$\frac{1}{|\mathbf{w}|}$$</li>
 
 <p>From this discussion above, the optimization problem <b>(Minimizing)</b> is given by</p>
 
-<p>$$L\left(\mathbf{w},b,\mathbf{a}\right) = \frac{1}{2}|\mathbf{w}|^2 - \sum_{n=1}^Na_n\left{t_n\left(\mathbf{w}^T\phi(\mathbf{x}_n) + b\right) -1 \right}$$</p>
+<div class="math">$$L\left(\mathbf{w},b,\mathbf{a}\right) = \frac{1}{2}\|\mathbf{w}\|^2 - \sum_{n=1}^Na_n\left\{t_n\left(\mathbf{w}^T\phi(\mathbf{x}_n) + b\right) -1 \right\}$$</div>
 
-<p>where $\mathbf{a} = \left(a_1,\ldots,a_N\right)^T$ are the Lagrange multipliers $a_n\gg0$.</p>
+<p>where <span class="math">\(\mathbf{a} = \left(a_1,\ldots,a_N\right)^T\)</span> are the Lagrange multipliers <span class="math">\(a_n\gg0\)</span>.</p>
 
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
   <p>Note the <font color="red"><b>minus sign</b></font> in front of the Lagrange multiplier term. Check <a href="https://iwasakishuto.github.io/University/3A/生物データマイニング論-3-2.html">HERE</a>.</p>
 </div>
 
-<p>To solve this optimization problem, set the derivatives of $L\left(\mathbf{w},b,\mathbf{a}\right)$ with respect to $\mathbf{w}$ and $b$ equal to zero.</p>
+<p>To solve this optimization problem, set the derivatives of <span class="math">\(L\left(\mathbf{w},b,\mathbf{a}\right)\)</span> with respect to <span class="math">\(\mathbf{w}\)</span> and <span class="math">\(b\)</span> equal to zero.</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-\frac{\partial L}{\partial \mathbf{w}} &amp;= \mathbf{w}-\sum_{n=1}^N a_nt_n\phi(\mathbf{x}<em n="1">n) =0 &amp;\therefore \mathbf{w}^{\ast}=\sum</em>^N a_nt_n\phi(\mathbf{x}<em n="1">n)\
-\frac{\partial L}{\partial b} &amp;= -\sum</em>^N a_nt_n = 0 &amp;\therefore\sum_{n=1}^Na_n^{\ast}t_n = 0\
+\frac{\partial L}{\partial \mathbf{w}} &amp;= \mathbf{w}-\sum_{n=1}^N a_nt_n\phi(\mathbf{x}_n) =0 &amp;\therefore \mathbf{w}^{\ast}=\sum_{n=1}^N a_nt_n\phi(\mathbf{x}_n)\\
+\frac{\partial L}{\partial b} &amp;= -\sum_{n=1}^N a_nt_n = 0 &amp;\therefore\sum_{n=1}^Na_n^{\ast}t_n = 0\\
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>Eliminating $\mathbf{w}$ and $b$ from $L\left(\mathbf{w},b,\mathbf{a}\right)$ using these conditions then gives the <font color="red"><b>dual representation</b></font> of the maximum margin problem in which we maximize</p>
+<p>Eliminating <span class="math">\(\mathbf{w}\)</span> and <span class="math">\(b\)</span> from <span class="math">\(L\left(\mathbf{w},b,\mathbf{a}\right)\)</span> using these conditions then gives the <font color="red"><b>dual representation</b></font> of the maximum margin problem in which we maximize</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
 \tilde{L}\left(\mathbf{a}\right)
-&amp;= \frac{1}{2}|\mathbf{w}|^2 - \mathbf{w}^T\sum_{n=1}^Na_nt_n\phi(\mathbf{x}<em n="1">n) - b\sum</em>^Na_nt_n + \sum_{n=1}^Na_n\
-&amp;= -\frac{1}{2}|\mathbf{w}|^2 - b\cdot0 + \sum_{n=1}^Na_n\
+&amp;= \frac{1}{2}\|\mathbf{w}\|^2 - \mathbf{w}^T\sum_{n=1}^Na_nt_n\phi(\mathbf{x}_n) - b\sum_{n=1}^Na_nt_n + \sum_{n=1}^Na_n\\
+&amp;= -\frac{1}{2}\|\mathbf{w}\|^2 - b\cdot0 + \sum_{n=1}^Na_n\\
 &amp;= \sum_{n=1}^Na_n - \frac{1}{2}\sum_{n=1}^N\sum_{m=1}^Na_na_mt_nt_mk\left(\mathbf{x}_n,\mathbf{x}_m\right)\quad k\left(\mathbf{x}_n,\mathbf{x}_m\right)=\phi(\mathbf{x}_n)^T\phi(\mathbf{x}_m)
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>with respect to $\mathbf{a}$ subject to the constraints</p>
+<p>with respect to <span class="math">\(\mathbf{a}\)</span> subject to the constraints</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-a_n &amp; \geq 0,\quad n=1,\ldots,N\
+a_n &amp; \geq 0,\quad n=1,\ldots,N\\
 \sum_{n=1}^Na_nt_n &amp;= 0
 \end{aligned}
-$$</p>
+$$</div>
 
 <p>This takes the form of a <font color="red"><b>quadratic programming problems</b></font>, and there are some well-known algorithms to solve them. (ex. <a href="https://iwasakishuto.github.io/University/3A/生物データマイニング論-3-5.html">SMO; Sequential Minimal Optimization</a>)</p>
 
-<p>Once optimal $\mathbf{a}$ are calculated, the decision boundary is given by</p>
+<p>Once optimal <span class="math">\(\mathbf{a}\)</span> are calculated, the decision boundary is given by</p>
 
-<p>$$y(\mathbf{x}) = \mathbf{w}^{\ast T}\phi(\mathbf{x})+b = \sum_{n=1}^N a_nt_nk(\mathbf{x},\mathbf{x}_n) + b$$</p>
+<div class="math">$$y(\mathbf{x}) = \mathbf{w}^{\ast T}\phi(\mathbf{x})+b = \sum_{n=1}^N a_nt_nk(\mathbf{x},\mathbf{x}_n) + b$$</div>
 
-<p>In terms of bias parameter $b$, we can calculate it by noting that any support vector $\mathbf{x}_n$ satisfies $t_ny(\mathbf{x}_n) = 1$.</p>
+<p>In terms of bias parameter <span class="math">\(b\)</span>, we can calculate it by noting that any support vector <span class="math">\(\mathbf{x}_n\)</span> satisfies <span class="math">\(t_ny(\mathbf{x}_n) = 1\)</span>.</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-&amp;t_n\left(\sum_{m\in\mathcal{S}}a_mt_mk(\mathbf{x}<em _mathcal_S="\mathcal{S">n,\mathbf{x}_m) + b\right) = 1\
-&amp;\therefore b^{\ast}= \frac{1}{N</em>}}\sum_{n\in\mathcal{S}}\left(t_n-\sum_{n\in\mathcal{S}}a_mt_mk(\mathbf{x}_n,\mathbf{x}_m)\right)
+&amp;t_n\left(\sum_{m\in\mathcal{S}}a_mt_mk(\mathbf{x}_n,\mathbf{x}_m) + b\right) = 1\\
+&amp;\therefore b^{\ast}= \frac{1}{N_{\mathcal{S}}}\sum_{n\in\mathcal{S}}\left(t_n-\sum_{n\in\mathcal{S}}a_mt_mk(\mathbf{x}_n,\mathbf{x}_m)\right)
 \end{aligned}
-$$</p>
+$$</div>
 
 <div class="admonition summary">
   <p class="admonition-title">Points</p>
@@ -455,80 +459,80 @@ $$</p>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">svm</span><span class="o">.</span><span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kernelargs</span><span class="p">)</span>
 </code></pre></div>
 
-<p>In the <b>Hard SVC</b>, we have assumed that the <b>training data</b> points are <font color="red"><b>linearly separable in the feature space $\phi(\mathbf{x})$</b></font>. However, in practice, this property may cause the bad effect on the <font color="red"><b>generalization performance</b></font>.</p>
+<p>In the <b>Hard SVC</b>, we have assumed that the <b>training data</b> points are <font color="red"><b>linearly separable in the feature space <span class="math">\(\phi(\mathbf{x})\)</span></b></font>. However, in practice, this property may cause the bad effect on the <font color="red"><b>generalization performance</b></font>.</p>
 
-<p>Therefore, we introduce <font color="red"><b>slack variables, $\xi_n\gg0$ </b></font> to allow some of the training points to be misclassified.</p>
+<p>Therefore, we introduce <font color="red"><b>slack variables, <span class="math">\(\xi_n\gg0\)</span> </b></font> to allow some of the training points to be misclassified.</p>
 
-<p>$$ t_ny(\mathbf{x}_n) \geq 1 \Longrightarrow t_ny(\mathbf{x}_n) \geq 1 - \xi_n $$</p>
+<div class="math">$$ t_ny(\mathbf{x}_n) \geq 1 \Longrightarrow t_ny(\mathbf{x}_n) \geq 1 - \xi_n $$</div>
 
 <p>Our goal is now to maximize the margin while <b>softly penalizing points that lie on the wrong side of the margin boundary</b></p>
 
-<p>$$C\sum_{n=1}^N\xi_n + \frac{1}{2}|\mathbf{w}|$$</p>
+<div class="math">$$C\sum_{n=1}^N\xi_n + \frac{1}{2}\|\mathbf{w}\|$$</div>
 
-<p>$C$ controls the trade-off between <b><font color="red">minimizing training errors</font></b> and controlling <b><font color="red">model complexity.</font></b> The corresponding Lagrangian is given by</p>
+<p><span class="math">\(C\)</span> controls the trade-off between <b><font color="red">minimizing training errors</font></b> and controlling <b><font color="red">model complexity.</font></b> The corresponding Lagrangian is given by</p>
 
-<p>$$L(\mathbf{w},b,\boldsymbol{\xi},\mathbf{a},\boldsymbol{\mu}) = \frac{1}{2}|\mathbf{w}|^2 + C\sum_{n=1}^N\xi_n - \sum_{n=1}^{N}a_n\left{t_n\left(\mathbf{w}^T\phi(\mathbf{x}<em n="1">n) + b\right) - 1 + \xi_n\right} - \sum</em>^N\mu_n\xi_n$$</p>
+<div class="math">$$L(\mathbf{w},b,\boldsymbol{\xi},\mathbf{a},\boldsymbol{\mu}) = \frac{1}{2}\|\mathbf{w}\|^2 + C\sum_{n=1}^N\xi_n - \sum_{n=1}^{N}a_n\left\{t_n\left(\mathbf{w}^T\phi(\mathbf{x}_n) + b\right) - 1 + \xi_n\right\} - \sum_{n=1}^N\mu_n\xi_n$$</div>
 
-<p>Same as before, we set the derivatives of $L\left(\mathbf{w},b,\mathbf{a}\right)$ with respect to $\mathbf{w}, b$ and ${\xi_n}$ equal to zero.</p>
+<p>Same as before, we set the derivatives of <span class="math">\(L\left(\mathbf{w},b,\mathbf{a}\right)\)</span> with respect to <span class="math">\(\mathbf{w}, b\)</span> and <span class="math">\(\{\xi_n\}\)</span> equal to zero.</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-\frac{\partial L}{\partial \mathbf{w}} &amp;= \mathbf{w}-\sum_{n=1}^N a_nt_n\phi(\mathbf{x}<em n="1">n) =0 &amp;\therefore \mathbf{w}^{\ast}=\sum</em>^N a_nt_n\phi(\mathbf{x}<em n="1">n)\
-\frac{\partial L}{\partial b} &amp;= -\sum</em>^N a_nt_n = 0 &amp;\therefore\sum_{n=1}^Na_n^{\ast}t_n = 0\
+\frac{\partial L}{\partial \mathbf{w}} &amp;= \mathbf{w}-\sum_{n=1}^N a_nt_n\phi(\mathbf{x}_n) =0 &amp;\therefore \mathbf{w}^{\ast}=\sum_{n=1}^N a_nt_n\phi(\mathbf{x}_n)\\
+\frac{\partial L}{\partial b} &amp;= -\sum_{n=1}^N a_nt_n = 0 &amp;\therefore\sum_{n=1}^Na_n^{\ast}t_n = 0\\
 \frac{\partial L}{\partial \xi_n} &amp;= C-a_n-\mu_n &amp;\therefore a_n = C-\mu_n
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>Eliminating them from $L$ using these conditions then gives the <font color="red"><b>dual representation</b></font> of the maximum margin problem in which we maximize</p>
+<p>Eliminating them from <span class="math">\(L\)</span> using these conditions then gives the <font color="red"><b>dual representation</b></font> of the maximum margin problem in which we maximize</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
 \tilde{L}\left(\mathbf{a}\right)
-&amp;= \frac{1}{2}|\mathbf{w}|^2 +C\sum_{n=1}^N\xi_n - |\mathbf{w}|^2 - b\sum_{n=1}^Na_nt_n + \sum_{n=1}^Na_n - \sum_{n=1}^Na_n\xi_n - \sum_{n=1}^N\mu_n\xi_n\
-&amp;= -\frac{1}{2}|\mathbf{w}|^2 - b\cdot0 + \sum_{n=1}^Na_n + \sum_{n=1}^N\left(C - a_n - \mu_n\right)\xi_n\
+&amp;= \frac{1}{2}\|\mathbf{w}\|^2 +C\sum_{n=1}^N\xi_n - \|\mathbf{w}\|^2 - b\sum_{n=1}^Na_nt_n + \sum_{n=1}^Na_n - \sum_{n=1}^Na_n\xi_n - \sum_{n=1}^N\mu_n\xi_n\\
+&amp;= -\frac{1}{2}\|\mathbf{w}\|^2 - b\cdot0 + \sum_{n=1}^Na_n + \sum_{n=1}^N\left(C - a_n - \mu_n\right)\xi_n\\
 &amp;= \sum_{n=1}^Na_n - \frac{1}{2}\sum_{n=1}^N\sum_{m=1}^Na_na_mt_nt_mk\left(\mathbf{x}_n,\mathbf{x}_m\right)\quad k\left(\mathbf{x}_n,\mathbf{x}_m\right)=\phi(\mathbf{x}_n)^T\phi(\mathbf{x}_m)
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>with respect to $\mathbf{a}$ subject to the constraints</p>
+<p>with respect to <span class="math">\(\mathbf{a}\)</span> subject to the constraints</p>
 
-<p>$$
+<div class="math">$$
 \begin{aligned}
-&amp;a_n \geq 0,\mu_n\geq 0 \quad n=1,\ldots,N\
-&amp;\therefore 0\leq a_n \leq C\
+&amp;a_n \geq 0,\mu_n\geq 0 \quad n=1,\ldots,N\\
+&amp;\therefore 0\leq a_n \leq C\\
 &amp;\sum_{n=1}^Na_nt_n = 0
 \end{aligned}
-$$</p>
+$$</div>
 
-<p>In this case, As shown in the table below, we consider only the data points having $0 &lt; a_n &lt; C$ to calculate the biasparameter $b$</p>
+<p>In this case, As shown in the table below, we consider only the data points having <span class="math">\(0 &lt; a_n &lt; C\)</span> to calculate the biasparameter <span class="math">\(b\)</span></p>
 
 <table>
 <thead>
 <tr>
-<th align="center">$a_n$</th>
-<th align="center">$\mu_n$</th>
-<th align="center">$\xi_n$</th>
+<th align="center"><span class="math">\(a_n\)</span></th>
+<th align="center"><span class="math">\(\mu_n\)</span></th>
+<th align="center"><span class="math">\(\xi_n\)</span></th>
 <th align="left">Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center">$a_n=0$</td>
+<td align="center"><span class="math">\(a_n=0\)</span></td>
 <td align="center"></td>
 <td align="center"></td>
 <td align="left">They do not contribute to the predictive model.</td>
 </tr>
 <tr>
-<td align="center">$0 &lt; a_n &lt; C$</td>
-<td align="center">$\mu_n&gt;0$</td>
-<td align="center">$\xi_n=0$</td>
-<td align="left" x>satisfy the $t_ny(\mathbf</td>
+<td align="center"><span class="math">\(0 &lt; a_n &lt; C\)</span></td>
+<td align="center"><span class="math">\(\mu_n&gt;0\)</span></td>
+<td align="center"><span class="math">\(\xi_n=0\)</span></td>
+<td align="left">satisfy the <span class="math">\(t_ny(\mathbf{x}_n) = 1\)</span></td>
 </tr>
 <tr>
-<td align="center">$a_n=C$</td>
-<td align="center">$\mu_n=0$</td>
-<td align="center">$\xi_n&gt;0$</td>
-<td align="left">lie inside the margin and can either be correctly classified if $\xi\ll1$ or misclassified if $\xi_n&gt;1$</td>
+<td align="center"><span class="math">\(a_n=C\)</span></td>
+<td align="center"><span class="math">\(\mu_n=0\)</span></td>
+<td align="center"><span class="math">\(\xi_n&gt;0\)</span></td>
+<td align="left">lie inside the margin and can either be correctly classified if <span class="math">\(\xi\ll1\)</span> or misclassified if <span class="math">\(\xi_n&gt;1\)</span></td>
 </tr>
 </tbody>
 </table>
@@ -539,9 +543,9 @@ $$</p>
 
 <p>The support vector machine is fundamentally a two-class classifier, but in practice, we often face the multiple class problems. In that cases, we have to combine the multiple two-class SVMs.</p>
 
-<p>Various methods have therefore been proposed for combining, and one commonly used approach <font color="red"><b>(this method is also used in Kerasy)</b></font> is to construct $K$ separate SVMs, in which the $k^{\text{th}}$ model $y_k(\mathbf{x})$ is trained to distinguish whether $\mathbf{x}$ belongs to class $k$ or not, and final decision is given by</p>
+<p>Various methods have therefore been proposed for combining, and one commonly used approach <font color="red"><b>(this method is also used in Kerasy)</b></font> is to construct <span class="math">\(K\)</span> separate SVMs, in which the <span class="math">\(k^{\text{th}}\)</span> model <span class="math">\(y_k(\mathbf{x})\)</span> is trained to distinguish whether <span class="math">\(\mathbf{x}\)</span> belongs to class <span class="math">\(k\)</span> or not, and final decision is given by</p>
 
-<p>$$y(\mathbf{x}) = \underset{k}{\max}y_k(\mathbf{x})$$</p>
+<div class="math">$$y(\mathbf{x}) = \underset{k}{\max}y_k(\mathbf{x})$$</div>
 
 <p>This is known as the <b>one-versus-the-rest</b> approach.</p>
 
@@ -560,6 +564,68 @@ $$</p>
     <li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/#!prml-book">Pattern Recognition and Machine Learning by Christopher Bishop</a></li>
   </ul>
 </div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 <!-- EoC -->
 

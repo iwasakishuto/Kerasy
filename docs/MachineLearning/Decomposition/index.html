@@ -409,28 +409,30 @@
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </code></pre></div>
 
-<p>Consider a dataset ${\mathbf{x}_n}$. If we consider a $D$-dimensional vector $\mathbf{u}_1$, each data point $\mathbf{x}_n\in\mathbb{R}^{D}$ is projected onto a scalar value $\mathbf{u}_1^T\mathbf{x}_n$. In that (one-dimensional) space,</p>
+<p>Consider a dataset <span class="math">\(\{\mathbf{x}_n\}\)</span>. If we consider a <span class="math">\(D\)</span>-dimensional vector <span class="math">\(\mathbf{u}_1\)</span>, each data point <span class="math">\(\mathbf{x}_n\in\mathbb{R}^{D}\)</span> is projected onto a scalar value <span class="math">\(\mathbf{u}_1^T\mathbf{x}_n\)</span>. In that (one-dimensional) space,</p>
 
 <ul>
 <li>Mean:
-$$\tilde{\mathbf{x}} = \frac{1}{N}\sum_{n=1}^N\mathbf{x}_n$$</li>
+<div class="math">$$\tilde{\mathbf{x}} = \frac{1}{N}\sum_{n=1}^N\mathbf{x}_n$$</div>
+</li>
 <li>Variance:
-$$\frac{1}{N}\sum_{n=1}^N\left{\mathbf{u}<em n="1">1^T\mathbf{x}_n - \mathbf{u}_1^T\tilde{\mathbf{x}}\right}^2 = \mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}= \frac{1}{N}\sum</em>^N\left(\mathbf{x}-\tilde{\mathbf{x}}\right)\left(\mathbf{x}-\tilde{\mathbf{x}}\right)^T$$</li>
+<div class="math">$$\frac{1}{N}\sum_{n=1}^N\left\{\mathbf{u}_1^T\mathbf{x}_n - \mathbf{u}_1^T\tilde{\mathbf{x}}\right\}^2 = \mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}= \frac{1}{N}\sum_{n=1}^N\left(\mathbf{x}-\tilde{\mathbf{x}}\right)\left(\mathbf{x}-\tilde{\mathbf{x}}\right)^T$$</div>
+</li>
 </ul>
 
-<p>We now maximize the projected variance $\mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}$ with respect to $\mathbf{u}_1$, because we can think <font color="red"><b>"Larger variance" ↔︎ "Features are more expressed"</b></font>.</p>
+<p>We now maximize the projected variance <span class="math">\(\mathbf{u}_1^T\mathbf{Su}_1\quad\mathbf{S}\)</span> with respect to <span class="math">\(\mathbf{u}_1\)</span>, because we can think <font color="red"><b>"Larger variance" ↔︎ "Features are more expressed"</b></font>.</p>
 
-<p>To avoid $|\mathbf{u}_1|\rightarrow\infty$, we introduce the normalization condition $\mathbf{u}_1^T\mathbf{u}_1=1$ using Lagrange multiplier $\lambda_1$.</p>
+<p>To avoid <span class="math">\(\|\mathbf{u}_1\|\rightarrow\infty\)</span>, we introduce the normalization condition <span class="math">\(\mathbf{u}_1^T\mathbf{u}_1=1\)</span> using Lagrange multiplier <span class="math">\(\lambda_1\)</span>.</p>
 
 <p>Then, the object function is given by</p>
 
-<p>$$\begin{aligned}
-L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}_1\right)\
-\frac{\partial L}{\partial \mathbf{u}_1} &amp;= 2\mathbf{S}\mathbf{u}_1 - 2\lambda_1\mathbf{u}_1 = 0\
+<div class="math">$$\begin{aligned}
+L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}_1\right)\\
+\frac{\partial L}{\partial \mathbf{u}_1} &amp;= 2\mathbf{S}\mathbf{u}_1 - 2\lambda_1\mathbf{u}_1 = 0\\
 \therefore\mathbf{u}_1^T\mathbf{Su}_1 &amp;= \lambda_1 \quad (\because \text{left-multiplied $\mathbf{u}_1^T$})
-\end{aligned}$$</p>
+\end{aligned}$$</div>
 
-<p>The variance will be a maximum when we set $\mathbf{u}_1$ eaual to the eigenvector having the largest eigenvalue $\lambda_1$. This eigenvector is known as the first principal component.</p>
+<p>The variance will be a maximum when we set <span class="math">\(\mathbf{u}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_1\)</span>. This eigenvector is known as the first principal component.</p>
 
 <p>We can define additional principal components in the same way.</p>
 
@@ -447,46 +449,46 @@ L &amp;= \mathbf{u}_1^T\mathbf{Su}_1 + \lambda_1\left(1-\mathbf{u}_1^T\mathbf{u}
 
 <p>If we <font color="red"><b>assume that the projected data set has zero mean</b></font>, The covariance matrix in feature space is given by</p>
 
-<p>$$
+<div class="math">$$
 \mathbf{C} = \frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x}_n)\phi(\mathbf{x}_n)^T
-$$</p>
+$$</div>
 
 <p>and its <strong>eigenvector expansion</strong> is defined by</p>
 
-<p>$$\begin{aligned}
-\mathbf{C}\mathbf{v}<em n="1">i &amp;= \lambda_i\mathbf{v}_i\
-\frac{1}{N}\sum</em>^N\phi(\mathbf{x}_n)\underset{\text{scalar}}{\left{\phi(\mathbf{x}_n)^T\mathbf{v}_i\right}} &amp;= \lambda_i\mathbf{v}_i\quad (\ast)\
-\end{aligned}$$</p>
+<div class="math">$$\begin{aligned}
+\mathbf{C}\mathbf{v}_i &amp;= \lambda_i\mathbf{v}_i\\
+\frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x}_n)\underset{\text{scalar}}{\left\{\phi(\mathbf{x}_n)^T\mathbf{v}_i\right\}} &amp;= \lambda_i\mathbf{v}_i\quad (\ast)\\
+\end{aligned}$$</div>
 
-<p>From this equation, we see that the vector $\mathbf{v}_i$ is given by a linear combination of the $\phi(\mathbf{x}_n)$</p>
+<p>From this equation, we see that the vector <span class="math">\(\mathbf{v}_i\)</span> is given by a linear combination of the <span class="math">\(\phi(\mathbf{x}_n)\)</span></p>
 
-<p>$$\mathbf{v}<em n="1">i = \sum</em>^N a_{in}\phi(\mathbf{x}_n)$$</p>
+<div class="math">$$\mathbf{v}_i = \sum_{n=1}^N a_{in}\phi(\mathbf{x}_n)$$</div>
 
-<p>Substituting this expansion back into the eigenvector equation $(\ast)$, we obtain</p>
+<p>Substituting this expansion back into the eigenvector equation <span class="math">\((\ast)\)</span>, we obtain</p>
 
-<p>$$\begin{aligned}
-\frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x_n})\phi(\mathbf{x}<em m="1">n)^T\sum</em>^Na_{im}\phi(\mathbf{x}<em n="1">m) &amp;= \lambda_i\sum</em>^Na_{in}\phi(\mathbf{x}<em n="1">n)\
-\frac{1}{N}\sum</em>^Nk(\mathbf{x}<em m="1">l,\mathbf{x}_n)\sum</em>^Na_{i,m}k(\mathbf{x}<em n="1">n,\mathbf{x}_m) &amp;= \lambda_i\sum</em>^Na_{in}k(\mathbf{x}_l,\mathbf{x}_n)\quad(\because\text{multiplied $\phi(\mathbf{x}_l)^T$})\
-\mathbf{K}^2\mathbf{a}_i &amp;= \lambda_iN\mathbf{Ka}_i\quad (\because\text{written in matrix notation})\
-\end{aligned}$$</p>
+<div class="math">$$\begin{aligned}
+\frac{1}{N}\sum_{n=1}^N\phi(\mathbf{x_n})\phi(\mathbf{x}_n)^T\sum_{m=1}^Na_{im}\phi(\mathbf{x}_m) &amp;= \lambda_i\sum_{n=1}^Na_{in}\phi(\mathbf{x}_n)\\
+\frac{1}{N}\sum_{n=1}^Nk(\mathbf{x}_l,\mathbf{x}_n)\sum_{m=1}^Na_{i,m}k(\mathbf{x}_n,\mathbf{x}_m) &amp;= \lambda_i\sum_{n=1}^Na_{in}k(\mathbf{x}_l,\mathbf{x}_n)\quad(\because\text{multiplied $\phi(\mathbf{x}_l)^T$})\\
+\mathbf{K}^2\mathbf{a}_i &amp;= \lambda_iN\mathbf{Ka}_i\quad (\because\text{written in matrix notation})\\
+\end{aligned}$$</div>
 
-<p>We can find solutions for $\mathbf{a}_i$ by solving the following eigenvalue problem. The variance in feature space will be a maximum when we set $\mathbf{a}_1$ eaual to the eigenvector having the largest eigenvalue $\lambda_i$.</p>
+<p>We can find solutions for <span class="math">\(\mathbf{a}_i\)</span> by solving the following eigenvalue problem. The variance in feature space will be a maximum when we set <span class="math">\(\mathbf{a}_1\)</span> eaual to the eigenvector having the largest eigenvalue <span class="math">\(\lambda_i\)</span>.</p>
 
-<p>$$\mathbf{Ka}_i = \lambda_iN\mathbf{a}_i$$</p>
+<div class="math">$$\mathbf{Ka}_i = \lambda_iN\mathbf{a}_i$$</div>
 
-<p>Having solved the eigenvector problem, the projection of a point $\mathbf{x}$ onto eigenvector $i$ is given by</p>
+<p>Having solved the eigenvector problem, the projection of a point <span class="math">\(\mathbf{x}\)</span> onto eigenvector <span class="math">\(i\)</span> is given by</p>
 
-<p>$$y_i(\mathbf{x}) = \phi(\mathbf{x})^T\mathbf{v}<em n="1">i = \sum</em>^Na_{in}\phi(\mathbf{x})^T\phi(\mathbf{x}<em n="1">n) = \sum</em>^Na_{in}k(\mathbf{x},\mathbf{x}_n)$$</p>
+<div class="math">$$y_i(\mathbf{x}) = \phi(\mathbf{x})^T\mathbf{v}_i = \sum_{n=1}^Na_{in}\phi(\mathbf{x})^T\phi(\mathbf{x}_n) = \sum_{n=1}^Na_{in}k(\mathbf{x},\mathbf{x}_n)$$</div>
 
 <p>If <font color="red"><b>projected data set doesn't have zero mean</b></font>, the projected data points after centralizing are given by</p>
 
-<p>$$\tilde{\phi(\mathbf{x}<em l="1">n)} = \phi(\mathbf{x}_n)-\frac{1}{N}\sum</em>^N\phi(\mathbf{x}_l)$$</p>
+<div class="math">$$\tilde{\phi(\mathbf{x}_n)} = \phi(\mathbf{x}_n)-\frac{1}{N}\sum_{l=1}^N\phi(\mathbf{x}_l)$$</div>
 
 <p>and the corresponding elements of the Gram matrix are given by</p>
 
-<p>$$\tilde{\mathbf{K}} = \mathbf{K} - \mathbf{1_NK} - \mathbf{K1_N} +\mathbf{1_NK1_N}$$</p>
+<div class="math">$$\tilde{\mathbf{K}} = \mathbf{K} - \mathbf{1_NK} - \mathbf{K1_N} +\mathbf{1_NK1_N}$$</div>
 
-<p>where $\mathbf{1}_N$ denotes the $N\times N$ matrix in which every element takes the value $1/N$.</p>
+<p>where <span class="math">\(\mathbf{1}_N\)</span> denotes the <span class="math">\(N\times N\)</span> matrix in which every element takes the value <span class="math">\(1/N\)</span>.</p>
 
 <div class="admonition warning">
   <p class="admonition-title">Warning</p>
@@ -494,52 +496,60 @@ $$</p>
 </div>
 
 <h2 id="sne">SNE</h2>
-<p><font color="red"><b>Stochastic Neighbor Embedding (SNE)</b></font> starts by <b>converting the high-dimensional Euclidean distances between datapoints into conditional probabilities</b>. The similarity of datapoint $\mathbf{x}<em j_i="j|i">j$ to datapoint $\mathbf{x}_i$ is conditional probability $p</em>$, that $\mathbf{x}_i$ would pick $\mathbf{x}_j$ as its neighbor <b>if neighbors were picked in propotion to their probability density under <font color="red">Gaussian centered at $\mathbf{x}_i$</font></b>.</p>
+<p><font color="red"><b>Stochastic Neighbor Embedding (SNE)</b></font> starts by <b>converting the high-dimensional Euclidean distances between datapoints into conditional probabilities</b>. The similarity of datapoint <span class="math">\(\mathbf{x}_j\)</span> to datapoint <span class="math">\(\mathbf{x}_i\)</span> is conditional probability <span class="math">\(p_{j|i}\)</span>, that <span class="math">\(\mathbf{x}_i\)</span> would pick <span class="math">\(\mathbf{x}_j\)</span> as its neighbor <b>if neighbors were picked in propotion to their probability density under <font color="red">Gaussian centered at <span class="math">\(\mathbf{x}_i\)</span></font></b>.</p>
 
-<p>Mathmatically, the conditional probability $p_{j|i}$ is given by</p>
+<p>Mathmatically, the conditional probability <span class="math">\(p_{j|i}\)</span> is given by</p>
 
-<p>$$p_{j|i} = \frac{\exp\left(-|\mathbf{x}<em i k_neq="k\neq">i-\mathbf{x}_j|^2/2\boldsymbol{\sigma}_i^2\right)}{\sum</em>\exp\left(-|\mathbf{x}_i-\mathbf{x}_k|^2/2\boldsymbol{\sigma}_i^2\right)}$$</p>
+<div class="math">$$p_{j|i} = \frac{\exp\left(-\|\mathbf{x}_i-\mathbf{x}_j\|^2/2\boldsymbol{\sigma}_i^2\right)}{\sum_{k\neq i}\exp\left(-\|\mathbf{x}_i-\mathbf{x}_k\|^2/2\boldsymbol{\sigma}_i^2\right)}$$</div>
 
-<p>Because we are only interested in modeling pairwise similarities, we set the value of $p_{i|i}$ to zero.</p>
+<p>Because we are only interested in modeling pairwise similarities, we set the value of <span class="math">\(p_{i|i}\)</span> to zero.</p>
 
-<p>For the low-dimensional counterparts $\mathbf{y}<em j_i="j|i">i$ and $\mathbf{y}_j$ of the high-dimensional data points $\mathbf{x}_i$ and $\mathbf{x}_j$, it is possible to compute a similar conditional probability, which we denote by $q</em>$</p>
+<p>For the low-dimensional counterparts <span class="math">\(\mathbf{y}_i\)</span> and <span class="math">\(\mathbf{y}_j\)</span> of the high-dimensional data points <span class="math">\(\mathbf{x}_i\)</span> and <span class="math">\(\mathbf{x}_j\)</span>, it is possible to compute a similar conditional probability, which we denote by <span class="math">\(q_{j|i}\)</span></p>
 
-<p>$$q_{j|i} = \frac{\exp\left(-|\mathbf{y}<em i k_neq="k\neq">i-\mathbf{y}_j|^2\right)}{\sum</em>\exp\left(-|\mathbf{y}_i-\mathbf{y}_k|^2\right)}$$</p>
+<div class="math">$$q_{j|i} = \frac{\exp\left(-\|\mathbf{y}_i-\mathbf{y}_j\|^2\right)}{\sum_{k\neq i}\exp\left(-\|\mathbf{y}_i-\mathbf{y}_k\|^2\right)}$$</div>
 
-<p>Again, we set $q_{i|i} = 0$, and the variance of the Gaussian to $\frac{1}{\sqrt{2}}$</p>
+<p>Again, we set <span class="math">\(q_{i|i} = 0\)</span>, and the variance of the Gaussian to <span class="math">\(\frac{1}{\sqrt{2}}\)</span></p>
 
 <p>Then, the cost function is given by</p>
 
-<p>$$C = \sum_i\mathrm{KL}(P_i|Q_i) = \sum_i\sum_j p_{j|i}\log\frac{p_{j|i}}{q_{j|i}}$$</p>
+<div class="math">$$C = \sum_i\mathrm{KL}(P_i\|Q_i) = \sum_i\sum_j p_{j|i}\log\frac{p_{j|i}}{q_{j|i}}$$</div>
 
-<p>in which $P_i$ represents <b>the conditional probability distribution over all other data points given data points $\mathbf{x}_i$</b></p>
+<p>in which <span class="math">\(P_i\)</span> represents <b>the conditional probability distribution over all other data points given data points <span class="math">\(\mathbf{x}_i\)</span></b></p>
 
-<p>The remaining parameter to be selected is the variance $\boldsymbol{\sigma_i}$. It is defined to produce a $P_i$ with a fixed <font color="red"><b>perplexity</b></font> that is specified by the user. The perplexity is defined as</p>
+<p>The remaining parameter to be selected is the variance <span class="math">\(\boldsymbol{\sigma_i}\)</span>. It is defined to produce a <span class="math">\(P_i\)</span> with a fixed <font color="red"><b>perplexity</b></font> that is specified by the user. The perplexity is defined as</p>
 
-<p>$$Perp(P_i) = 2^{H(P_i)},\quad H(P_i) = -\sum_jp_{j|i}\log_2p_{j|i}$$</p>
+<div class="math">$$Perp(P_i) = 2^{H(P_i)},\quad H(P_i) = -\sum_jp_{j|i}\log_2p_{j|i}$$</div>
 
 <p>The minimization of the cost function is performed using a gradient descent method. The gradient has a surprisingly simple form</p>
 
-<p>$$\frac{\partial C}{\partial \mathbf{y}<em j_i="j|i">i} = 2\sum_j\left(p</em> - q_{j|i} + p_{i|j} - q_{i|j}\right)\left(\mathbf{y}_i-\mathbf{y}_j\right)$$</p>
+<div class="math">$$\frac{\partial C}{\partial \mathbf{y}_i} = 2\sum_j\left(p_{j|i} - q_{j|i} + p_{i|j} - q_{i|j}\right)\left(\mathbf{y}_i-\mathbf{y}_j\right)$$</div>
 
 <h2 id="tsne">tSNE</h2>
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">kerasy</span><span class="o">.</span><span class="n">ML</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">tSNE</span><span class="p">(</span><span class="n">initial_momentum</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">final_momoentum</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">eta</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_gain</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">prec_max_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
 </code></pre></div>
 
-<p>As an alternative to minimizing the sum of the Kullback-Leibler divergence between a joint probability distribution $p_{j|i}$ and $q_{j|i}$, it is also possible to minimize a single Kullback-Leibler divergence between a joint probability distribution:</p>
+<p>As an alternative to minimizing the sum of the Kullback-Leibler divergence between a joint probability distribution <span class="math">\(p_{j|i}\)</span> and <span class="math">\(q_{j|i}\)</span>, it is also possible to minimize a single Kullback-Leibler divergence between a joint probability distribution:</p>
 
-<p>$$C = KL\left(P|Q\right) = \sum_i\sum_jp_{ij}\log\frac{p_{ij}}{q_{ij}}$$</p>
+<div class="math">$$C = KL\left(P\|Q\right) = \sum_i\sum_jp_{ij}\log\frac{p_{ij}}{q_{ij}}$$</div>
 
 <p>In t-SNE,
-- Employ a <b>Student t-distribution with one degree of freedom (which is the same as a Cauchy distribution)</b> as the heavy-tailed distribution in the <b>low-dimensional map.</b> Using this distribution, the joint probabilities $q_{ij}$ are defined as
-$$q_{ij} = \frac{\left(1 + |\mathbf{y}<em k_neq="k\neq" l>i-\mathbf{y}_j|^2\right)^{-1}}{\sum</em>\left(1 + |\mathbf{y}<em ij>k-\mathbf{y}_l|^2\right)^{-1}}$$
-- If there is an outlier $\mathbf{x}_i$, low-dimensional map point $\mathbf{y}_i$ has very little effect on the cost function, so set
-$$p</em> = \frac{p_{j|i} + p_{i|j}}{2n}$$
-to ensure that $\sum_jp_{ij}&gt;\frac{1}{2n}$ for all datapoints $\mathbf{x}_i$</p>
+- Employ a <b>Student t-distribution with one degree of freedom (which is the same as a Cauchy distribution)</b> as the heavy-tailed distribution in the <b>low-dimensional map.</b> Using this distribution, the joint probabilities <span class="math">\(q_{ij}\)</span> are defined as
+</p>
+
+<div class="math">$$q_{ij} = \frac{\left(1 + \|\mathbf{y}_i-\mathbf{y}_j\|^2\right)^{-1}}{\sum_{k\neq l}\left(1 + \|\mathbf{y}_k-\mathbf{y}_l\|^2\right)^{-1}}$$</div>
+
+<p>
+- If there is an outlier <span class="math">\(\mathbf{x}_i\)</span>, low-dimensional map point <span class="math">\(\mathbf{y}_i\)</span> has very little effect on the cost function, so set
+</p>
+
+<div class="math">$$p_{ij} = \frac{p_{j|i} + p_{i|j}}{2n}$$</div>
+
+<p>
+to ensure that <span class="math">\(\sum_jp_{ij}&gt;\frac{1}{2n}\)</span> for all datapoints <span class="math">\(\mathbf{x}_i\)</span></p>
 
 <p>The gradient is given by</p>
 
-<p>$$\frac{\partial C}{\partial \mathbf{y}<em ij>i} = 4\sum_j\left(p</em> - q_{ij}\right) \left(\mathbf{y}_i - \mathbf{y}_j\right)\left(1 + |\mathbf{y}_i - \mathbf{y}_j|^2\right)^{-1}$$</p>
+<div class="math">$$\frac{\partial C}{\partial \mathbf{y}_i} = 4\sum_j\left(p_{ij} - q_{ij}\right) \left(\mathbf{y}_i - \mathbf{y}_j\right)\left(1 + \|\mathbf{y}_i - \mathbf{y}_j\|^2\right)^{-1}$$</div>
 
 <div class="admonition reference">
   <p class="admonition-title">Reference</p>
@@ -584,28 +594,45 @@ to ensure that $\sum_jp_{ij}&gt;\frac{1}{2n}$ for all datapoints $\mathbf{x}_i$<
 </tr>
 <tr>
 <td align="center">probability in <strong>high-dimensional space</strong></td>
-<td align="center" i j_mid="j\mid">$$p_</td>
-<td align="center" i_mid="i\mid" j>$$p_</td>
+<td align="center">
+<div class="math">$$p_{j\mid i} = \frac{\exp\left(-\|x_i-x_j\|^2/2\sigma_i^2\right)}{\sum_{k\neq i}\exp\left(-\|x_i-x_k\|^2/2\sigma_i^2\right)}$$</div>
+</td>
+<td align="center">
+<div class="math">$$p_{i\mid j} = \exp\left(-\frac{d(x_i,x_j)-\rho_i}{\sigma_i}\right), \quad \rho_i = \min_{j\neq i}\left\{d(x_i,x_j)\right\}$$</div>
+</td>
 </tr>
 <tr>
 <td align="center">joint probability in <strong>high-dimensional space</strong></td>
-<td align="center" ij>$$p_</td>
-<td align="center" ij>$$p_</td>
+<td align="center">
+<div class="math">$$p_{ij}=\frac{p_{i\mid j}+p_{j\mid i}}{2N}$$</div>
+</td>
+<td align="center">
+<div class="math">$$p_{ij} = p_{i\mid j} + p_{j\mid i} - p_{i\mid j}p_{j\mid i}$$</div>
+</td>
 </tr>
 <tr>
 <td align="center"></td>
-<td Perplexity align="center">$$\text</td>
-<td align="center"><strong>number of nearest neighbors</strong>$$k = 2^{\sum_jp_{i\mid j}}$$</td>
+<td align="center">
+<div class="math">$$\text{Perplexity} = 2^{-\sum_j p_{j\mid i}\log_2p_{j\mid i}}$$</div>
+</td>
+<td align="center"><strong>number of nearest neighbors</strong><div class="math">$$k = 2^{\sum_jp_{i\mid j}}$$</div>
+</td>
 </tr>
 <tr>
 <td align="center">probability in <strong>low-dimensional space</strong></td>
-<td align="center" ij>$$q_</td>
-<td align="center" ij>$$q_</td>
+<td align="center">
+<div class="math">$$q_{ij}=\frac{\left(1 + \|y_i-y_j\|^2\right)^{-1}}{\sum_{k\neq i}\left(1 + \|y_i-y_k\|^2\right)^{-1}}$$</div>
+</td>
+<td align="center">
+<div class="math">$$q_{ij} = \left(1 + a(y_i-y_j)^{2b}\right)^{-1}$$</div>
+</td>
 </tr>
 <tr>
 <td align="center">loss function</td>
-<td KL align="center">$\mathrm</td>
-<td CE align="center">$$\mathrm</td>
+<td align="center"><span class="math">\(\mathrm{KL}(P_i\|Q_i) = \sum_i\sum_jp_{j\mid i}\log\frac{p_{j\mid i}}{q_{j\mid i}}\)</span></td>
+<td align="center">
+<div class="math">$$\mathrm{CE}(X,Y) = \sum_i\sum_j\left[p_{ij}(X)\log\left(\frac{p_{ij}(X)}{q_{ij}(Y)}\right) + \left(1-p_{ij}(X)\right)\log\left(\frac{1-p_{ij}(X)}{1-q_{ij}(Y)}\right)\right]$$</div>
+</td>
 </tr>
 <tr>
 <td align="center">Optimization</td>
@@ -614,8 +641,12 @@ to ensure that $\sum_jp_{ij}&gt;\frac{1}{2n}$ for all datapoints $\mathbf{x}_i$<
 </tr>
 <tr>
 <td align="center">Gradients</td>
-<td _partial_mathrm_KL="\partial\mathrm{KL" align="center">$$\frac</td>
-<td align="center">$$\frac{\partial\mathrm{CE}}{\partial y_i} = \sum_j\left<a href="y_i-y_j">\frac{2abd_{ij}^{2(b-1)}P(X)}{1 + ad_{ij}^{2b}}-\frac{2b(1-P(X))}{d_{ij}^2\left(1 + ad_{ij}^{2b}\right)}\right</a>$$</td>
+<td align="center">
+<div class="math">$$\frac{\partial\mathrm{KL}}{\partial y_i} = 4\sum_j(p_{ij}-q_{ij})(y_i-y_j)\left(1 + \|y_i-y_j\|^2\right)^{-1}$$</div>
+</td>
+<td align="center">
+<div class="math">$$\frac{\partial\mathrm{CE}}{\partial y_i} = \sum_j\left[\frac{2abd_{ij}^{2(b-1)}P(X)}{1 + ad_{ij}^{2b}}-\frac{2b(1-P(X))}{d_{ij}^2\left(1 + ad_{ij}^{2b}\right)}\right](y_i-y_j)$$</div>
+</td>
 </tr>
 <tr>
 <td align="center">Initial low-dimensional coordinates</td>
@@ -624,6 +655,68 @@ to ensure that $\sum_jp_{ij}&gt;\frac{1}{2n}$ for all datapoints $\mathbf{x}_i$<
 </tr>
 </tbody>
 </table>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        fonts: [['STIX', 'TeX']]," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
 
 <!-- EoC -->
 

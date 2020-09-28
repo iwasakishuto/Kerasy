@@ -320,15 +320,15 @@
         <div class="row info-bar" style="margin-left:0rem;margin-bottom:6px;">
     <div class="small-12 columns">
         <ul class="inline-list">
-            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-23(金)</span></li>
+            <li><span><i class="fa fa-calendar"></i>&nbsp; 2019-08-23(Fri)</span></li>
             <li><span><i class="far fa-file-code"></i>&nbsp; <a href="https://github.com/iwasakishuto/Kerasy/blob/gh-pages/kerasy/activations.py">activations.py</a></span></li>
-            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/doc/category/deeplearning.html">DeepLearning</a></span></li> -->
+            <!-- <li><span><i class="fa fa-folder-open"></i>&nbsp; <a href="https://iwasakishuto.github.io/Kerasy/category/deeplearning.html">DeepLearning</a></span></li> -->
         </ul>
     </div>
 </div>
 <section class="article">
 <!-- SoC -->
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+<body><div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>A <strong>computational graph</strong> is a directed graph where</p>
@@ -338,20 +338,22 @@
 </ul>
 <p>By using computational graph, it is possible to obtain the final calculation result by <strong>propagating the local calculation</strong>, which <strong>simplifies</strong> the problem.</p>
 <p>Especially in the backpropagation method, the <strong>"chain rule"</strong> is exactly the localization of the calculation, so it has good compatibility.</p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><img alt="計算グラフの逆伝播" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/BackPropagation.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/BackPropagation.png" alt="計算グラフの逆伝播"></p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Chain-rule-vs.-Computational-graph">Chain rule vs. Computational graph<a class="anchor-link" href="#Chain-rule-vs.-Computational-graph">¶</a></h3>$$\text{ex.)}\quad z=(x+y)^2$$<table>
+<h3 id="Chain-rule-vs.-Computational-graph">Chain rule vs. Computational graph<a class="anchor-link" href="#Chain-rule-vs.-Computational-graph">&#182;</a></h3>$$\text{ex.)}\quad z=(x+y)^2$$<table>
 <thead><tr>
 <th style="text-align:center">Chain rule</th>
 <th style="text-align:center">Computational graph</th>
@@ -360,10 +362,11 @@
 <tbody>
 <tr>
 <td style="text-align:center">$$\begin{cases}z = t^2\\t = x+y\end{cases}\\ \Longrightarrow\frac{\partial z}{\partial x} = \frac{\partial z}{\partial t} \times \frac{\partial t}{\partial x}$$</td>
-<td style="text-align:center"><img alt="computational graph" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/ChainRule.png" /></td>
+<td style="text-align:center"><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/ChainRule.png" alt="computational graph"></td>
 </tr>
 </tbody>
 </table>
+
 </div>
 </div>
 </div>
@@ -371,15 +374,15 @@
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <div class="admonition summary">
-<p class="admonition-title" style="font-size: 125%;">Various operation nodes</p>
-<p>Let's look at backpropagation in various nodes.</p>
-<ul>
-<li><a href="#add">Add</a></li>
-<li><a href="#multiple">Multiple</a></li>
-<li><a href="#inverse">Inverse</a></li>
-<li><a href="#exp">exp</a></li>
-<li><a href="#dot">dot</a></li>
-</ul>
+  <p class="admonition-title" style="font-size: 125%;">Various operation nodes</p>
+  <p>Let's look at backpropagation in various nodes.</p>
+  <ul>    
+    <li><a href="#add">Add</a></li>
+    <li><a href="#multiple">Multiple</a></li>
+    <li><a href="#inverse">Inverse</a></li>
+    <li><a href="#exp">exp</a></li>
+    <li><a href="#dot">dot</a></li>
+  </ul>
 </div>
 </div>
 </div>
@@ -396,8 +399,9 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>Therefore, the backpropagation of the <code>Add</code> node is expressed as follows:</p>
-<p><img alt="Add node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/add.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/add.png" alt="Add node"></p>
 <p>※ <strong>Just pass</strong> the differential value transmitted from the upstream to the downstream.</p>
+
 </div>
 </div>
 </div>
@@ -413,8 +417,9 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>Therefore, the backpropagation of the <code>Mul</code> node is expressed as follows:</p>
-<p><img alt="Mul node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/multiple.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/multiple.png" alt="Mul node"></p>
 <p>※ Multiply the "turned over value" of the input signal.</p>
+
 </div>
 </div>
 </div>
@@ -425,8 +430,9 @@ $$<p>Therefore, the backpropagation of the <code>Mul</code> node is expressed as
 $$
 \frac{\partial y}{\partial x} = -\frac{1}{x^2} = -y^2
 $$<p>Therefore, the backpropagation of the <code>Inverse</code> node is expressed as follows:</p>
-<p><img alt="Inverse node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/inverse.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/inverse.png" alt="Inverse node"></p>
 <p>※ Multiply the minus square of "the output of forward propagation".</p>
+
 </div>
 </div>
 </div>
@@ -437,8 +443,9 @@ $$<p>Therefore, the backpropagation of the <code>Inverse</code> node is expresse
 $$
 \frac{\partial y}{\partial x} = \exp\left(x\right) = y
 $$<p>Therefore, the backpropagation of the <code>exp</code> node is expressed as follows:</p>
-<p><img alt="exp node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/exp.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/exp.png" alt="exp node"></p>
 <p>※ Multiply the minus square of "the output of forward propagation".</p>
+
 </div>
 </div>
 </div>
@@ -446,12 +453,12 @@ $$<p>Therefore, the backpropagation of the <code>exp</code> node is expressed as
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <div class="admonition summary">
-<p class="admonition-title" style="font-size: 125%;">Connecting nodes</p>
-<p>By connecting the above four nodes, we can easily calculate the backpropagation of <b>Softmax</b> and <b>Cross Entropy Error</b></p>
-<img alt="Softmax-with-Loss" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/Softmax-with-Loss.png" />
-<details>
-<summary>Supplementary explanation</summary>
-<p>The backpropagation of the <b>Softmax</b> can be expressed as follows.</p>
+  <p class="admonition-title" style="font-size: 125%;">Connecting nodes</p>
+  <p>By connecting the above four nodes, we can easily calculate the backpropagation of <b>Softmax</b> and <b>Cross Entropy Error</b></p>
+  <img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/Softmax-with-Loss.png" alt="Softmax-with-Loss">
+  <details>
+    <summary>Supplementary explanation</summary>
+    <p>The backpropagation of the <b>Softmax</b> can be expressed as follows.</p>
     $$
     \begin{cases}
         \begin{aligned}
@@ -477,32 +484,33 @@ $$
   \end{aligned}
 \end{cases}
 $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as follows:</p>
-<p><img alt="dot node" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/affine.png" alt="dot node"></p>
 <p>※ You can easily understand the content of the figure above by decomposing a matrix calculation into its elements and using a computational graphs in smaller units.</p>
-<p><img alt="dot node (decomposed)" src="https://iwasakishuto.github.io/Kerasy/doc/theme/img/ComputationalGraph/affine_element.png" /></p>
+<p><img src="https://iwasakishuto.github.io/Kerasy/theme/img/ComputationalGraph/affine_element.png" alt="dot node (decomposed)"></p>
+
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Implementation">Implementation<a class="anchor-link" href="#Implementation">¶</a></h3>
+<h3 id="Implementation">Implementation<a class="anchor-link" href="#Implementation">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Add">Add<a class="anchor-link" href="#Add">¶</a></h4>
+<h4 id="Add">Add<a class="anchor-link" href="#Add">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [1]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Add</span><span class="p">:</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Add</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
@@ -516,23 +524,25 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
 
         <span class="k">return</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span>
 </pre></div>
+
+    </div>
 </div>
 </div>
-</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Mul">Mul<a class="anchor-link" href="#Mul">¶</a></h4>
+<h4 id="Mul">Mul<a class="anchor-link" href="#Mul">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [2]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Mul</span><span class="p">:</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Mul</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="kc">None</span>
@@ -550,23 +560,25 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
 
         <span class="k">return</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span>
 </pre></div>
+
+    </div>
 </div>
 </div>
-</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Inverse">Inverse<a class="anchor-link" href="#Inverse">¶</a></h4>
+<h4 id="Inverse">Inverse<a class="anchor-link" href="#Inverse">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [1]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Inverse</span><span class="p">:</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Inverse</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -581,23 +593,25 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
 
         <span class="k">return</span> <span class="n">dx</span>
 </pre></div>
+
+    </div>
 </div>
 </div>
-</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="exp">exp<a class="anchor-link" href="#exp">¶</a></h4>
+<h4 id="exp">exp<a class="anchor-link" href="#exp">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [4]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Exp</span><span class="p">:</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">Exp</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -612,33 +626,35 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
 
         <span class="k">return</span> <span class="n">dx</span>
 </pre></div>
+
+    </div>
 </div>
 </div>
-</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="dot">dot<a class="anchor-link" href="#dot">¶</a></h4>
+<h4 id="dot">dot<a class="anchor-link" href="#dot">&#182;</a></h4>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In [5]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
-<div class="input_area">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DotLayer</span><span class="p">:</span>
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">class</span> <span class="nc">DotLayer</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">):</span>
-        <span class="sd">"""</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        @param X   : shape=(1,a)</span>
 <span class="sd">        @param W   : shape=(a,b)</span>
 <span class="sd">        @return out: shape=(1,b)</span>
-<span class="sd">        """</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">W</span> <span class="o">=</span> <span class="n">W</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W</span><span class="p">)</span> <span class="c1"># shape=(1,b)</span>
@@ -646,38 +662,42 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dout</span><span class="p">):</span>
-        <span class="sd">"""</span>
+        <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        @param dout: shape=(1,b)</span>
 <span class="sd">        @return dX : shape=(1,a)</span>
 <span class="sd">        @return dW : shape=(a,b)</span>
-<span class="sd">        """</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
         <span class="n">dW</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dout</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">dX</span><span class="p">,</span><span class="n">dW</span>
 </pre></div>
+
+    </div>
 </div>
 </div>
-</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <div class="admonition reference">
-<p class="admonition-title">Reference</p>
-<ul>
-<li><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585">ゼロから作る Deep Learning</a> (<a href="https://github.com/oreilly-japan/deep-learning-from-scratch">Github</a>)</li>
-</ul>
+  <p class="admonition-title">Reference</p>
+  <ul>
+    <li><a href="https://www.amazon.co.jp/ゼロから作るDeep Learning ―Pythonで学ぶディープラーニングの理論と実装/dp/4873117585">ゼロから作る Deep Learning</a> (<a href="https://github.com/oreilly-japan/deep-learning-from-scratch">Github</a>)</li>
+  </ul>
 </div>
 </div>
 </div>
 </div>
 
+
+</body>
 <script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
     var mathjaxscript = document.createElement('script');
     mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
     mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript.src = '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
     mathjaxscript[(window.opera ? "innerHTML" : "text")] =
         "MathJax.Hub.Config({" +
         "    config: ['MMLorHTML.js']," +
@@ -694,6 +714,7 @@ $$<p>Therefore, the backpropagation of the <code>dot</code> node is expressed as
         "        preview: 'TeX'," +
         "    }, " +
         "    'HTML-CSS': { " +
+        " linebreaks: { automatic: true, width: '95% container' }, " +
         "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
         "    } " +
         "}); ";

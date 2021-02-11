@@ -18,7 +18,7 @@
     /* width: 320px; */
     overflow-x: hidden;
     overflow-y: scroll;
-    height: 100%;
+    height: calc(100% - 92.8125px - 45px - 12px);
     position: relative;
 }
 /*Added by Shuto Iwasaki.*/
@@ -4364,7 +4364,7 @@ p.caption::before {
   color: #fff;
   padding: 0.4045em 0.809em;
   position: relative;
-  line-height: 50px;
+  line-height: 30px;
   text-align: center;
   font-size: 100%;
   *zoom: 1
@@ -4661,12 +4661,18 @@ nav.stickynav {
     width: 85%;
     display: none
   }
+  .wy-menu.wy-menu-vertical {
+    height: calc(100% - 92.8125px - 12px);
+  }
   .rst-versions.shift {
     display: block
   }
   img {
     width: 100%;
     height: auto
+  }
+  .badge-wrapper img {
+    width: none;
   }
 }
 

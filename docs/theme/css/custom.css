@@ -43,3 +43,6 @@ h4 {
     padding: 0.25em 0.5em;
     border-left: solid 4px #800000;
 }
+.badge-wrapper img {
+    width: fit-content;
+}

@@ -97,14 +97,12 @@ pre, code, .rst-content tt, kbd, samp {
 }
 
 /* Added by Shuto Iwasaki. */
-/* Github Style. */
 pre {
-    padding: 16px;
-    overflow: auto;
-    font-size: 85%;
-    line-height: 1.45;
-    background-color: #f6f8fa;
-    border-radius: 3px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: unset;
+  border-radius: 3px;
 }
 
 q {
@@ -3619,7 +3617,7 @@ code, .rst-content tt {
   background: #fff;
   border: solid 1px #e1e4e5;
   font-size: 75%;
-  font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
+  font-family: Monaco, monospace, Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace;
   color: #E74C3C;
   overflow-x: auto
 }
@@ -4694,9 +4692,10 @@ nav.stickynav {
 }
 
 .rst-content blockquote {
-  margin-left: 24px;
   line-height: 24px;
-  margin-bottom: 24px
+  margin: 1em;
+  border-left: 5px solid #eee;
+  padding: 9px 18px;
 }
 
 .rst-content .note .last, .rst-content .attention .last, .rst-content .caution .last, .rst-content .danger .last, .rst-content .error .last, .rst-content .hint .last, .rst-content .important .last, .rst-content .tip .last, .rst-content .warning .last, .rst-content .seealso .last, .rst-content .admonition-todo .last {
